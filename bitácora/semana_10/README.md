@@ -1,4 +1,4 @@
-# BITÁCORA DE PROYECTO: PARO DE LA CARRERA DE INFORMÁTICA
+# BITÁCORA DE PROYECTO: PARO DE INFORMÁTICA Y PROPUESTAS DE SOLUCIÓN
 
 **Proyecto:** Gestión y Medición de Residuos Reciclables del Hub Providencia (Desafío 04 | Sostenibilidad)  
 **Equipo:** HubCircular  
@@ -13,3 +13,4 @@
 * [1. Resumen de la Semana](1_resumen_semana.md)
 * [2. Impacto en el Proyecto](2_impacto_proyecto.md)
 * [3. Feedback de la Profesora](3_feedback_profesora.md)
+* [4. Propuestas de Solución](4_propuestas_solucion.md)
