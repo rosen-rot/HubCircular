@@ -38,7 +38,7 @@
 
 **Parte II: Pitches para la Presentación**
 
-* [19. Pitch de 1 minuto](../pitch/19_pitch_1_minuto.md)
-* [20. Pitch de 3 minutos](../pitch/20_pitch_3_minutos.md)
-* [21. Guion visual de la presentación](../pitch/21_guion_visual.md)
+* [19. Pitch de 1 minuto](../pitch/pitch_1_minuto.md)
+* [20. Pitch de 3 minutos](../pitch/pitch_3_minutos.md)
+* [21. Guion visual de la presentación](../pitch/guion_visual.md)
 * [22. Decisiones finales y próximos pasos](22_decisiones_proximos_pasos.md)
