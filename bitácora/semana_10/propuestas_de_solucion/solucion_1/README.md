@@ -6,7 +6,7 @@
 
 **Fecha de Emisión:** 22 de octubre de 2026
 
-**Estado:** propuesta consolidada de solución; no implica software ya implementado ni resultados del piloto verificados.
+**Estado:** propuesta descartada a favor de la [solución 3](../solucion_3/README.md). Propuesta consolidada de solución; no implica software ya implementado ni resultados del piloto verificados.
 **Eslogan:** *Medir, gestionar y transformar residuos en decisiones.*
 
 > **Uso y fuentes.** Este documento reúne la propuesta EcoHub discutida inicialmente, los aportes del documento del compañero («Propuesta integral de solución», HubCircular), la solución unificada y los dos pitch preparados. Se fundamenta en la ficha del Desafío 04 de `Fichas_Desafios_Capstone_2026.pdf` (Universidad Mayor, uso interno). Las arquitecturas, metas, flujos, indicadores y pantallas adicionales son **propuestas del equipo**, no exigencias literales de la ficha. Respetar el carácter interno del material fuente.
@@ -14,6 +14,8 @@
 ---
 
 ## Contenido
+
+* [0. Descripción general: pesaje manual con registro QR](0_descripcion_general.md)
 
 **Parte I: Propuesta Integral de Solución**
 
@@ -42,3 +44,7 @@
 * [20. Pitch de 3 minutos](../pitch/pitch_3_minutos.md)
 * [21. Guion visual de la presentación](../pitch/guion_visual.md)
 * [22. Decisiones finales y próximos pasos](22_decisiones_proximos_pasos.md)
+
+---
+
+[← Volver a las propuestas de solución](../README.md)

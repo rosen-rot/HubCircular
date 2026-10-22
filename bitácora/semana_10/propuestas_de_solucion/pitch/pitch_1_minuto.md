@@ -25,4 +25,4 @@
 
 ---
 
-[← Volver al índice de la semana 11](../solucion_1/README.md)
+[← Volver a las propuestas de solución](../README.md)

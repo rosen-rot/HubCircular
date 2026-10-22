@@ -19,4 +19,4 @@ El nombre final propuesto es **HubCircular**; el nombre **EcoHub** corresponde a
 
 ---
 
-[← Volver al índice de la semana 11](README.md)
+[← Volver al índice de la solución 1](README.md)

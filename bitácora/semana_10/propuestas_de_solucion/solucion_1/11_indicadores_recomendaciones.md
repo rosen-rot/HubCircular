@@ -24,4 +24,4 @@ Toda recomendación debe mostrar la regla y los datos usados; idealmente podrá 
 
 ---
 
-[← Volver al índice de la semana 11](README.md)
+[← Volver al índice de la solución 1](README.md)

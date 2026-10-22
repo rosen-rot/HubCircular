@@ -30,4 +30,4 @@ Portal de resultados agregados, material educativo de segregación, campañas y 
 
 ---
 
-[← Volver al índice de la semana 11](README.md)
+[← Volver al índice de la solución 1](README.md)

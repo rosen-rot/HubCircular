@@ -41,11 +41,12 @@ En la [semana 7](bitácora/semana_7/README.md) el equipo visitó el Hub Providen
 
 | Propuesta | Estado |
 | :-- | :-- |
-| [Solución 1: Propuesta integral HubCircular](bitácora/semana_10/propuestas_de_solucion/solucion_1/README.md) | ✅ Documentada |
-| Solución 2 | 🛠️ En desarrollo |
-| Solución 3 | 🛠️ En desarrollo |
+| [Solución 1: Pesaje manual en el retiro con registro QR](bitácora/semana_10/propuestas_de_solucion/solucion_1/README.md) | ❌ Descartada |
+| [Solución 2: Contenedores con sensor de conteo](bitácora/semana_10/propuestas_de_solucion/solucion_2/README.md) | ❌ Descartada |
+| [Solución 3: Contenedores con pesaje automático](bitácora/semana_10/propuestas_de_solucion/solucion_3/README.md) | ✅ **Seleccionada** |
 | [Pitch de 1 minuto](bitácora/semana_10/propuestas_de_solucion/pitch/pitch_1_minuto.md) · [Pitch de 3 minutos](bitácora/semana_10/propuestas_de_solucion/pitch/pitch_3_minutos.md) · [Guion visual](bitácora/semana_10/propuestas_de_solucion/pitch/guion_visual.md) | ✅ Preparados |
-| [Sistema de pesaje IoT (celda de carga + HX711 + ESP32)](bitácora/semana_11/8_sistema_pesaje_iot.md) | 🧪 Propuesto |
+
+➡️ [Comparación de las tres propuestas y decisión](bitácora/semana_10/propuestas_de_solucion/README.md) · [Sistema de pesaje IoT de la solución 3](bitácora/semana_11/8_sistema_pesaje_iot.md)
 
 ## 👥 Equipo
 
@@ -82,8 +83,9 @@ bitácora/
     assets/           ← fotografías, diagramas y material de apoyo
   semana_10/
     propuestas_de_solucion/
-      solucion_1/     ← propuesta integral de solución
-      solucion_2/
-      solucion_3/
+      README.md       ← comparación de las propuestas y decisión
+      solucion_1/     ← pesaje manual con registro QR
+      solucion_2/     ← contenedores con sensor de conteo
+      solucion_3/     ← contenedores con pesaje automático (seleccionada)
       pitch/          ← pitch de 1 y 3 minutos y guion visual
 ```

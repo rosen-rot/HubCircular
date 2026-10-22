@@ -29,4 +29,4 @@ Diseñar, implementar y validar un prototipo web que permita registrar y seguir 
 
 ---
 
-[← Volver al índice de la semana 11](README.md)
+[← Volver al índice de la solución 1](README.md)

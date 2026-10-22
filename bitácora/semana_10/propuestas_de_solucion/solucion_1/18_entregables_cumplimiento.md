@@ -30,4 +30,4 @@ Una plataforma web funcional con mediciones, trazabilidad, indicadores y resulta
 
 ---
 
-[← Volver al índice de la semana 11](README.md)
+[← Volver al índice de la solución 1](README.md)

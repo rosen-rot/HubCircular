@@ -37,4 +37,4 @@ Este ejemplo solo ilustra una maqueta. **El inventario es un saldo** calculado e
 
 ---
 
-[← Volver al índice de la semana 11](README.md)
+[← Volver al índice de la solución 1](README.md)
