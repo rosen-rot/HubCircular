@@ -18,3 +18,4 @@
 * [6. Reflexión del Equipo](6_reflexion_equipo.md)
 * [7. Conexión con el Proyecto Capstone](7_conexion_proyecto.md)
 * [8. Presentación del Pitch de 1 Minuto](8_presentacion_pitch.md)
+* [9. Actividad en Grupo: ¿Qué Demostraremos en la Feria?](9_actividad_grupo.md)
