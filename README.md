@@ -48,6 +48,17 @@ En la [semana 7](bitácora/semana_7/README.md) el equipo visitó el Hub Providen
 
 ➡️ [Comparación de las tres propuestas y decisión](bitácora/semana_10/propuestas_de_solucion/README.md) · [Sistema de pesaje IoT de la solución 3](bitácora/semana_11/8_sistema_pesaje_iot.md)
 
+## 🛠️ Producto Mínimo Viable (MVP)
+
+> **Objetivo:** que una bolsa depositada en el contenedor aparezca en el dashboard como un ingreso en kg, enviado por Wi-Fi, sin que nadie escriba nada.
+
+| Parte | Tecnología | Responsable | Estado |
+| :-- | :-- | :-- | :-- |
+| [MVP del Software](mvp/software/README.md) | Python + FastAPI + SQLite, servidor local | Carlos Concha | ✅ Definido |
+| [MVP del Hardware](mvp/hardware/README.md) | Celda de carga + HX711 + ESP32 + HC-SR04 | Vicente Lizama | ✅ Definido |
+
+➡️ [Contrato entre hardware y software (API de lecturas)](mvp/software/3_api_datos.md) · [Conexiones](mvp/hardware/3_conexiones.md) · Validación: [software](mvp/software/7_validacion.md) / [hardware](mvp/hardware/7_validacion.md)
+
 ## 👥 Equipo
 
 | Integrante | Rol |
@@ -77,6 +88,10 @@ En la [semana 7](bitácora/semana_7/README.md) el equipo visitó el Hub Providen
 ## 🗂️ Estructura del Repositorio
 
 ```
+mvp/
+  README.md         ← objetivo del MVP y relación hardware–software
+  software/         ← MVP del software (API, reglas, dashboard, pruebas)
+  hardware/         ← MVP del hardware (conexiones, firmware, montaje, calibración)
 bitácora/
   semana_N/
     README.md         ← índice de la semana: datos generales y enlaces a cada sección
