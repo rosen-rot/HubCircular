@@ -24,7 +24,7 @@ Respuestas del equipo a las preguntas de la actividad en grupo de la clase 12. S
 
 Cada prueba se registra con fecha, responsable, condiciones, resultados, fallas y cambios. Las tablas y fotos se guardan en `assets/` de la semana en que se realizan.
 
-## 9.3 ¿Cómo lo presentaremos en la feria y quién presentará el pitch?
+## 9.3 ¿Cómo lo presentaremos en la feria?
 
 **Stand:**
 
@@ -44,7 +44,6 @@ Cada prueba se registra con fecha, responsable, condiciones, resultados, fallas 
 | :-- | :-- |
 | Explicar el hardware y la medición | Vicente Lizama |
 | Explicar el software y el dashboard | Carlos Concha |
-| Competencia de pitch (2 integrantes) | Débora Cáceres y Carlos Concha |
 
 ## 9.4 ¿Qué haremos si el proyecto no resulta como esperamos?
 

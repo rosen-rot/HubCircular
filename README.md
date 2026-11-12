@@ -9,7 +9,7 @@
 ![Desafío](https://img.shields.io/badge/Desaf%C3%ADo-04-2e7d32?style=for-the-badge)
 ![Área](https://img.shields.io/badge/%C3%81rea-Sostenibilidad-43a047?style=for-the-badge)
 ![Curso](https://img.shields.io/badge/Capstone-Intermedio-1565c0?style=for-the-badge)
-![Bitácora](https://img.shields.io/badge/Bit%C3%A1cora-Semana%2013-f9a825?style=for-the-badge)
+![Bitácora](https://img.shields.io/badge/Bit%C3%A1cora-Semana%2014-f9a825?style=for-the-badge)
 
 <img src="bitácora/semana_7/assets/foto_grupal.jpeg" alt="Equipo HubCircular en la visita al Hub Providencia" width="720">
 
@@ -84,6 +84,7 @@ En la [semana 7](bitácora/semana_7/README.md) el equipo visitó el Hub Providen
 | 11 | [Ficha de observación y sistema de pesaje](bitácora/semana_11/README.md) | [Resumen](bitácora/semana_11/1_resumen_sesion.md) · [Fotografía](bitácora/semana_11/2_fotografia_equipo.md) · [Ficha de observación](bitácora/semana_11/3_ficha_observacion.md) · [Registro individual](bitácora/semana_11/4_registro_individual.md) · [Observación grupal](bitácora/semana_11/5_observacion_grupal.md) · [Síntesis del equipo](bitácora/semana_11/6_sintesis_equipo.md) · [Conexión con el proyecto](bitácora/semana_11/7_conexion_proyecto.md) · [Sistema de pesaje IoT](bitácora/semana_11/8_sistema_pesaje_iot.md) · [Lista de materiales](bitácora/semana_11/9_lista_materiales.md) |
 | 12 | [Sin clases y práctica del pitch](bitácora/semana_12/README.md) | [Resumen](bitácora/semana_12/1_resumen_semana.md) · [Práctica del pitch](bitácora/semana_12/2_practica_pitch.md) |
 | 13 | [Desafío del marshmallow y presentación del pitch](bitácora/semana_13/README.md) | [Resumen](bitácora/semana_13/1_resumen_sesion.md) · [Fotografía](bitácora/semana_13/2_fotografia_equipo.md) · [Retroalimentación de informes](bitácora/semana_13/3_retroalimentacion_informes.md) · [Calendario Unidad 3](bitácora/semana_13/4_calendario_unidad3.md) · [Desafío del marshmallow](bitácora/semana_13/5_desafio_marshmallow.md) · [Reflexión del equipo](bitácora/semana_13/6_reflexion_equipo.md) · [Conexión con el proyecto](bitácora/semana_13/7_conexion_proyecto.md) · [Presentación del pitch](bitácora/semana_13/8_presentacion_pitch.md) · [Actividad en grupo](bitácora/semana_13/9_actividad_grupo.md) |
+| 14 | [Camino a la feria y Egg Drop Challenge](bitácora/semana_14/README.md) | [Resumen](bitácora/semana_14/1_resumen_sesion.md) · [Fotografía](bitácora/semana_14/2_fotografia_equipo.md) · [Anuncios: feria, informe y cierre](bitácora/semana_14/3_anuncios_feria.md) · [Avance del equipo](bitácora/semana_14/4_avance_equipo.md) · [Materiales faltantes](bitácora/semana_14/5_materiales_faltantes.md) · [Egg Drop Challenge](bitácora/semana_14/6_egg_drop_challenge.md) · [Registro de evidencia](bitácora/semana_14/7_registro_evidencia.md) · [Reflexión del equipo](bitácora/semana_14/8_reflexion_equipo.md) · [Conexión con el proyecto](bitácora/semana_14/9_conexion_proyecto.md) |
 
 ## 🗂️ Estructura del Repositorio
 
