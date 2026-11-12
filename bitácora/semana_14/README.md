@@ -19,3 +19,4 @@
 * [7. Registro de Evidencia de los Lanzamientos](7_registro_evidencia.md)
 * [8. Reflexión del Equipo](8_reflexion_equipo.md)
 * [9. Conexión con el Proyecto Capstone](9_conexion_proyecto.md)
+* [10. Pitch de 5 Minutos para la Feria](10_pitch_feria.md)
