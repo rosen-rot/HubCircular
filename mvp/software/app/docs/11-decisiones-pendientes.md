@@ -23,8 +23,8 @@ Detalle completo en `docs/17-auditoria-documental.md`; decisiones de diseño en 
 
 | Asunto | Estado / resolución provisional | Quién valida | Iteración |
 |---|---|---|---|
-| "Ubicación" de inventario sin entidad propia (H-01) | Provisional: ubicación = zona (ADR-005). Análisis en `docs/21` | Hub + equipo | 2 |
-| Valorización: ¿movimiento o verificación? (H-05) | Pendiente: modelar como verificación de evidencia, sin segunda salida. Análisis en `docs/21` | Equipo | 2 |
+| "Ubicación" de inventario sin entidad propia (H-01) | Provisional: ubicación = zona (ADR-005); aplicada en movimientos (ADR-019). Análisis en `docs/21` | Hub + equipo | 2 |
+| Valorización: ¿movimiento o verificación? (H-05) | Provisional aplicado (ADR-020): verificación de evidencia por texto, sin segunda salida. Análisis en `docs/21` | Equipo | 2 |
 | Fecha del KPI de valorización (despacho vs. confirmación) (H-06) | Pendiente | Hub + equipo | 3 |
 | Material del pesaje distinto del esperado del contenedor (RN-03, H-07) | Fase 1: **no se permite**; excepción justificada pendiente. Análisis en `docs/21` | Hub | 2 |
 | Cero confirmado vs. captación (H-04) | Modelar en `measurement_occurrences`; no es pesaje | Equipo | 3 |

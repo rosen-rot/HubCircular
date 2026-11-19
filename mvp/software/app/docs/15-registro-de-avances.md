@@ -79,6 +79,22 @@
 - Pruebas (Linux, PostgreSQL 16): typecheck y lint limpios; Vitest **16 archivos, 171/171**; E2E **20/20**. Sin cambios de migraciones ni de código de aplicación.
 - Supabase: el usuario volvió a ejecutar `db:seed` y informó que el contenedor global mixto funciona ; salida de `db:seed` compartida después (sin errores, sin claves impresas ⇒ se usaron `SEED_*_PASSWORD` de `.env.local`).
 
+### 2026-11-18 — Iteración 2: Trazabilidad (movimientos, destinos, evidencia, verificación)
+- Agente / rama / commit: Claude (Cowork) · `main` · commit «Iteración 2…» (ver `git log`).
+- Objetivo: saldo por lote y ubicación con movimientos auditables (traslado, despacho, reutilización, rechazo, ajuste), correcciones sin borrado, destinos y evidencia/verificación sin segunda salida.
+- Alcance decidido con el usuario: evidencia = solo referencia de texto; destinos = catálogo con DEMO y administración básica (destino obligatorio en todo despacho); los cinco tipos con un único flujo y formulario común; ajuste y correcciones solo administrador.
+- Cambios y archivos:
+  - Nuevos: `db/migrations/0007_movements_traceability.sql`; `src/modules/movements/{schema,service,queries}.ts`; `src/app/(app)/retiros/{page,actions,movement-form}`; `src/app/(app)/destinos/{page,actions,destination-form}`; `src/app/(app)/lotes/[id]/{actions,movement-panels}`; `tests/integration/movements.test.ts`, `tests/unit/movement-schema.test.ts`, `tests/e2e/traceability.spec.ts`; `docs/22-validacion-iteracion-2.md`.
+  - Modificados: `src/lib/errors.ts`, `src/modules/identity/permissions.ts`, `src/modules/weighing/refs.ts`, `src/components/app-shell.tsx`, `src/app/(app)/lotes/[id]/page.tsx`, `db/seed/demo.ts` (3 destinos DEMO), `scripts/db-check.ts`, `tests/helpers/db.ts`, `tests/integration/hardening.test.ts` (acepta migraciones posteriores a 0006), `docs/{11,14,15,18}`, `README.md`.
+- Comandos y pruebas (resultados reales; Linux, PostgreSQL 16.15): `tsc --noEmit` ✅ · `eslint` ✅ · `next build` ✅ · Vitest **18 archivos, 225/225** (40 de integración de movimientos + 14 unitarias nuevas) · Playwright **31/31** (11 nuevas, incluida axe-core) · `db:check` local ✅. **Prueba de mutación:** sin los `FOR UPDATE`, fallan las pruebas de concurrencia. Detalle y casos de aceptación en `docs/22`.
+- Decisiones tomadas: ADR-019 (flujo único, bloqueo de lote, correcciones como movimiento inverso, coherencia DEMO/real) y ADR-020 (evidencia por texto; valorización como verificación, valor provisional de H-05).
+- Riesgos, bloqueos y cambios no confirmados:
+  - **0007 no se aplicó en Supabase** (pendiente de aprobación del usuario). Windows nativo sigue sin verificarse.
+  - H-01, H-05 y H-07 siguen abiertas con valores provisionales; sin excepciones de material ni MIXTO real.
+  - Un operador solo ve zonas de su ámbito como destino de traslado; la BD permite trasladar a cualquier zona activa si se conoce su identificador (revisar con el Hub).
+  - Sin API REST de movimientos ni archivos de evidencia; sin dashboard/CSV.
+- Próxima acción (usuario): `docs/22` sección 5 para aplicar 0007 en Supabase (solo con su aprobación) y probar `/retiros` con los datos DEMO. Después: Iteración 3.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

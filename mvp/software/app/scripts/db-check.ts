@@ -125,6 +125,19 @@ async function main() {
         );
         console.log(`Pesajes: ${c!.real} reales · ${c!.demo} DEMO · ${c!.bal} saldos de lote`);
       }
+      if (plan.applied.some((f) => f.startsWith("0007_"))) {
+        const [m] = await q<{ real: number; demo: number; dest: number; neg: number; ev: number; ver: number }>(
+          `select (select count(*) from hc.movements where data_origin = 'real')::int as real,
+                  (select count(*) from hc.movements where data_origin = 'demo')::int as demo,
+                  (select count(*) from hc.destinations)::int as dest,
+                  (select count(*) from hc.batch_location_balances where balance_g < 0)::int as neg,
+                  (select count(*) from hc.movement_evidence)::int as ev,
+                  (select count(*) from hc.movement_verifications)::int as ver`,
+        );
+        console.log(`Movimientos: ${m!.real} reales · ${m!.demo} DEMO · ${m!.dest} destinos · ${m!.ev} evidencias · ${m!.ver} verificaciones`);
+        if (m!.neg > 0) line("ERROR", `Hay ${m!.neg} saldos negativos (no debería ser posible).`);
+        else line("OK", "Ningún saldo de lote es negativo.");
+      }
     }
     await client.query("rollback");
   } finally {

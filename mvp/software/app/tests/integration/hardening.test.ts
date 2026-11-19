@@ -47,7 +47,8 @@ describe("0006 · endurecimiento", () => {
     expect(before.rows[0]).toEqual({ a: true, b: true });
 
     const plan = await planMigrations(admin);
-    expect(plan.pending).toEqual(["0006_managed_postgres_hardening.sql"]);
+    // Pendientes: 0006 y toda migración posterior (las posteriores deben dejar también cerrados anon/authenticated).
+    expect(plan.pending).toEqual(readdirSync(src).filter((f) => /^\d{4}_.*\.sql$/.test(f) && f >= "0006").sort());
     await runMigrations(admin);
 
     const exposed = await admin.query(

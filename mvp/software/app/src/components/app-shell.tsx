@@ -13,8 +13,10 @@ async function logout() {
 export function AppShell({ actor, children }: { actor: Actor; children: React.ReactNode }) {
   const items: NavItem[] = [];
   if (can(actor, "weighing:create")) items.push({ href: "/registro", label: "Registro" });
+  if (can(actor, "movement:create")) items.push({ href: "/retiros", label: "Movimientos" });
   if (can(actor, "weighing:read")) items.push({ href: "/historial", label: "Historial" });
   if (can(actor, "catalog:read")) items.push({ href: "/contenedores", label: "Contenedores" });
+  if (can(actor, "destination:manage")) items.push({ href: "/destinos", label: "Destinos" });
   const roles = [...new Set(actor.roles.map((r) => roleLabel(r.role)))].join(", ");
 
   return (

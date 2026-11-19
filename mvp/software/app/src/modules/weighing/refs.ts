@@ -1,6 +1,7 @@
-/** Referencias legibles: P-000123 (pesaje) y L-000123 (lote). */
+/** Referencias legibles: P-000123 (pesaje), L-000123 (lote) y M-000123 (movimiento). */
 export const formatWeighingRef = (n: number) => `P-${String(n).padStart(6, "0")}`;
 export const formatBatchRef = (n: number) => `L-${String(n).padStart(6, "0")}`;
+export const formatMovementRef = (n: number) => `M-${String(n).padStart(6, "0")}`;
 
 export type RefQuery =
   | { kind: "weighing"; n: number }

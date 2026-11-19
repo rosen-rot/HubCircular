@@ -140,3 +140,45 @@ export async function counts(db: TestDb) {
   const q = async (t: string) => Number((await db.admin.query(`select count(*)::int as n from hc.${t}`)).rows[0].n);
   return { weighings: await q("weighings"), batches: await q("batches"), balances: await q("batch_location_balances") };
 }
+
+/** Identificadores de ejemplo para pruebas de movimientos (todos DEMO). */
+export async function destinationId(db: TestDb, type: "gestor" | "reutilizacion" | "otro"): Promise<string> {
+  const r = await db.admin.query("select id from hc.destinations where type = $1 and data_origin = 'demo' order by name limit 1", [type]);
+  return r.rows[0].id as string;
+}
+
+export interface MovementParams {
+  batchId: string;
+  type: "traslado" | "despacho" | "reutilizacion" | "rechazo" | "ajuste";
+  quantityG: number;
+  from?: string | null;
+  to?: string | null;
+  destinationId?: string | null;
+  occurredAt?: Date | null;
+  reason?: string | null;
+  key?: string;
+}
+
+/** Llama a hc.register_movement como `hc_app` con el actor indicado (transacción propia). */
+export async function moveAs(db: TestDb, actorId: string, p: MovementParams) {
+  return db.asActor(actorId, async (c) => {
+    const r = await c.query("select * from hc.register_movement($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)", [
+      actorId,
+      p.batchId,
+      p.type,
+      p.quantityG,
+      p.from ?? null,
+      p.to ?? null,
+      p.destinationId ?? null,
+      p.occurredAt ?? null,
+      p.reason ?? null,
+      p.key ?? crypto.randomUUID(),
+    ]);
+    return r.rows[0] as { o_movement_id: string; o_movement_ref: number; o_duplicate: boolean };
+  });
+}
+
+export async function balancesOf(db: TestDb, batchId: string): Promise<Record<string, number>> {
+  const r = await db.admin.query("select zone_id, balance_g from hc.batch_location_balances where batch_id = $1", [batchId]);
+  return Object.fromEntries(r.rows.map((x) => [x.zone_id as string, Number(x.balance_g)]));
+}

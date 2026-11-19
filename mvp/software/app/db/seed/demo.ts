@@ -60,6 +60,11 @@ export async function seedDemo(db: Client, opts: SeedOptions): Promise<void> {
     // Sin tara nominal: se desconoce el peso del contenedor global; el operador la ingresa en cada pesaje.
     await upsertContainer(db, sGlobal, mat["DEMO-MIXTO"]!, "DEMO-Z01-GLOBAL-MIXTO", null);
 
+    // Destinos de ejemplo (no existe un gestor real definido; ver docs/21). Un destino DEMO solo admite lotes DEMO.
+    await upsertDestination(db, "Gestor de residuos DEMO", "gestor");
+    await upsertDestination(db, "Reutilización interna DEMO", "reutilizacion");
+    await upsertDestination(db, "Otro destino DEMO", "otro");
+
     const hashOpts = opts.fastHash ? { N: 2 ** 10, r: 8, p: 1 } : {};
     for (const key of ["admin", "operator", "reader"] as const) {
       const u = DEMO_USERS[key];
@@ -125,6 +130,14 @@ async function upsertContainer(db: Client, stationId: string, materialId: string
     `insert into hc.containers (station_id, material_id, code, tare_g, data_origin) values ($1, $2, $3, $4, 'demo')
      on conflict (code) do nothing`,
     [stationId, materialId, code, tareG],
+  );
+}
+
+async function upsertDestination(db: Client, name: string, type: "gestor" | "reutilizacion" | "otro"): Promise<void> {
+  await db.query(
+    `insert into hc.destinations (name, type, data_origin) values ($1, $2, 'demo')
+     on conflict (lower(btrim(name)), data_origin) do nothing`,
+    [name, type],
   );
 }
 

@@ -3,6 +3,12 @@
 **Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-18 (Iteración 2 — Trazabilidad):**
+- **Hecho y verificado en PostgreSQL local (ver `docs/22`):** migración 0007 (movimientos, destinos, evidencia por referencia de texto, verificaciones); los cinco movimientos con un único flujo transaccional, bloqueo del lote, saldo nunca negativo, idempotencia, correcciones sin borrado, auditoría y RLS; pantallas `/retiros`, `/destinos` y trazabilidad en el detalle del lote. **225 pruebas Vitest en 18 archivos y 31 E2E pasan** (incl. concurrencia con prueba de mutación y axe-core). Casos de aceptación 3, 4, 6 y 8 de `docs/01` cubiertos.
+- **Pendiente / no verificado:** la migración 0007 **no está aplicada en Supabase** (requiere aprobación y comandos del usuario; `docs/22` sección 5); Windows nativo; Supabase Auth; API REST de movimientos (no definida en `docs/04`); carga de archivos de evidencia (descartada por el usuario).
+- **Decisiones abiertas con valor provisional:** H-01 (ubicación = zona), H-05 (valorización = verificación sin movimiento), H-07 (sin excepciones de material). Ver ADR-019/019 y `docs/21`.
+- **Estado por iteración de `docs/07`:** Iter. 0 ✅ · Iter. 1 ✅ · Iter. 2 ✅ (local) · Iter. 3–6 ⏳.
+
 **Corte 2026-11-18 (Iteración 1.5 — Windows, Supabase, Git, validación):**
 - **Hecho y verificado (Linux + PostgreSQL 16, ver `docs/20`):** capa de conexión compatible con el pooler de Supabase (`SET LOCAL ROLE`, TLS configurable), migración 0006 de endurecimiento, `npm run db:check` (solo lectura), candados para destinos remotos, guardas que impiden pruebas destructivas fuera de PostgreSQL local, defensa de origen en la API, checksums de migración robustos ante CRLF, `docker-compose.yml` eliminado. **167 pruebas Vitest y 20 E2E pasan; `npm audit`: 0 vulnerabilidades.** Git local inicializado (sin remoto).
 - **Pendiente / no verificado:** validación funcional en Supabase (migraciones 0001–0006 **ya aplicadas** el 2026-11-18 en el proyecto de desarrollo; falta seed DEMO opcional y la lista de `docs/20` §8); `npm run dev`, typecheck, lint y pruebas en Windows (la instalación y los scripts de BD sí corrieron en Windows); Supabase Auth (ADR-014: decidido, no implementado); CSP/HSTS, gestión de usuarios y copias de seguridad antes de datos reales. El rol `hc_login` ya está en uso en Supabase (informado por el usuario).
@@ -20,7 +26,8 @@
 2. `README.md` → «Puesta en marcha» y `docs/19`. Requiere Node ≥ 20.9 y PostgreSQL ≥ 14 (la base de Supabase; para pruebas destructivas, un PostgreSQL local; **sin Docker**).
 3. Verificar el punto de partida: `npm run verify` (tipos, lint, pruebas, build) y `npm run test:e2e`.
 4. Antes de la Iteración 2: conectar y validar Supabase (`docs/19` y lista de `docs/20`, sección 8).
-5. Próxima tarea recomendada: **Iteración 2 — Trazabilidad** (`docs/07`): tabla `movements`, función transaccional de traslado/despacho/rechazo/reutilización/ajuste con `FOR UPDATE` sobre `batch_location_balances`, destinos, evidencias, correcciones auditadas, y la **prueba de concurrencia de dos retiros simultáneos**. Antes, resolver con el Hub las decisiones H-01, H-05 y H-07 (`docs/11`).
+5. Antes de seguir: aplicar 0007 en Supabase con aprobación del usuario (`docs/22`, sección 5) y repasar con el Hub H-01, H-05 y H-07 (`docs/11`, `docs/21`).
+6. Próxima tarea recomendada: **Iteración 3** (`docs/07`): dashboard consistente con las mismas reglas de saldo y captación, indicadores y exportación CSV; registrar `measurement_occurrences` («cero confirmado», ADR-012).
 
 ## Hardware
 | Componente | Estado conocido | Precaución |

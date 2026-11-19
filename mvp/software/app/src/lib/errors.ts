@@ -13,6 +13,26 @@ export type DomainErrorCode =
   | "idempotency_conflict"
   | "idempotency_key_required"
   | "container_required"
+  | "invalid_movement_type"
+  | "invalid_movement_shape"
+  | "reason_required"
+  | "batch_not_found"
+  | "destination_invalid"
+  | "destination_inactive"
+  | "destination_exists"
+  | "destination_not_found"
+  | "zone_invalid"
+  | "occurred_before_batch"
+  | "insufficient_balance"
+  | "movement_not_found"
+  | "already_corrected"
+  | "cannot_correct_correction"
+  | "verification_blocks_correction"
+  | "movement_not_verifiable"
+  | "evidence_required"
+  | "evidence_duplicate"
+  | "verification_unchanged"
+  | "movement_batch_mismatch"
   | "immutable_record"
   | "validation"
   | "unexpected";
@@ -32,6 +52,27 @@ const MESSAGES: Record<DomainErrorCode, string> = {
     "Este envío ya se registró con datos distintos. Recargue el formulario para crear un nuevo pesaje.",
   idempotency_key_required: "Falta la clave de seguridad del formulario. Recargue la página.",
   container_required: "Seleccione un contenedor.",
+  invalid_movement_type: "Tipo de movimiento no válido.",
+  invalid_movement_shape: "Los datos no corresponden al tipo de movimiento (ubicaciones o destino incorrectos).",
+  reason_required: "Ingrese un motivo de al menos 5 caracteres.",
+  batch_not_found: "No existe el lote indicado o no está dentro de su ámbito.",
+  destination_invalid: "Destino no válido para este movimiento. Revise el tipo de destino y que sea del mismo origen de datos (real/DEMO).",
+  destination_inactive: "El destino está inactivo. Elija otro o pida a un administrador que lo reactive.",
+  destination_exists: "Ya existe un destino con ese nombre.",
+  destination_not_found: "No existe el destino indicado.",
+  zone_invalid: "La ubicación indicada no existe o está inactiva.",
+  occurred_before_batch: "La fecha del movimiento no puede ser anterior al pesaje del lote.",
+  insufficient_balance: "Saldo insuficiente en la ubicación de origen: el saldo no puede quedar negativo.",
+  movement_not_found: "No existe el movimiento indicado o no está dentro de su ámbito.",
+  already_corrected: "Este movimiento ya fue corregido.",
+  cannot_correct_correction: "Una corrección no puede corregirse. Registre un movimiento nuevo si es necesario.",
+  verification_blocks_correction:
+    "El despacho tiene una valorización confirmada. Rechace primero la verificación (con motivo) para poder corregirlo.",
+  movement_not_verifiable: "Solo los despachos admiten evidencia y verificación.",
+  evidence_required: "Para confirmar la valorización se necesita al menos una evidencia registrada.",
+  evidence_duplicate: "Esa evidencia (tipo y referencia) ya está registrada en este movimiento.",
+  verification_unchanged: "La verificación ya tiene ese estado.",
+  movement_batch_mismatch: "El movimiento no corresponde al lote indicado.",
   immutable_record: "Este registro no puede modificarse ni eliminarse.",
   validation: "Revise los campos marcados.",
   unexpected: "Ocurrió un error inesperado. Intente nuevamente; si persiste, avise a un administrador.",
@@ -60,8 +101,14 @@ function defaultStatus(code: DomainErrorCode): number {
     case "forbidden":
       return 403;
     case "container_not_found":
+    case "batch_not_found":
+    case "movement_not_found":
+    case "destination_not_found":
       return 404;
     case "idempotency_conflict":
+    case "destination_exists":
+    case "evidence_duplicate":
+    case "verification_unchanged":
       return 409;
     case "unexpected":
       return 500;

@@ -4,7 +4,7 @@
 
 **Objetivo:** desarrollar una plataforma web de gestión, trazabilidad y análisis de residuos, preparada para el prototipo físico basado en ESP32.
 
-**Estado del software (2026-11-18):** Fase 1 implementada (autenticación con roles, registro manual de pesajes con lote atómico, historial, lotes y contenedores) y probada; ver «Puesta en marcha» y `docs/14-estado-actual-y-handoff.md`. Iteraciones 2–6 de `docs/07` pendientes. El paquete conserva además la documentación y referencias originales.
+**Estado del software (2026-11-18):** Fase 1 implementada (autenticación con roles, registro manual de pesajes con lote atómico, historial, lotes y contenedores) y probada; ver «Puesta en marcha» y `docs/14-estado-actual-y-handoff.md`. Iteración 2 (trazabilidad: movimientos, destinos, evidencia por texto y verificación) implementada y probada en PostgreSQL local (`docs/22`). Iteraciones 3–6 de `docs/07` pendientes. El paquete conserva además la documentación y referencias originales.
 
 ## Inicio rápido
 1. Descomprime en una carpeta permanente de trabajo.
@@ -76,10 +76,10 @@ Usuarios DEMO (rol, ámbito): `admin@demo.hubcircular.test` (administrador, toda
 Las pruebas de integración y E2E necesitan un PostgreSQL **local** con permiso para crear bases (`TEST_DATABASE_URL`); se niegan a ejecutarse contra cualquier host remoto, incluido Supabase. En Windows sin Docker: `scripts/windows/postgres-local.ps1` (ver `docs/19`, sección 5).
 
 ### Estructura del código
-`db/migrations` (SQL versionado) · `db/seed` (datos DEMO) · `src/modules/{identity,catalog,weighing,inventory}` (dominio por módulos, `docs/02`) · `src/lib` (BD, errores, tiempo) · `src/app` (rutas: `/login`, `/registro`, `/historial`, `/pesajes/[id]`, `/lotes/[id]`, `/contenedores`, `/api/weighings`) · `tests/{unit,integration,e2e}`.
+`db/migrations` (SQL versionado) · `db/seed` (datos DEMO) · `src/modules/{identity,catalog,weighing,inventory,movements}` (dominio por módulos, `docs/02`) · `src/lib` (BD, errores, tiempo) · `src/app` (rutas: `/login`, `/registro`, `/historial`, `/pesajes/[id]`, `/lotes/[id]`, `/retiros`, `/destinos`, `/contenedores`, `/api/weighings`) · `tests/{unit,integration,e2e}`.
 
 ## Estado real a 18-11-2026
-- **Software web:** Fase 1 (Iteraciones 0 y 1 de `docs/07`) implementada y probada en un entorno Linux con PostgreSQL 16 (ver `docs/15`). Iteración 1.5: capa de conexión compatible con el pooler de Supabase, migración 0006, `db:check`, candados para destinos remotos y Git local; ver `docs/20`. **No** probado en Windows nativo, **no** probado contra Supabase (sin `.env.local`), **no** desplegado.
+- **Software web:** Fase 1 (Iteraciones 0 y 1 de `docs/07`) implementada y probada en un entorno Linux con PostgreSQL 16 (ver `docs/15`). Iteración 1.5: capa de conexión compatible con el pooler de Supabase, migración 0006, `db:check`, candados para destinos remotos y Git local; ver `docs/20`. Migraciones 0001–0006 aplicadas y validadas por el usuario en el proyecto Supabase de desarrollo (`docs/20`). Iteración 2 (movimientos, destinos, evidencia y verificación) probada en PostgreSQL local (`docs/22`); su migración 0007 **no** está aplicada en Supabase hasta que el usuario la apruebe. **No** probado en Windows nativo completo (solo `npm ci` y scripts de base de datos); **no** desplegado.
 - ESP32-WROOM-32D: sketch de prueba subido y mensajes seriales comprobados.
 - HX711: recibido; conexión y lectura **pendientes**, pines por soldar según evidencia disponible.
 - Celda de carga: vendida como 50 kg, **tres cables**, probablemente medio puente; pinout y capacidad real sin medir, montaje no calibrado.

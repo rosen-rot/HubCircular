@@ -7,6 +7,13 @@ import type { Actor, AppRole } from "./types";
  */
 export type Permission =
   | "weighing:create"
+  | "movement:create"
+  | "movement:adjust"
+  | "movement:correct"
+  | "movement:read"
+  | "evidence:add"
+  | "verification:decide"
+  | "destination:manage"
   | "weighing:read"
   | "batch:read"
   | "catalog:read"
@@ -15,6 +22,13 @@ export type Permission =
 
 const MATRIX: Record<Permission, AppRole[]> = {
   "weighing:create": ["administrador", "operador"],
+  "movement:create": ["administrador", "operador"],
+  "movement:adjust": ["administrador"],
+  "movement:correct": ["administrador"],
+  "movement:read": ["administrador", "operador", "lector"],
+  "evidence:add": ["administrador", "operador"],
+  "verification:decide": ["administrador"],
+  "destination:manage": ["administrador"],
   "weighing:read": ["administrador", "operador", "lector"],
   "batch:read": ["administrador", "operador", "lector"],
   "catalog:read": ["administrador", "operador", "lector"],
