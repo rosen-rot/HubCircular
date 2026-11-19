@@ -51,6 +51,15 @@
   - El historial de Git se armó fuera de la carpeta y se trasladó; la autoría local es «Claude (Cowork)».
 - Próxima acción (usuario): seguir `docs/19` secciones 1–4 (verificar entorno, crear `.env.local`, `db:check`, `--dry-run`) y **aprobar** la migración; luego la lista de `docs/20` sección 8. Después, decidir H-01/H-05/H-07 con el Hub y comenzar la Iteración 2.
 
+### 2026-11-18 — Conexión y migración en Supabase (ejecutadas por el usuario)
+- Agente / rama / commit: usuario en PowerShell + Claude (Cowork) · `main`.
+- Objetivo: conectar con el proyecto Supabase de desarrollo y aplicar las migraciones con aprobación explícita.
+- Cambios: `npm ci` en Windows (414 paquetes, 0 vulnerabilidades); corrección de `scripts/db-check.ts` (mide el TLS del tramo equipo→servidor; con pooler `pg_stat_ssl` daba un falso «sin TLS»); migraciones 0001–0006 aplicadas en Supabase (esquema `hc` y rol `hc_app` creados; ningún otro esquema tocado).
+- Comandos y resultados (salida real del usuario): `db:check` previo sin errores; `db:migrate -- --dry-run` ⇒ 6 pendientes; `db:migrate` ⇒ 6 aplicadas; `db:check` posterior sin errores (TLS, `SET LOCAL ROLE hc_app`, RLS, sin privilegios de anon/authenticated, 0 pendientes, 0 pesajes). Primera ejecución nativa en Windows de Node 24.13/npm 11.6 con las dependencias del proyecto: instalación y scripts de BD funcionan; `npm run dev`, typecheck, lint y pruebas **aún no ejecutados en Windows**.
+- Decisiones: sin cambios. Pendiente decidir si se carga el seed DEMO en Supabase (opcional, con `CONFIRM_REMOTE_SEED`).
+- Riesgos: `DATABASE_URL` aún usa el usuario `postgres` (ver `hc_login` en `docs/19`); validación funcional en Supabase pendiente (`docs/20`, sección 8).
+- Próxima acción: seed DEMO opcional, `npm run dev` y la lista de validación.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

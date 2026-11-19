@@ -5,7 +5,7 @@
 ## Software web
 **Corte 2026-11-18 (Iteración 1.5 — Windows, Supabase, Git, validación):**
 - **Hecho y verificado (Linux + PostgreSQL 16, ver `docs/20`):** capa de conexión compatible con el pooler de Supabase (`SET LOCAL ROLE`, TLS configurable), migración 0006 de endurecimiento, `npm run db:check` (solo lectura), candados para destinos remotos, guardas que impiden pruebas destructivas fuera de PostgreSQL local, defensa de origen en la API, checksums de migración robustos ante CRLF, `docker-compose.yml` eliminado. **167 pruebas Vitest y 20 E2E pasan; `npm audit`: 0 vulnerabilidades.** Git local inicializado (sin remoto).
-- **Pendiente / no verificado:** conexión y migración en el proyecto Supabase «HubCircular» (requiere que el usuario cree `.env.local` y apruebe; ver `docs/19`); ejecución en Windows nativo y scripts `.ps1` (no ejecutados); Supabase Auth (ADR-014: decidido, no implementado); rol `hc_login`, CSP/HSTS y gestión de usuarios antes de datos reales.
+- **Pendiente / no verificado:** validación funcional en Supabase (migraciones 0001–0006 **ya aplicadas** el 2026-11-18 en el proyecto de desarrollo; falta seed DEMO opcional y la lista de `docs/20` §8); `npm run dev`, typecheck, lint y pruebas en Windows (la instalación y los scripts de BD sí corrieron en Windows); Supabase Auth (ADR-014: decidido, no implementado); rol `hc_login`, CSP/HSTS y gestión de usuarios antes de datos reales.
 - **Decisiones abiertas con análisis** (`docs/21`): H-01 ubicación, H-05 valorización, H-07 excepciones de material. Ninguna está resuelta.
 
 **Corte 2026-11-18 (fin de la sesión de Fase 1):**

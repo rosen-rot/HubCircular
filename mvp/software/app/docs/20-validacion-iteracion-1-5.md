@@ -11,7 +11,7 @@ Fecha: 2026-11-18. Este documento separa **lo verificado con evidencia**, **lo q
 | Next.js | 16.4.6 |
 | PostgreSQL | 16.15 local, puerto 54329, creado para la sesión sin Docker |
 | Equipo del usuario | Windows x64 (Electron/Node 24 de la app de escritorio). El shell remoto disponible allí es una **VM Linux**, no PowerShell; no se puede ejecutar Node/Git nativos de Windows desde la sesión |
-| Proyecto Supabase | **No conectado**: no existe `.env.local` en la carpeta y las credenciales no se piden por chat |
+| Proyecto Supabase | Conectado **después**, por el usuario desde su PowerShell (Windows, Node 24.13, npm 11.6, Git 2.53); `.env.local` creado por él, sin compartir credenciales |
 
 ## 2. Resultados de pruebas (cifras exactas)
 
@@ -41,7 +41,7 @@ Comprobaciones de candados ejecutadas a mano (sin conexión: se rechazan antes d
 | Destino | Estado |
 |---|---|
 | PostgreSQL local de pruebas (Linux) | Migraciones **0001–0006 aplicadas y comprobadas** con `db:check` (sin errores): `SET LOCAL ROLE hc_app` funciona, RLS en las 13 tablas de negocio de `hc` (más `schema_migrations`, tabla de control), `anon`/`authenticated` sin privilegios, 0 migraciones pendientes. Seed DEMO cargado. |
-| **Supabase «HubCircular»** | **Ninguna migración ejecutada.** Estado desconocido; sin verificar. Pasos y aprobación requeridos en `docs/19` (secciones 2–4). |
+| **Supabase «HubCircular»** (proyecto de desarrollo, PostgreSQL 17.11, pooler de sesión sa-east-1) | **Migraciones 0001–0006 aplicadas el 2026-11-18** por el usuario, con su aprobación explícita y `CONFIRM_REMOTE_MIGRATION`. `db:check` posterior (salida pegada por el usuario) sin errores: TLS desde el equipo OK, `SET LOCAL ROLE hc_app` OK, RLS en todas las tablas de `hc`, `anon`/`authenticated` sin privilegios, 0 pendientes; esquemas ajenos (`auth`, `storage`, `realtime`, `vault`…) intactos y `public` con 0 tablas. Pesajes: 0 reales, 0 DEMO. **Aún sin validar** en Supabase: seed DEMO, persistencia, roles/ámbitos e idempotencia (lista de la sección 8). |
 
 Cambios a la base introducidos por la iteración: **solo** la migración nueva `0006_managed_postgres_hardening.sql` (no se editó ninguna ya existente; los checksums de 0001–0005 no cambian).
 
@@ -71,7 +71,7 @@ Repositorio local inicializado en la carpeta del proyecto, rama `main`, **sin re
 
 | Pendiente | Bloqueo / quién |
 |---|---|
-| Conexión y migración en Supabase | Requiere que el usuario cree `.env.local` y apruebe `db:migrate` (`docs/19`) |
+| ~~Conexión y migración en Supabase~~ | **Hecho** (ver sección 4) |
 | Validación en Supabase de persistencia, roles y ámbitos, idempotencia, saldos y separación DEMO/real | Después de migrar; lista en la sección 8 |
 | Ejecución en Windows nativo (`npm ci`, `dev`, `localhost:3000`, scripts `.ps1`) | Solo el usuario; el asistente no tiene PowerShell |
 | Pruebas de integración/E2E en Windows | Requiere PostgreSQL local portable (`docs/19`, sección 5) |
