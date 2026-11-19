@@ -117,6 +117,13 @@
 - Riesgos, bloqueos y cambios no confirmados: **0008 y 0009 NO aplicadas en Supabase** (0008 cambia la firma de `auth_resolve_session`: aplicar junto con el código nuevo); **Supabase Auth no probado contra el servicio real** (respuestas simuladas); respaldo y cabeceras sin probar en Supabase/producción ni en Windows nativo; pg_dump 16 probado, el servidor de Supabase es 17 (se necesita cliente ≥ 17). Los respaldos contienen hashes de contraseña.
 - Próxima acción: el usuario decide si aplica 0008 (y 0009) con respaldo previo (`docs/23` §3 y §5); primera corrida real de `db:backup`/`db:restore-check`; confirmar copias de Supabase; luego Iteración 3 y decisiones H-01/H-05/H-07.
 
+### 2026-11-19 — Migraciones 0008 y 0009 aplicadas en Supabase (ejecutadas por el usuario)
+- Agente / rama / commit: usuario en PowerShell + Claude (Cowork) · `main`.
+- Comandos y resultados (salida real del usuario): `db:migrate -- --dry-run` ⇒ aplicadas 7, pendientes 0008 y 0009; `db:migrate` con `CONFIRM_REMOTE_MIGRATION` ⇒ «Migraciones aplicadas: 0008, 0009»; `db:check` posterior sin errores: PostgreSQL 17.11, TLS cifrado, `SET LOCAL ROLE hc_app` funciona, RLS en las 18 tablas de `hc`, `anon`/`authenticated` sin privilegios, 9 migraciones y 0 pendientes, `Pesajes: 0 reales · 6 DEMO · 6 saldos`, `Movimientos: 0 reales · 1 DEMO · 4 destinos · 1 evidencias · 1 verificaciones`, ningún saldo negativo.
+- Observaciones: los conteos de movimientos y destinos (antes 0 y 3) indican datos DEMO creados por el usuario en sus pruebas manuales; no se pidió ni se recibió detalle.
+- **No informado / sin verificar:** el usuario no compartió la salida de `db:backup`, por lo que **no consta** que se haya hecho un respaldo antes de migrar ni que `db:backup` o `db:restore-check` hayan corrido en Windows; tampoco consta la prueba manual de `/usuarios` ni de la clave temporal contra Supabase, ni que se haya activado Supabase Auth (el proveedor sigue siendo `local` salvo que el usuario indique lo contrario).
+- Próxima acción: primera corrida real de `db:backup` (y `db:restore-check`), prueba manual de `/usuarios` en Supabase, confirmar las copias del plan de Supabase y decidir el proveedor de identidad (`docs/23` §3 y §5).
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

@@ -1,6 +1,6 @@
 # 23 · Seguridad previa a datos reales (cabeceras, usuarios, Supabase Auth, respaldos)
 
-**Corte:** 19 de noviembre de 2026, Chile. Todo lo de este documento se implementó y probó **en el entorno Linux de la sesión con PostgreSQL 16 local**. Las migraciones **0008 y 0009 NO están aplicadas en Supabase** y **Supabase Auth NO se probó contra el servicio real** (solo contra un servidor simulado). Lo que cuenta como verificado y lo que no está en la sección 6.
+**Corte:** 19 de noviembre de 2026, Chile. Todo lo de este documento se implementó y probó **en el entorno Linux de la sesión con PostgreSQL 16 local**. Las migraciones **0008 y 0009 fueron aplicadas en Supabase por el usuario el 19-11-2026** (`db:check` sin errores; `docs/15`) y **Supabase Auth NO se probó contra el servicio real** (solo contra un servidor simulado; el proveedor sigue siendo `local`). Lo que cuenta como verificado y lo que no está en la sección 6.
 
 ## 1. Cabeceras de seguridad (CSP, HSTS y otras) — ADR-022
 
@@ -58,7 +58,7 @@ Ver `docs/24-respaldos-y-restauracion.md`: `npm run db:backup` y `npm run db:res
 
 | # | Acción | Responsable | Estado |
 |---|---|---|---|
-| 1 | Respaldo previo y aplicación de 0008 (y 0009 si se usa Supabase Auth) en Supabase con `CONFIRM_REMOTE_MIGRATION` | Usuario | Pendiente |
+| 1 | Aplicación de 0008 y 0009 en Supabase con `CONFIRM_REMOTE_MIGRATION` | Usuario | **Hecho** el 19-11-2026 (salida real en `docs/15`); no consta respaldo previo |
 | 2 | Primera corrida real de `db:backup` y de `db:restore-check` en Windows (PostgreSQL 17 cliente) | Usuario | Pendiente |
 | 3 | Confirmar en el panel de Supabase qué copias automáticas/PITR incluye el plan (`docs/24` §6) | Usuario | Pendiente |
 | 4 | Decidir el proveedor de identidad (local o Supabase Auth) y, si es Supabase, completar la sección 3 | Usuario/equipo | Pendiente |
@@ -78,4 +78,4 @@ Ver `docs/24-respaldos-y-restauracion.md`: `npm run db:backup` y `npm run db:res
 | Mutaciones (prueba de que las pruebas detectan fallos) | Quitar el control del último administrador (6 fallos); aceptar correo sin confirmar, identidad distinta de Supabase o perfil inactivo (1 fallo cada una) |
 | Respaldo y restauración | Restauración real en base vacía: 18 tablas, 43 filas, 8 migraciones, 17 políticas, 35 funciones y RLS idénticos; 7 salvaguardas negativas verificadas |
 
-**No verificado:** Supabase Auth real (forma exacta de las respuestas, `email_confirmed_at`, límites de tasa, registro deshabilitado, correo de confirmación/SMTP); migraciones 0008/0009, respaldo y cabeceras en Supabase/producción; ejecución nativa en Windows; PostgreSQL 17 como servidor de la restauración. La validación manual de la Iteración 2 en Supabase (`docs/22`) fue informada por el usuario («está bien todo») sin detalle por paso.
+**No verificado:** Supabase Auth real (forma exacta de las respuestas, `email_confirmed_at`, límites de tasa, registro deshabilitado, correo de confirmación/SMTP); `/usuarios` y la clave temporal contra Supabase, respaldo y cabeceras en Supabase/producción; ejecución nativa en Windows; PostgreSQL 17 como servidor de la restauración. La validación manual de la Iteración 2 en Supabase (`docs/22`) fue informada por el usuario («está bien todo») sin detalle por paso.
