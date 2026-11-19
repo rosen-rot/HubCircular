@@ -1,8 +1,9 @@
 import { defineConfig, devices } from "@playwright/test";
+import { assertSafeTestUrl } from "./tests/helpers/guard";
 
 const PORT = 3100;
 export const E2E_DB = "hc_e2e";
-const adminUrl = process.env.TEST_DATABASE_URL ?? "postgres://postgres@127.0.0.1:54329/postgres";
+const adminUrl = assertSafeTestUrl(process.env.TEST_DATABASE_URL ?? "postgres://postgres@127.0.0.1:54329/postgres");
 const appUrl = adminUrl.replace(/\/[^/]*$/, `/${E2E_DB}`);
 
 export default defineConfig({

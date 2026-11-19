@@ -1,0 +1,7 @@
+# Saltos de línea estables entre Windows y Linux. Las migraciones SQL se verifican por checksum.
+* text=auto eol=lf
+*.sql text eol=lf
+*.ps1 text eol=crlf
+*.png binary
+*.pdf binary
+*.zip binary

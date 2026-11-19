@@ -14,7 +14,8 @@ export function loadMigrations(dir = path.join(process.cwd(), "db", "migrations"
     .filter((f) => /^\d{4}_.+\.sql$/.test(f))
     .sort()
     .map((name) => {
-      const sql = readFileSync(path.join(dir, name), "utf8");
+      // Se normaliza CRLF→LF: en Windows Git puede convertir los saltos de línea y el checksum no debe cambiar por ello.
+      const sql = readFileSync(path.join(dir, name), "utf8").replace(/\r\n/g, "\n");
       return { name, sql, checksum: createHash("sha256").update(sql).digest("hex") };
     });
 }
@@ -61,4 +62,32 @@ export async function runMigrations(client: Client, dir?: string): Promise<{ app
   } finally {
     await client.query("select pg_advisory_unlock($1)", [LOCK_KEY]);
   }
+}
+
+export interface MigrationPlan {
+  applied: string[];
+  pending: string[];
+  /** Migraciones aplicadas cuyo archivo cambió (checksum distinto) o que ya no existen en el repositorio. */
+  conflicts: string[];
+}
+
+/** Compara el repositorio con la BD SIN escribir nada (no crea el esquema ni la tabla de control). */
+export async function planMigrations(client: Client, dir?: string): Promise<MigrationPlan> {
+  const migrations = loadMigrations(dir);
+  const exists = (await client.query<{ t: string | null }>("select to_regclass('hc.schema_migrations')::text as t")).rows[0]?.t;
+  const done = new Map<string, string>();
+  if (exists) {
+    const { rows } = await client.query<{ name: string; checksum: string }>("select name, checksum from hc.schema_migrations");
+    for (const r of rows) done.set(r.name, r.checksum);
+  }
+  const known = new Set(migrations.map((m) => m.name));
+  const conflicts = [
+    ...migrations.filter((m) => done.has(m.name) && done.get(m.name) !== m.checksum).map((m) => `${m.name} (modificada)`),
+    ...[...done.keys()].filter((n) => !known.has(n)).map((n) => `${n} (no existe en el repositorio)`),
+  ];
+  return {
+    applied: migrations.filter((m) => done.has(m.name)).map((m) => m.name),
+    pending: migrations.filter((m) => !done.has(m.name)).map((m) => m.name),
+    conflicts,
+  };
 }

@@ -3,6 +3,11 @@
 **Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-18 (Iteración 1.5 — Windows, Supabase, Git, validación):**
+- **Hecho y verificado (Linux + PostgreSQL 16, ver `docs/20`):** capa de conexión compatible con el pooler de Supabase (`SET LOCAL ROLE`, TLS configurable), migración 0006 de endurecimiento, `npm run db:check` (solo lectura), candados para destinos remotos, guardas que impiden pruebas destructivas fuera de PostgreSQL local, defensa de origen en la API, checksums de migración robustos ante CRLF, `docker-compose.yml` eliminado. **167 pruebas Vitest y 20 E2E pasan; `npm audit`: 0 vulnerabilidades.** Git local inicializado (sin remoto).
+- **Pendiente / no verificado:** conexión y migración en el proyecto Supabase «HubCircular» (requiere que el usuario cree `.env.local` y apruebe; ver `docs/19`); ejecución en Windows nativo y scripts `.ps1` (no ejecutados); Supabase Auth (ADR-014: decidido, no implementado); rol `hc_login`, CSP/HSTS y gestión de usuarios antes de datos reales.
+- **Decisiones abiertas con análisis** (`docs/21`): H-01 ubicación, H-05 valorización, H-07 excepciones de material. Ninguna está resuelta.
+
 **Corte 2026-11-18 (fin de la sesión de Fase 1):**
 - **Implementado y probado (ver `docs/15`):** proyecto Next.js 16 + TypeScript + Tailwind; 5 migraciones SQL (identidad, catálogo, pesajes/lotes/saldos, funciones de autenticación, RLS y privilegios); autenticación local con roles administrador/operador/lector y ámbito por zona; registro manual de pesaje con validación en servidor, lote atómico, idempotencia y auditoría; historial con filtros (fecha, material, zona, usuario, referencia) y paginación; detalle de pesaje y de lote (saldo por ubicación); listado de contenedores; `POST/GET /api/weighings`; datos semilla DEMO etiquetados; 134 pruebas unitarias/integración + 20 E2E (incl. accesibilidad).
 - **No existe aún:** administración de catálogo y usuarios por interfaz, movimientos/retiros/destinos/evidencias (iteración 2), dashboard y CSV (iteración 3), telemetría/IoT y simulador (iteración 4), reglas de oportunidad (iteración 5), calendario/cobertura, imágenes QR.
@@ -11,9 +16,10 @@
 
 ### Cómo continuar
 1. Leer `docs/17` (auditoría y trazabilidad), `docs/18` (decisiones) y la última entrada de `docs/15`.
-2. `README.md` → «Puesta en marcha». Requiere Node ≥ 20.9 y un PostgreSQL ≥ 14 (docker-compose incluido, o la BD de un proyecto Supabase).
+2. `README.md` → «Puesta en marcha» y `docs/19`. Requiere Node ≥ 20.9 y PostgreSQL ≥ 14 (la base de Supabase; para pruebas destructivas, un PostgreSQL local; **sin Docker**).
 3. Verificar el punto de partida: `npm run verify` (tipos, lint, pruebas, build) y `npm run test:e2e`.
-4. Próxima tarea recomendada: **Iteración 2 — Trazabilidad** (`docs/07`): tabla `movements`, función transaccional de traslado/despacho/rechazo/reutilización/ajuste con `FOR UPDATE` sobre `batch_location_balances`, destinos, evidencias, correcciones auditadas, y la **prueba de concurrencia de dos retiros simultáneos**. Antes, resolver con el Hub las decisiones H-01, H-05 y H-07 (`docs/11`).
+4. Antes de la Iteración 2: conectar y validar Supabase (`docs/19` y lista de `docs/20`, sección 8).
+5. Próxima tarea recomendada: **Iteración 2 — Trazabilidad** (`docs/07`): tabla `movements`, función transaccional de traslado/despacho/rechazo/reutilización/ajuste con `FOR UPDATE` sobre `batch_location_balances`, destinos, evidencias, correcciones auditadas, y la **prueba de concurrencia de dos retiros simultáneos**. Antes, resolver con el Hub las decisiones H-01, H-05 y H-07 (`docs/11`).
 
 ## Hardware
 | Componente | Estado conocido | Precaución |

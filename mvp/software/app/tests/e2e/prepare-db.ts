@@ -2,11 +2,12 @@ import { Client } from "pg";
 import { seedDemo } from "../../db/seed/demo";
 import { runMigrations } from "../../src/lib/migrator";
 import { PASSWORDS } from "../helpers/db";
+import { assertSafeTestUrl } from "../helpers/guard";
 
 const E2E_DB = "hc_e2e";
 
 (async () => {
-  const adminUrl = process.env.TEST_DATABASE_URL ?? "postgres://postgres@127.0.0.1:54329/postgres";
+  const adminUrl = assertSafeTestUrl(process.env.TEST_DATABASE_URL ?? "postgres://postgres@127.0.0.1:54329/postgres");
   const root = new Client({ connectionString: adminUrl });
   await root.connect();
   await root.query(`drop database if exists ${E2E_DB} with (force)`);

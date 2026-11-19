@@ -34,6 +34,23 @@
   - Datos semilla = **DEMO**; ningún dato real del Hub. Hardware/firmware: sin cambios ni afirmaciones nuevas.
 - **Próxima acción:** en el equipo del usuario: instalar dependencias, aplicar migraciones y repetir `npm run verify` + `npm run test:e2e` (README). Luego, **Iteración 2 — Trazabilidad** (ver `docs/14`).
 
+### 2026-11-18 — Iteración 1.5: Windows + Supabase + Git + validación integral
+- Agente / rama / commit: Claude (Cowork) · `main` · commit «Iteración 1.5…» (ver `git log`).
+- Objetivo: dejar el proyecto listo para operar en Windows sin Docker y conectarse de forma segura al proyecto Supabase «HubCircular», sin iniciar la Iteración 2.
+- Cambios y archivos:
+  - Nuevos: `db/migrations/0006_managed_postgres_hardening.sql`, `src/lib/{db-config,origin}.ts`, `scripts/db-check.ts`, `scripts/windows/{verificar-entorno,postgres-local}.ps1`, `.gitattributes`, `tests/helpers/guard.ts`, `tests/unit/{db-config,origin,migrator}.test.ts`, `tests/integration/{app-role,hardening}.test.ts`, `docs/{19,20,21}-*.md`.
+  - Modificados: `src/lib/{db,migrator}.ts`, `scripts/{migrate,seed,reset-dev-db}.ts`, `src/app/api/weighings/route.ts`, `tests/helpers/db.ts`, `tests/e2e/{prepare-db,global-teardown}.ts`, `playwright.config.ts`, `package.json` (`db:check`), `.env.example`, `.gitignore`, `README.md`, `CLAUDE.md`, `AGENTS.md`, `docs/{14,15,18}`.
+  - Eliminado: `docker-compose.yml`.
+- Comandos y pruebas (resultados reales; Linux, Node 22.23.5, PostgreSQL 16.15): línea base 134/134 · `typecheck` ✅ · `lint` ✅ · Vitest **15 archivos, 167/167** (85 unitarias, 82 integración; 0 omitidas) · E2E **20/20** · `npm audit` 0 vulnerabilidades · `db:check`/`db:migrate`/`db:seed` sobre PostgreSQL local ✅ · candados remotos comprobados sin conexión. Detalle en `docs/20`.
+- Decisiones tomadas: ADR-014 (auth: transición controlada, local activa), ADR-015 (`SET LOCAL ROLE` + 0006 + `db:check`), ADR-016 (sin Docker; pruebas destructivas solo locales; candados remotos), ADR-017 (CRLF en migraciones). H-01, H-05 y H-07: análisis en `docs/21`, **sin resolver**.
+- Riesgos, bloqueos y cambios no confirmados:
+  - **Supabase no conectado**: no existe `.env.local`; no se piden credenciales por chat. Ninguna migración se ejecutó allí; su estado es desconocido.
+  - **Windows nativo no verificado**: el shell disponible es una VM Linux; los `.ps1` no se ejecutaron ni se analizaron sintácticamente.
+  - Las 15 comprobaciones manuales en `localhost:3000` no se hicieron en Windows; sus equivalentes automatizados (20 E2E) sí pasan en Linux.
+  - Riesgo residual: conexión como `postgres` + `SET LOCAL ROLE` (mitigación `hc_login`, `docs/19`). Sin CSP/HSTS, sin UI de usuarios.
+  - El historial de Git se armó fuera de la carpeta y se trasladó; la autoría local es «Claude (Cowork)».
+- Próxima acción (usuario): seguir `docs/19` secciones 1–4 (verificar entorno, crear `.env.local`, `db:check`, `--dry-run`) y **aprobar** la migración; luego la lista de `docs/20` sección 8. Después, decidir H-01/H-05/H-07 con el Hub y comenzar la Iteración 2.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

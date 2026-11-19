@@ -1,5 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { DomainError } from "@/lib/errors";
+import { isJsonContentType, isSameOrigin } from "@/lib/origin";
 import { getCurrentActor } from "@/modules/identity/service";
 import { assertCan } from "@/modules/identity/permissions";
 import { listWeighings } from "@/modules/weighing/queries";
@@ -28,7 +29,10 @@ export async function POST(req: NextRequest) {
     const actor = await getCurrentActor();
     assertCan(actor, "weighing:create");
 
-    if (!req.headers.get("content-type")?.includes("application/json")) {
+    if (!isSameOrigin(req.headers.get("origin"), req.headers.get("host"))) {
+      return NextResponse.json({ error: { code: "forbidden", message: "Origen no permitido." } }, { status: 403 });
+    }
+    if (!isJsonContentType(req.headers.get("content-type"))) {
       return NextResponse.json({ error: { code: "validation", message: "Content-Type debe ser application/json." } }, { status: 415 });
     }
     const raw = await req.text();

@@ -56,3 +56,36 @@ Formato: contexto → decisión → consecuencias / cómo revertir. Las decision
 ## ADR-013 · Estrategia de pruebas
 - **Decisión.** Tres niveles: (1) **unitarias** (Vitest) de conversión de unidades, horario, validación, permisos, hashing; (2) **integración con PostgreSQL real** (BD efímera por archivo, migraciones + seed reales, ejecutando como `hc_app` para que RLS y privilegios sean efectivos); (3) **E2E con Playwright** contra la compilación de producción y una BD dedicada, más **axe-core** (WCAG 2 A/AA: sin violaciones serias o críticas). Una prueba de mutación manual confirmó que el test de concurrencia detecta la ausencia de la restricción única.
 - **Límite conocido:** el entorno de ejecución fue Linux/PostgreSQL 16; no se probó en Windows ni con Supabase.
+
+---
+# Iteración 1.5 (2026-11-18): Windows, Supabase, Git y validación
+
+## ADR-014 · Autenticación: transición controlada (se mantiene la local por ahora)
+- **Contexto.** `docs/03` supone `profiles.id = auth.users.id` (Supabase Auth). Hoy funciona una autenticación local propia (ADR-002: scrypt, sesión opaca con hash en BD, bloqueo por intentos). El proyecto Supabase «HubCircular» existe, pero en esta iteración **no hubo conexión** (sin `.env.local`; las credenciales no se pegan en el chat), de modo que Supabase Auth no puede probarse.
+- **Alternativas.**
+  1. *Solo local.* Probada (167 pruebas + 20 E2E), sin dependencias externas. Carencias: sin verificación de correo, recuperación de clave ni MFA; no hay interfaz de gestión de usuarios (se crean por seed/SQL).
+  2. *Supabase Auth de inmediato.* Delega credenciales, recuperación y MFA. Exige `@supabase/ssr`, URL y clave pública del proyecto, validar el JWT en servidor, configurar URL de redirección en el panel y vincular `profiles` con `auth.users`; crear usuarios por API requeriría una clave `service_role` (no se presupone). Hoy sería código **sin poder probarse** y obligaría a retirar la local antes de demostrar la nueva, lo que el encargo prohíbe.
+  3. *Transición controlada (elegida).* Local como proveedor activo; integración de Supabase Auth diseñada como segundo proveedor detrás de la misma interfaz (`src/modules/identity/service.ts`), activable por configuración y retirable por etapas.
+- **Decisión.** Opción 3. En esta iteración **no se cambia el proveedor**; se deja lista la capa de datos (ADR-015) y se define la transición:
+  1. Nueva migración: `hc.profiles.auth_user_id uuid unique null` (vínculo con `auth.users.id`; sin FK dura para que el esquema siga funcionando en PostgreSQL local).
+  2. Variable `AUTH_PROVIDER=local|supabase` (por defecto `local`). Con `supabase`: iniciar sesión con Supabase, verificar al usuario **en el servidor** (`auth.getUser()`, no confiar en la cookie sin verificar) y resolver `auth_user_id → profile`. La **autorización no cambia**: sigue basada en `user_roles` y en las políticas RLS por `hc.actor_id` (ninguna política se reescribe para depender de `auth.uid()`).
+  3. Alta de usuarios mediante invitación desde el panel de Supabase (sin `service_role`); vínculo por correo verificado.
+  4. Convivencia hasta que todos los usuarios activos hayan ingresado por Supabase y existan pruebas E2E del proveedor nuevo; entonces `AUTH_PROVIDER=supabase`. La tabla `local_credentials` **se conserva** hasta pasar un período de prueba; eliminarla es una migración destructiva que requiere aprobación explícita.
+- **Reversión.** Volver a `AUTH_PROVIDER=local` (las credenciales locales siguen intactas hasta el paso final).
+- **Criterios de aceptación de la transición** (pendientes): login/logout, bloqueo de usuario inactivo, mismas matrices de permisos y de ámbito por zona, caducidad de sesión, rechazo de JWT inválido o vencido, y que ninguna clave secreta llegue al navegador.
+- **Estado:** decisión tomada; implementación **no iniciada** (depende de validar antes la base en Supabase y de configurar Auth en el panel).
+
+## ADR-015 · Rol de la aplicación: `SET LOCAL ROLE` por transacción (reemplaza la opción de arranque)
+- **Contexto.** ADR-010 conectaba con la opción de arranque `-c role=hc_app` y advertía que podía no funcionar tras el pooler de transacciones de Supabase.
+- **Decisión.** `src/lib/db.ts` abre cada transacción con `begin; set local role "hc_app"` (también las consultas «sin actor»). El efecto desaparece solo al terminar la transacción, no depende de estado de sesión ni de parámetros de arranque y funciona con conexión directa, Session pooler y Transaction pooler. El nombre del rol se valida (`/^[a-z_][a-z0-9_]*$/`) antes de interpolarse. TLS configurable (`DB_SSL`, `DB_SSL_CA_FILE`; remoto = `require` por defecto).
+- **Recomendado antes de datos reales:** rol de login dedicado `hc_login` (miembro de `hc_app`, sin atributos especiales) para que la app **nunca** conecte como `postgres` ni pueda hacer `RESET ROLE` hacia un rol privilegiado. Verificado en PostgreSQL 16 local; **no** en Supabase (ver `docs/19`).
+- **Migración 0006:** falla de forma explícita si el rol que migra no es miembro de `hc_app` (0001 solo avisaba) y retira todo privilegio de `anon`, `authenticated` y PUBLIC sobre el esquema `hc` (incluidos privilegios por defecto), por si la plataforma los otorga a objetos nuevos. Idempotente y sin cambios de datos.
+- **Herramientas:** `npm run db:check` (solo lectura) verifica identidad del destino, TLS, `SET ROLE`, RLS en todas las tablas, ausencia de privilegios de `anon`/`authenticated`, migraciones pendientes y conflictos.
+
+## ADR-016 · Sin Docker; pruebas destructivas solo contra PostgreSQL local
+- **Decisión.** Se elimina `docker-compose.yml`. Las pruebas de integración y E2E crean y borran bases: `tests/helpers/guard.ts` y `assertLocalOnly` las **rechazan contra cualquier host no local** (incluido Supabase), sin variable que lo anule. Para Windows se documenta un PostgreSQL 16 portable (zip binario de EDB, sin instalador ni Docker) gestionado con `scripts/windows/postgres-local.ps1`. `db:reset` se niega siempre a actuar sobre hosts no locales.
+- **Candados remotos:** migrar y sembrar contra un host no local exigen `CONFIRM_REMOTE_MIGRATION=<host>` / `CONFIRM_REMOTE_SEED=<host>` (el script imprime el host exacto); `db:migrate -- --dry-run` informa sin escribir; migrar por el puerto 6543 se rechaza (advisory lock de sesión).
+- **Límite:** el script de PowerShell no se ha ejecutado en Windows.
+
+## ADR-017 · Portabilidad Windows de las migraciones
+- **Decisión.** `.gitattributes` fija LF en `*.sql` y el migrador normaliza CRLF→LF antes de calcular el checksum: un `git clone` en Windows no genera falsos «migración modificada». Con LF el checksum es idéntico al anterior, de modo que no invalida bases ya migradas.

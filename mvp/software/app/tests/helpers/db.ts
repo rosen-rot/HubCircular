@@ -2,11 +2,12 @@ import { randomBytes } from "node:crypto";
 import { Client, types } from "pg";
 import { seedDemo, DEMO_USERS } from "../../db/seed/demo";
 import { runMigrations } from "../../src/lib/migrator";
+import { assertSafeTestUrl } from "./guard";
 
 types.setTypeParser(20, (v) => Number(v));
 
 /** Conexión administrativa (dueño del esquema). Local por defecto; configurable con TEST_DATABASE_URL. */
-export const ADMIN_URL = process.env.TEST_DATABASE_URL ?? "postgres://postgres@127.0.0.1:54329/postgres";
+export const ADMIN_URL = assertSafeTestUrl(process.env.TEST_DATABASE_URL ?? "postgres://postgres@127.0.0.1:54329/postgres");
 
 export const PASSWORDS = {
   admin: "Admin-demo-Passw0rd!",

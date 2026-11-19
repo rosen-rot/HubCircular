@@ -23,10 +23,10 @@ Detalle completo en `docs/17-auditoria-documental.md`; decisiones de diseño en 
 
 | Asunto | Estado / resolución provisional | Quién valida | Iteración |
 |---|---|---|---|
-| "Ubicación" de inventario sin entidad propia (H-01) | Provisional: ubicación = zona (ADR-005) | Hub + equipo | 2 |
-| Valorización: ¿movimiento o verificación? (H-05) | Pendiente: modelar como verificación de evidencia, sin segunda salida | Equipo | 2 |
+| "Ubicación" de inventario sin entidad propia (H-01) | Provisional: ubicación = zona (ADR-005). Análisis en `docs/21` | Hub + equipo | 2 |
+| Valorización: ¿movimiento o verificación? (H-05) | Pendiente: modelar como verificación de evidencia, sin segunda salida. Análisis en `docs/21` | Equipo | 2 |
 | Fecha del KPI de valorización (despacho vs. confirmación) (H-06) | Pendiente | Hub + equipo | 3 |
-| Material del pesaje distinto del esperado del contenedor (RN-03, H-07) | Fase 1: **no se permite**; excepción justificada pendiente | Hub | 2 |
+| Material del pesaje distinto del esperado del contenedor (RN-03, H-07) | Fase 1: **no se permite**; excepción justificada pendiente. Análisis en `docs/21` | Hub | 2 |
 | Cero confirmado vs. captación (H-04) | Modelar en `measurement_occurrences`; no es pesaje | Equipo | 3 |
 | Rol «gestor»: lector del Hub vs. gestor de residuos externo (H-08) | Rol técnico = `lector`; tercero = `destinations` | Hub | 1 (resuelto en código) |
 | ¿El administrador puede registrar pesajes? (H-10) | Supuesto: sí | Hub | 1 |

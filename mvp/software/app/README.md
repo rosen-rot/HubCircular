@@ -40,19 +40,24 @@
 | `docs/16-guia-claude-y-codex.md` | Cómo trabajar con ambas herramientas en el mismo repositorio |
 | `docs/17-auditoria-documental.md` | Auditoría de Fase 0: hallazgos, riesgos y matriz de cobertura por requisito |
 | `docs/18-decisiones-de-arquitectura.md` | Registro de decisiones (ADR) de la implementación |
+| `docs/19-configuracion-windows-supabase.md` | Windows sin Docker y conexión segura a Supabase (sin secretos) |
+| `docs/20-validacion-iteracion-1-5.md` | Evidencia y resultados de la Iteración 1.5 |
+| `docs/21-analisis-decisiones-pendientes.md` | Análisis de H-01, H-05 y H-07 (decisiones **abiertas**) |
 | `diseno/HubCircular_Dashboard_MVP.png` | Maqueta conceptual, no web construida |
 | `referencias/HubCircular_Propuesta_Completa_Actualizada_2026.md` | Propuesta histórica conservada sin reescritura |
 | `referencias/Fichas_Desafios_Capstone_2026.pdf` | Ficha oficial interna, **no publicar sin permiso** |
 
 ## Puesta en marcha (desarrollo local)
 
-Requisitos: **Node.js ≥ 20.9** y un **PostgreSQL ≥ 14** (opciones: `docker compose up -d`, una instalación local, o la cadena de conexión de la base de datos de un proyecto Supabase; la aplicación solo necesita `DATABASE_URL`).
+Requisitos: **Node.js ≥ 20.9** y un **PostgreSQL ≥ 14** (la base del proyecto Supabase «HubCircular» o una instalación local; **sin Docker**; la aplicación solo necesita `DATABASE_URL`). Guía completa para Windows y Supabase, sin secretos en el chat: `docs/19-configuracion-windows-supabase.md`.
 
 ```bash
-npm install
+npm ci
 cp .env.example .env.local        # Windows PowerShell: Copy-Item .env.example .env.local
 # edite .env.local: DATABASE_URL (y MIGRATION_DATABASE_URL si el rol de la app no es el dueño del esquema)
-npm run db:migrate                # aplica db/migrations (idempotente, con checksum)
+npm run db:check                  # diagnóstico de SOLO LECTURA: destino, TLS, roles, RLS, migraciones
+npm run db:migrate -- --dry-run   # qué migraciones faltan (no escribe)
+npm run db:migrate                # aplica db/migrations (idempotente, con checksum); en un host remoto exige CONFIRM_REMOTE_MIGRATION=<host>
 npm run db:seed                   # datos DEMO y 3 usuarios DEMO; si no define SEED_*_PASSWORD imprime claves aleatorias UNA vez
 npm run dev                       # http://localhost:3000
 ```
@@ -64,15 +69,16 @@ Usuarios DEMO (rol, ámbito): `admin@demo.hubcircular.test` (administrador, toda
 | `npm run verify` | typecheck + lint + pruebas unitarias/integración + build |
 | `npm test` | Vitest (unitarias + integración contra PostgreSQL real; usa `TEST_DATABASE_URL`, por defecto `postgres://postgres@127.0.0.1:54329/postgres`; crea y borra bases efímeras `hc_test_*`) |
 | `npm run test:e2e` | build + Playwright (Chromium) sobre la compilación de producción y la BD `hc_e2e`; requiere `npx playwright install chromium` la primera vez |
-| `npm run db:reset` | **solo local**: elimina el esquema `hc` (rechaza hosts no locales) |
+| `npm run db:check` | diagnóstico de solo lectura de la base destino (no imprime claves) |
+| `npm run db:reset` | **solo local**: elimina el esquema `hc`; se niega siempre a actuar sobre hosts no locales (incluido Supabase) |
 
-Las pruebas de integración necesitan un usuario PostgreSQL con permiso para crear bases de datos. Con docker-compose: `TEST_DATABASE_URL=postgres://postgres:<su_clave>@127.0.0.1:5432/postgres npm test`.
+Las pruebas de integración y E2E necesitan un PostgreSQL **local** con permiso para crear bases (`TEST_DATABASE_URL`); se niegan a ejecutarse contra cualquier host remoto, incluido Supabase. En Windows sin Docker: `scripts/windows/postgres-local.ps1` (ver `docs/19`, sección 5).
 
 ### Estructura del código
 `db/migrations` (SQL versionado) · `db/seed` (datos DEMO) · `src/modules/{identity,catalog,weighing,inventory}` (dominio por módulos, `docs/02`) · `src/lib` (BD, errores, tiempo) · `src/app` (rutas: `/login`, `/registro`, `/historial`, `/pesajes/[id]`, `/lotes/[id]`, `/contenedores`, `/api/weighings`) · `tests/{unit,integration,e2e}`.
 
 ## Estado real a 18-11-2026
-- **Software web:** Fase 1 (Iteraciones 0 y 1 de `docs/07`) implementada y probada en un entorno Linux con PostgreSQL 16 (ver `docs/15`). **No** probado en Windows, **no** probado contra Supabase, **no** desplegado. Sin proyecto Supabase, hosting ni credenciales.
+- **Software web:** Fase 1 (Iteraciones 0 y 1 de `docs/07`) implementada y probada en un entorno Linux con PostgreSQL 16 (ver `docs/15`). Iteración 1.5: capa de conexión compatible con el pooler de Supabase, migración 0006, `db:check`, candados para destinos remotos y Git local; ver `docs/20`. **No** probado en Windows nativo, **no** probado contra Supabase (sin `.env.local`), **no** desplegado.
 - ESP32-WROOM-32D: sketch de prueba subido y mensajes seriales comprobados.
 - HX711: recibido; conexión y lectura **pendientes**, pines por soldar según evidencia disponible.
 - Celda de carga: vendida como 50 kg, **tres cables**, probablemente medio puente; pinout y capacidad real sin medir, montaje no calibrado.
