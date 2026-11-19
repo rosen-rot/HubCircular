@@ -106,10 +106,10 @@ export function WeighingForm({
 
       {container ? (
         <div className="rounded-lg bg-brand-50 p-3 text-sm" aria-live="polite">
-          <p>
+          <div>
             <span className="font-semibold"><Term k="material">Material:</Term></span> {container.materialName} · <span className="font-semibold"><Term k="zona">Zona:</Term></span> {container.zoneName}{" "}
             {container.demo ? <DemoBadge /> : null}
-          </p>
+          </div>
           {container.demo ? (
             <p className="mt-1 text-amber-900">Contenedor de demostración: este registro no cuenta como medición real.</p>
           ) : null}
@@ -149,9 +149,9 @@ export function WeighingForm({
       </div>
 
       <div className="rounded-lg border border-slate-300 bg-white p-4" aria-live="polite" data-testid="net-preview">
-        <p className="text-sm text-slate-700">
+        <div className="text-sm text-slate-700">
           <Term k="neto">Peso neto: solo el material (vista previa)</Term>
-        </p>
+        </div>
         {net.kind === "ok" ? (
           <p className="text-2xl font-bold text-brand-900">
             {formatKg(net.grams)} <span className="text-base font-normal text-slate-600">({formatGrams(net.grams)})</span>

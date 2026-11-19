@@ -131,9 +131,9 @@ export function MovementForm({
 
       {batch ? (
         <div className="rounded-lg bg-brand-50 p-3 text-sm" aria-live="polite">
-          <p className="font-semibold">
+          <div className="font-semibold">
             <Term k="saldo">Saldo por ubicación</Term> {batch.dataOrigin === "demo" ? <DemoBadge /> : null}
-          </p>
+          </div>
           <ul className="mt-1">
             {batch.balances.map((b) => (
               <li key={b.zoneId}>

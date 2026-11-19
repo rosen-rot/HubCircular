@@ -68,12 +68,12 @@ export default async function CalendariosPage({ searchParams }: { searchParams: 
                     <p className="font-mono text-sm font-semibold">{c.code} {c.dataOrigin === "demo" ? <DemoBadge /> : null}</p>
                     <p className="text-sm text-slate-700">{c.materialName} · {c.zoneName}</p>
                   </div>
-                  <p>
+                  <div>
                     <Badge tone={o.status === "pendiente" ? "neutral" : "ok"}>{COVERAGE_LABEL[o.status]}</Badge>
                     <InfoTip k={o.status === "pendiente" ? "pendiente" : o.status === "realizado" ? "con_pesaje" : "cero"} />
                     {o.status === "realizado" ? <span className="ml-2 text-sm">{o.weighings} pesaje{o.weighings === 1 ? "" : "s"} hoy</span> : null}
                     {o.status === "cero_confirmado" && o.zeroNote ? <span className="ml-2 text-sm">Nota: {o.zeroNote}</span> : null}
-                  </p>
+                  </div>
                   {o.status === "pendiente" ? (
                     <div className="space-y-3">
                       <Button asChild variant="outline"><Link href={`/registro?container=${encodeURIComponent(c.code)}`}>Registrar pesaje</Link></Button>

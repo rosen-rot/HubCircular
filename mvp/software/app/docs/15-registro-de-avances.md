@@ -173,6 +173,14 @@
 - Riesgos, bloqueos y cambios no confirmados: no se probó con lector de pantalla real; los textos del glosario deben ser revisados por el equipo (p. ej. si el Hub prefiere otras palabras); H-01/H-05/H-07 siguen abiertas; sin pesajes reales; sin probar en Windows nativo ni desplegado. El calendario y el «cero» que el usuario creó en Supabase son datos de prueba.
 - Próxima acción: el usuario revisa los nombres e iconos nuevos en pantalla y dice si algún término sigue sin entenderse; decisiones H-01/H-05/H-07 con el Hub; luego Iteración 4 (IoT simulado) o unir los CSV, según prioridad.
 
+### 2026-11-19 — Corrección: iconos (i) dentro de `<p>` rompían la hidratación en `npm run dev`
+- Agente / rama / commit: Claude (Cowork) · `main` (commit al entregar).
+- Hallazgo (informado por el usuario al pegar la salida de `npm run dev` en Windows): React avisaba «`<details>` cannot be a descendant of `<p>`» y «Hydration failed» en `/registro`. Causa: el commit `e424c7a` puso `InfoTip`/`Term` (que usan `<details>`) dentro de 13 elementos `<p>`, HTML inválido. **Mis pruebas no lo detectaron** porque Playwright corre sobre la compilación de producción, donde React no emite esos avisos de desarrollo; el error se debió haber visto antes de entregar.
+- Corrección: esos 13 `<p>` pasan a `<div>` (registro, retiros, detalle de lote y sus paneles, tablero, calendarios). Sin cambios de comportamiento ni de base de datos.
+- Verificación (resultados reales, Linux): comprobación en **modo desarrollo** (`next dev`) con Chromium capturando la consola en `/registro`, `/retiros`, `/historial`, `/contenedores`, `/destinos`, `/usuarios`, `/dashboard`, `/calendarios`, `/ayuda`, detalle de lote y `/retiros?lote=…`: **0 avisos de hidratación/anidación**; la misma comprobación, con el `<p>` de `/registro` restaurado a propósito, detecta **17** avisos (el detector funciona). Nueva prueba unitaria estática: ningún `<p>` puede contener `InfoTip` ni `Term`. `tsc`, `eslint` y `next build` sin errores; **Vitest 344/344** (29 archivos); **Playwright 61/61**.
+- Límite: la comprobación en modo desarrollo se hizo a mano (script desechable), no está automatizada en la suite; la prueba estática cubre solo este patrón (`<p>` con iconos).
+- Próxima acción: el usuario vuelve a correr `npm run dev` y confirma que el aviso desapareció.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

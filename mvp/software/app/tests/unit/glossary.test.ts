@@ -49,3 +49,16 @@ describe("glosario", () => {
     expect(GLOSSARY.cero.short.toLowerCase()).toContain("vacío");
   });
 });
+
+describe("HTML válido con los iconos (i)", () => {
+  it("ningún <p> contiene InfoTip ni Term (un <details> dentro de <p> rompe la hidratación de React)", () => {
+    const bad: string[] = [];
+    for (const f of sources(join(__dirname, "../../src"))) {
+      const text = readFileSync(f, "utf8");
+      for (const m of text.matchAll(/<p\b[^>]*>([\s\S]*?)<\/p>/g)) {
+        if (/<(InfoTip|Term)\b/.test(m[1]!)) bad.push(`${f}: ${m[0].slice(0, 60).replace(/\s+/g, " ")}`);
+      }
+    }
+    expect(bad).toEqual([]);
+  });
+});

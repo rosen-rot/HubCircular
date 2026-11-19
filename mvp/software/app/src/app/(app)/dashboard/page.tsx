@@ -161,19 +161,19 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <h2 id="h-resumen" className="text-xl font-bold text-brand-900">Resumen del período</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           <Tile title="Reciclable captado" help="reciclable_captado" value={formatKg(k.capturedG)}>
-            <p>{k.weighings} pesaje{k.weighings === 1 ? "" : "s"} · {k.contaminated} con contaminación observada<InfoTip k="contaminacion" /></p>
+            <div>{k.weighings} pesaje{k.weighings === 1 ? "" : "s"} · {k.contaminated} con contaminación observada<InfoTip k="contaminacion" /></div>
             <p>
               <Link className="font-semibold text-brand-700 underline" href={`/historial?${historyQuery.toString()}`}>Ver pesajes</Link>
             </p>
           </Tile>
           <Tile title="Despachado a gestor" help="despacho" value={formatKg(k.dispatchedG)}>
-            <p>Valorización confirmada<InfoTip k="valorizacion" />: <strong>{formatKg(k.dispatchedConfirmedG)}</strong></p>
+            <div>Valorización confirmada<InfoTip k="valorizacion" />: <strong>{formatKg(k.dispatchedConfirmedG)}</strong></div>
             <p>Verificación rechazada: {formatKg(k.dispatchedRejectedG)}</p>
-            <p>Sin decisión<InfoTip k="sin_decision" />: {formatKg(k.dispatchedPendingG)}{k.dispatchedPendingNoEvidenceG > 0 ? ` (de ellos ${formatKg(k.dispatchedPendingNoEvidenceG)} sin evidencia)` : ""}</p>
+            <div>Sin decisión<InfoTip k="sin_decision" />: {formatKg(k.dispatchedPendingG)}{k.dispatchedPendingNoEvidenceG > 0 ? ` (de ellos ${formatKg(k.dispatchedPendingNoEvidenceG)} sin evidencia)` : ""}</div>
             <p className="text-slate-600">Fecha del despacho, no de la confirmación.</p>
           </Tile>
           <Tile title="Reutilizado" help="reutilizacion" value={formatKg(k.reusedG)}>
-            <p>Respaldado con evidencia<InfoTip k="evidencia" />: <strong>{formatKg(k.reusedBackedG)}</strong></p>
+            <div>Respaldado con evidencia<InfoTip k="evidencia" />: <strong>{formatKg(k.reusedBackedG)}</strong></div>
             <p>Solo registrado: {formatKg(k.reusedG - k.reusedBackedG)}</p>
           </Tile>
           <Tile title="Rechazado" help="rechazo" value={formatKg(k.rejectedG)}>

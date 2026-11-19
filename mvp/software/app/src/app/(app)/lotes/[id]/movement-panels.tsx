@@ -32,9 +32,9 @@ export function EvidenceForm({ batchId, movementId, refLabel: refNo }: { batchId
   const id = `ev-${movementId}`;
   return (
     <form action={action} className="mt-3 space-y-3 rounded-lg border border-slate-300 p-3" noValidate aria-label={`Agregar evidencia al movimiento ${refNo}`}>
-      <p className="text-sm font-semibold">
+      <div className="text-sm font-semibold">
         Agregar evidencia (referencia de texto)<InfoTip k="evidencia" />
-      </p>
+      </div>
       <input type="hidden" name="batchId" value={batchId} />
       <input type="hidden" name="movementId" value={movementId} />
       <Messages state={state} />
@@ -64,9 +64,9 @@ export function VerifyForm({ batchId, movementId, refLabel: refNo, hasEvidence }
   const id = `vf-${movementId}`;
   return (
     <form action={action} className="mt-3 space-y-3 rounded-lg border border-slate-300 p-3" noValidate aria-label={`Verificar el despacho ${refNo}`}>
-      <p className="text-sm font-semibold">
+      <div className="text-sm font-semibold">
         Verificación de valorización (¿el material fue aprovechado?)<InfoTip k="valorizacion" />
-      </p>
+      </div>
       <p className="text-sm text-slate-700">Confirmar o rechazar no mueve saldo ni crea otra salida; solo deja constancia de quién verificó y cuándo.</p>
       <input type="hidden" name="batchId" value={batchId} />
       <input type="hidden" name="movementId" value={movementId} />
@@ -93,9 +93,9 @@ export function CorrectForm({ batchId, movementId, refLabel: refNo, idempotencyK
   const id = `co-${movementId}`;
   return (
     <form action={action} className="mt-3 space-y-3 rounded-lg border border-amber-400 bg-amber-50 p-3" noValidate aria-label={`Corregir el movimiento ${refNo}`}>
-      <p className="text-sm font-semibold">
+      <div className="text-sm font-semibold">
         Corregir este movimiento<InfoTip k="correccion" />
-      </p>
+      </div>
       <p className="text-sm text-slate-800">No se borra ni se edita: se registra un movimiento nuevo de efecto inverso, con su motivo, autor y fecha.</p>
       <input type="hidden" name="batchId" value={batchId} />
       <input type="hidden" name="movementId" value={movementId} />

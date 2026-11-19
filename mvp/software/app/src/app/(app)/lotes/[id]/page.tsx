@@ -131,9 +131,9 @@ export default async function LotePage({
 
                   {m.type === "despacho" ? (
                     <div className="mt-2 text-sm">
-                      <p className="font-semibold">
+                      <div className="font-semibold">
                         Evidencia ({m.evidence.length})<InfoTip k="evidencia" />
-                      </p>
+                      </div>
                       {m.evidence.length === 0 ? (
                         <p className="text-slate-700">Sin evidencia registrada. Un despacho sin evidencia no se declara valorizado.</p>
                       ) : (
@@ -148,9 +148,9 @@ export default async function LotePage({
                       )}
                       {m.verifications.length > 0 ? (
                         <>
-                          <p className="mt-2 font-semibold">
+                          <div className="mt-2 font-semibold">
                             Historial de verificación<InfoTip k="valorizacion" />
-                          </p>
+                          </div>
                           <ul className="list-disc pl-5">
                             {m.verifications.map((v) => (
                               <li key={v.id}>
