@@ -18,7 +18,8 @@ export type Permission =
   | "batch:read"
   | "catalog:read"
   | "audit:read"
-  | "user:manage";
+  | "user:manage"
+  | "account:password";
 
 const MATRIX: Record<Permission, AppRole[]> = {
   "weighing:create": ["administrador", "operador"],
@@ -34,15 +35,19 @@ const MATRIX: Record<Permission, AppRole[]> = {
   "catalog:read": ["administrador", "operador", "lector"],
   "audit:read": ["administrador"],
   "user:manage": ["administrador"],
+  "account:password": ["administrador", "operador", "lector"],
 };
 
 export function can(actor: Actor | null | undefined, permission: Permission): boolean {
   if (!actor) return false;
+  // Con clave temporal solo se puede cambiar la propia contraseña (defensa para páginas, acciones y API).
+  if (actor.mustChangePassword) return permission === "account:password";
   return actor.roles.some((g) => MATRIX[permission].includes(g.role));
 }
 
 export function assertCan(actor: Actor | null | undefined, permission: Permission): asserts actor is Actor {
   if (!actor) throw new DomainError("unauthenticated");
+  if (actor.mustChangePassword && permission !== "account:password") throw new DomainError("password_change_required");
   if (!can(actor, permission)) throw new DomainError("forbidden");
 }
 

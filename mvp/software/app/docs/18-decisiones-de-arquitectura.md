@@ -119,3 +119,26 @@ Formato: contexto → decisión → consecuencias / cómo revertir. Las decision
   - Solo el administrador decide la verificación; operador y administrador agregan evidencia. No se puede corregir un despacho con verificación `confirmada` sin rechazarla antes (con motivo); el historial se conserva.
 - **Pendiente con el Hub (H-05):** si la valorización debe ser un evento propio, quién la certifica y con qué documentos. Si cambia, el efecto es acotado: la tabla de verificaciones es independiente de los saldos.
 - **Destinos.** `hc.destinations` (`gestor`, `reutilizacion`, `otro`; activo/inactivo; DEMO/real). Se **desactivan**, no se eliminan. Alta y activación solo administrador, con auditoría. Todo despacho y reutilización exige destino (queda fuera del alcance: despachos con destino indefinido, ver `docs/11`). Se siembran 3 destinos DEMO.
+
+## ADR-021 · Supabase Auth como segundo proveedor de identidad; la autorización sigue siendo de HubCircular (cumple ADR-002/014)
+- **Contexto.** ADR-002/014 previeron reemplazar la autenticación local por Supabase Auth. Antes de datos reales se pidió implementarlo.
+- **Decisión.** `AUTH_PROVIDER=local|supabase` (por defecto `local`). Supabase solo **verifica** correo y contraseña por REST (`/auth/v1/token`); la app abre su propia sesión opaca y decide permisos con sus roles/zonas/RLS. El perfil debe existir (creado por un administrador), estar activo y tener el correo **confirmado** en Supabase; el primer ingreso lo vincula con `profiles.auth_user_id` (único); una identidad distinta para el mismo correo se rechaza (migración 0009, `hc.auth_link_supabase`).
+- **Sin `service_role` ni `@supabase/supabase-js`.** Solo la clave publicable, solo en servidor (nunca `NEXT_PUBLIC_*`); una clave secreta/service_role se rechaza al cargar la configuración. `fetch` nativo con tiempo límite de 8 s; 429/5xx/red caída se informan como «servicio no disponible».
+- **Por qué no los JWT de Supabase en la aplicación ni RLS con `auth.uid()`.** Las políticas actuales usan `hc.current_actor()` fijado por el servidor; cambiarlas habría tocado todo el modelo. Con este diseño el cambio de proveedor es reversible y no altera RLS.
+- **Consecuencias.** En modo Supabase no hay claves en HubCircular (sin restablecer/cambiar, sin clave temporal); el bloqueo por intentos lo aplica Supabase; los usuarios de Supabase Auth viven fuera del respaldo de `hc`. Volver a `local` es posible porque no se borran credenciales locales y el administrador puede restablecer claves.
+- **Verificado:** contra un GoTrue **simulado** (19 pruebas de integración, 9 unitarias, 5 E2E). **No verificado contra Supabase real.**
+
+## ADR-022 · CSP con nonce por solicitud y cabeceras de endurecimiento en el proxy
+- **Decisión.** `src/proxy.ts` aplica a toda respuesta una CSP con nonce y `strict-dynamic` (sin `unsafe-inline`/`unsafe-eval` en producción para scripts), más `nosniff`, `X-Frame-Options: DENY`, `Referrer-Policy`, `Permissions-Policy`, COOP/CORP. HSTS y `upgrade-insecure-requests` solo con `SESSION_COOKIE_SECURE=true`.
+- **Compromisos aceptados.** `style-src 'unsafe-inline'` (React/Next); layout raíz dinámico; sin `preload` de HSTS hasta decidir dominio definitivo.
+- **Verificado:** 5 pruebas unitarias y 3 E2E (cabeceras, nonce, ausencia de violaciones, bloqueo de manejador inline inyectado). Falta comprobarlo en el host real.
+
+## ADR-023 · Gestión de usuarios por interfaz con clave temporal mostrada una vez
+- **Decisión.** Funciones `SECURITY DEFINER` (0008) para alta, activación, roles y restablecimiento; clave temporal aleatoria generada y hasheada (scrypt) en el servidor, mostrada una vez; `must_change_password` obliga a cambiarla en el primer ingreso. Protecciones en la base: no desactivarse, no quedar sin administrador con acceso total, no dejar usuarios sin roles. Auditoría sin secretos.
+- **Compromiso aceptado.** La obligación de cambiar la clave temporal se aplica en la aplicación, no en RLS.
+- **Alternativas descartadas.** Clave elegida por el administrador (la conoce un tercero); enlace por correo (no hay SMTP ni dominio aún).
+
+## ADR-024 · Respaldo lógico fuera del repositorio y prueba de restauración obligatoria
+- **Decisión.** `npm run db:backup` (pg_dump formato custom del esquema `hc` + manifiesto con checksum y conteos) hacia una carpeta fuera del repo; `npm run db:restore-check` restaura en una base **local vacía** y compara con el manifiesto. No sustituye las copias propias de Supabase (a confirmar en el panel); las complementa y se puede restaurar y probar sin tocar Supabase.
+- **Salvaguardas.** Rechaza escribir dentro del repo, el puerto 6543, un `pg_dump` más antiguo que el servidor, destinos de restauración no locales o con esquema `hc`; la clave va por `PGPASSWORD`. El respaldo contiene hashes de contraseña: es información sensible.
+- **Verificado:** restauración real en PostgreSQL 16 local; **no** ejecutado contra Supabase.

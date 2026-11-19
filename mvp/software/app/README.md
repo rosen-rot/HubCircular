@@ -4,7 +4,7 @@
 
 **Objetivo:** desarrollar una plataforma web de gestión, trazabilidad y análisis de residuos, preparada para el prototipo físico basado en ESP32.
 
-**Estado del software (2026-11-18):** Fase 1 implementada (autenticación con roles, registro manual de pesajes con lote atómico, historial, lotes y contenedores) y probada; ver «Puesta en marcha» y `docs/14-estado-actual-y-handoff.md`. Iteración 2 (trazabilidad: movimientos, destinos, evidencia por texto y verificación) implementada y probada en PostgreSQL local (`docs/22`). Iteraciones 3–6 de `docs/07` pendientes. El paquete conserva además la documentación y referencias originales.
+**Estado del software (2026-11-18):** Fase 1 implementada (autenticación con roles, registro manual de pesajes con lote atómico, historial, lotes y contenedores) y probada; ver «Puesta en marcha» y `docs/14-estado-actual-y-handoff.md`. Iteración 2 (trazabilidad: movimientos, destinos, evidencia por texto y verificación) implementada y probada en PostgreSQL local (`docs/22`). Antes de datos reales (2026-11-19, solo PostgreSQL local; **sin aplicar en Supabase**): cabeceras CSP/HSTS, gestión de usuarios por interfaz con clave temporal, respaldo y restauración, y Supabase Auth como segundo proveedor (`docs/23`, `docs/24`). Iteraciones 3–6 de `docs/07` pendientes. El paquete conserva además la documentación y referencias originales.
 
 ## Inicio rápido
 1. Descomprime en una carpeta permanente de trabajo.
@@ -43,6 +43,9 @@
 | `docs/19-configuracion-windows-supabase.md` | Windows sin Docker y conexión segura a Supabase (sin secretos) |
 | `docs/20-validacion-iteracion-1-5.md` | Evidencia y resultados de la Iteración 1.5 |
 | `docs/21-analisis-decisiones-pendientes.md` | Análisis de H-01, H-05 y H-07 (decisiones **abiertas**) |
+| `docs/22-validacion-iteracion-2.md` | Evidencia y validación de la Iteración 2 (trazabilidad) |
+| `docs/23-seguridad-previa-a-datos-reales.md` | Cabeceras, usuarios, Supabase Auth y lista de control antes de datos reales |
+| `docs/24-respaldos-y-restauracion.md` | Plan de respaldos, restauración y prueba de restauración |
 | `diseno/HubCircular_Dashboard_MVP.png` | Maqueta conceptual, no web construida |
 | `referencias/HubCircular_Propuesta_Completa_Actualizada_2026.md` | Propuesta histórica conservada sin reescritura |
 | `referencias/Fichas_Desafios_Capstone_2026.pdf` | Ficha oficial interna, **no publicar sin permiso** |
@@ -71,6 +74,8 @@ Usuarios DEMO (rol, ámbito): `admin@demo.hubcircular.test` (administrador, toda
 | `npm run test:e2e` | build + Playwright (Chromium) sobre la compilación de producción y la BD `hc_e2e`; requiere `npx playwright install chromium` la primera vez |
 | `npm run db:check` | diagnóstico de solo lectura de la base destino (no imprime claves) |
 | `npm run db:check:app` | comprueba la conexión que usa la app (`DATABASE_URL`): privilegios del rol y bajada a `hc_app` (solo lectura) |
+| `npm run db:backup` | respaldo lógico del esquema `hc` hacia `BACKUP_DIR` (fuera del repo, sensible; `docs/24`) |
+| `npm run db:restore-check -- <archivo.dump>` | prueba de restauración en una base **local vacía** y comparación con el manifiesto |
 | `npm run db:reset` | **solo local**: elimina el esquema `hc`; se niega siempre a actuar sobre hosts no locales (incluido Supabase) |
 
 Las pruebas de integración y E2E necesitan un PostgreSQL **local** con permiso para crear bases (`TEST_DATABASE_URL`); se niegan a ejecutarse contra cualquier host remoto, incluido Supabase. En Windows sin Docker: `scripts/windows/postgres-local.ps1` (ver `docs/19`, sección 5).
@@ -79,7 +84,7 @@ Las pruebas de integración y E2E necesitan un PostgreSQL **local** con permiso 
 `db/migrations` (SQL versionado) · `db/seed` (datos DEMO) · `src/modules/{identity,catalog,weighing,inventory,movements}` (dominio por módulos, `docs/02`) · `src/lib` (BD, errores, tiempo) · `src/app` (rutas: `/login`, `/registro`, `/historial`, `/pesajes/[id]`, `/lotes/[id]`, `/retiros`, `/destinos`, `/contenedores`, `/api/weighings`) · `tests/{unit,integration,e2e}`.
 
 ## Estado real a 18-11-2026
-- **Software web:** Fase 1 (Iteraciones 0 y 1 de `docs/07`) implementada y probada en un entorno Linux con PostgreSQL 16 (ver `docs/15`). Iteración 1.5: capa de conexión compatible con el pooler de Supabase, migración 0006, `db:check`, candados para destinos remotos y Git local; ver `docs/20`. Migraciones 0001–0006 aplicadas y validadas por el usuario en el proyecto Supabase de desarrollo (`docs/20`). Iteración 2 (movimientos, destinos, evidencia y verificación) probada en PostgreSQL local (`docs/22`); su migración 0007 ya fue aplicada por el usuario en Supabase (sin probar aún movimientos allí). **No** probado en Windows nativo completo (solo `npm ci` y scripts de base de datos); **no** desplegado.
+- **Software web:** Fase 1 (Iteraciones 0 y 1 de `docs/07`) implementada y probada en un entorno Linux con PostgreSQL 16 (ver `docs/15`). Iteración 1.5: capa de conexión compatible con el pooler de Supabase, migración 0006, `db:check`, candados para destinos remotos y Git local; ver `docs/20`. Migraciones 0001–0006 aplicadas y validadas por el usuario en el proyecto Supabase de desarrollo (`docs/20`). Iteración 2 (movimientos, destinos, evidencia y verificación) probada en PostgreSQL local (`docs/22`); su migración 0007 ya fue aplicada por el usuario en Supabase (sin probar aún movimientos allí). **No** probado en Windows nativo completo (solo `npm ci` y scripts de base de datos); **no** desplegado. Antes de datos reales (`docs/23`): CSP/HSTS, `/usuarios`, respaldos y Supabase Auth implementados y probados solo en PostgreSQL local (Vitest 288/288, Playwright 44/44); las migraciones 0008 y 0009 **no** están aplicadas en Supabase y Supabase Auth **no** se probó contra el servicio real.
 - ESP32-WROOM-32D: sketch de prueba subido y mensajes seriales comprobados.
 - HX711: recibido; conexión y lectura **pendientes**, pines por soldar según evidencia disponible.
 - Celda de carga: vendida como 50 kg, **tres cables**, probablemente medio puente; pinout y capacidad real sin medir, montaje no calibrado.

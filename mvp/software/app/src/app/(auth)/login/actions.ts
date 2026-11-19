@@ -14,6 +14,7 @@ const schema = z.object({
   password: z.string().min(1).max(256),
 });
 
+const UNAVAILABLE = "No fue posible contactar el servicio de autenticación. Intente nuevamente en unos minutos.";
 const GENERIC = "No fue posible iniciar sesión. Verifique su correo y contraseña, o intente más tarde.";
 
 export async function loginAction(_prev: LoginState, formData: FormData): Promise<LoginState> {
@@ -21,7 +22,7 @@ export async function loginAction(_prev: LoginState, formData: FormData): Promis
   if (!parsed.success) return { error: "Ingrese su correo y contraseña." };
 
   const result = await authenticate(parsed.data.email, parsed.data.password);
-  if (!result.ok) return { error: GENERIC };
+  if (!result.ok) return { error: result.reason === "unavailable" ? UNAVAILABLE : GENERIC };
 
   await startSession(result.token, result.expires);
   redirect(safeNextPath(String(formData.get("next") ?? ""), "/"));

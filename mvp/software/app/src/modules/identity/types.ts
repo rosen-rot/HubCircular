@@ -11,4 +11,6 @@ export interface Actor {
   email: string;
   displayName: string;
   roles: RoleGrant[];
+  /** Clave temporal: hasta cambiarla, la sesión no puede usar ninguna función de la aplicación. */
+  mustChangePassword?: boolean;
 }

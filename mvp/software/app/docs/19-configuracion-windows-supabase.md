@@ -203,6 +203,12 @@ Sin PostgreSQL local, `npm run test:unit` sigue funcionando y las pruebas de int
 | `SEED_*_PASSWORD` | no | Claves de los usuarios DEMO; si faltan, se generan y se muestran una vez. |
 | `CONFIRM_REMOTE_MIGRATION` / `CONFIRM_REMOTE_SEED` | solo remoto | Host exacto; confirmación explícita por comando. |
 | `TEST_DATABASE_URL` | solo pruebas | PostgreSQL **local** con permiso de crear bases. |
+| `AUTH_PROVIDER` | no (`local`) | `local` o `supabase` (`docs/23` §3). Con `supabase` se exigen las dos siguientes. |
+| `SUPABASE_URL` | con `supabase` | `https://<referencia>.supabase.co`. Solo servidor. |
+| `SUPABASE_PUBLISHABLE_KEY` | con `supabase` | Clave **publicable/anon**. Solo servidor; **nunca** `service_role` ni clave secreta (se rechazan). |
+| `BACKUP_DIR` | para `db:backup` | Carpeta **fuera del repositorio** (`docs/24`). |
+| `PG_DUMP_PATH` / `PG_RESTORE_PATH` | no | Si `pg_dump`/`pg_restore` no están en el `PATH`; versión ≥ la del servidor. |
+| `RESTORE_TEST_DATABASE_URL` | para `db:restore-check` | Base **local y vacía** para la prueba de restauración. |
 
 ## 7. Problemas frecuentes
 

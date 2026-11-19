@@ -6,5 +6,6 @@ export default async function globalTeardown() {
   const c = new Client({ connectionString: adminUrl });
   await c.connect();
   await c.query("drop database if exists hc_e2e with (force)");
+  await c.query("drop database if exists hc_e2e_sb with (force)");
   await c.end();
 }

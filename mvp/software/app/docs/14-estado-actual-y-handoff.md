@@ -3,10 +3,16 @@
 **Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-19 (seguridad previa a datos reales, solo PostgreSQL local — ver `docs/23`, `docs/24`):**
+- **Hecho y verificado en Linux + PostgreSQL 16 local:** cabeceras CSP (nonce) y HSTS condicionado a HTTPS (ADR-022); `/usuarios` y `/cuenta/clave` con clave temporal mostrada una vez y cambio obligatorio (migración 0008, ADR-023); `db:backup` y `db:restore-check` con restauración real comprobada (ADR-024, `docs/24`); Supabase Auth como segundo proveedor, `AUTH_PROVIDER=local|supabase` (migración 0009, ADR-021). Vitest 288/288, Playwright 44/44 (5 en modo Supabase contra un GoTrue **simulado**), tsc/eslint/build limpios.
+- **Pendiente / no verificado:** las migraciones **0008 y 0009 no están aplicadas en Supabase** (requieren respaldo previo, aprobación y comandos del usuario; 0008 cambia `auth_resolve_session`, aplicar junto con el código nuevo); Supabase Auth **no probado contra el servicio real**; respaldo, restauración y cabeceras sin probar en Supabase/producción ni en Windows nativo; confirmar qué copias incluye el plan de Supabase. Lista de control en `docs/23` §5.
+- **Sigue igual:** H-01, H-05 y H-07 abiertas con valores provisionales; extras aplazados; sin IoT; el PDF oficial es interno.
+- **Estado por iteración de `docs/07`:** Iter. 0 ✅ · Iter. 1 ✅ · Iter. 2 ✅ · refuerzo previo a datos reales ✅ (local) · Iter. 3–6 ⏳.
+
 **Corte 2026-11-18 (Iteración 2 — Trazabilidad):**
 - **Hecho y verificado en PostgreSQL local (ver `docs/22`):** migración 0007 (movimientos, destinos, evidencia por referencia de texto, verificaciones); los cinco movimientos con un único flujo transaccional, bloqueo del lote, saldo nunca negativo, idempotencia, correcciones sin borrado, auditoría y RLS; pantallas `/retiros`, `/destinos` y trazabilidad en el detalle del lote. **225 pruebas Vitest en 18 archivos y 31 E2E pasan** (incl. concurrencia con prueba de mutación y axe-core). Casos de aceptación 3, 4, 6 y 8 de `docs/01` cubiertos.
 - **Pendiente / no verificado:** la migración 0007 **ya está aplicada en Supabase** (ejecutada por el usuario; `db:check` sin errores), destinos DEMO cargados y movimientos, evidencia y verificación probados a mano por el usuario en Supabase (informado como correcto, sin detalle por paso); Windows nativo; Supabase Auth; API REST de movimientos (no definida en `docs/04`); carga de archivos de evidencia (descartada por el usuario).
-- **Decisiones abiertas con valor provisional:** H-01 (ubicación = zona), H-05 (valorización = verificación sin movimiento), H-07 (sin excepciones de material). Ver ADR-019/019 y `docs/21`.
+- **Decisiones abiertas con valor provisional:** H-01 (ubicación = zona), H-05 (valorización = verificación sin movimiento), H-07 (sin excepciones de material). Ver ADR-019/020 y `docs/21`.
 - **Estado por iteración de `docs/07`:** Iter. 0 ✅ · Iter. 1 ✅ · Iter. 2 ✅ (local) · Iter. 3–6 ⏳.
 
 **Corte 2026-11-18 (Iteración 1.5 — Windows, Supabase, Git, validación):**
@@ -27,7 +33,8 @@
 3. Verificar el punto de partida: `npm run verify` (tipos, lint, pruebas, build) y `npm run test:e2e`.
 4. Antes de la Iteración 2: conectar y validar Supabase (`docs/19` y lista de `docs/20`, sección 8).
 5. Antes de seguir: aplicar 0007 en Supabase con aprobación del usuario (`docs/22`, sección 5) y repasar con el Hub H-01, H-05 y H-07 (`docs/11`, `docs/21`).
-6. Próxima tarea recomendada: **Iteración 3** (`docs/07`): dashboard consistente con las mismas reglas de saldo y captación, indicadores y exportación CSV; registrar `measurement_occurrences` («cero confirmado», ADR-012).
+6. Si se van a usar datos reales: seguir primero `docs/23` §5 (respaldo, aplicar 0008/0009 con aprobación, decidir proveedor de identidad, HTTPS).
+7. Próxima tarea recomendada: **Iteración 3** (`docs/07`): dashboard consistente con las mismas reglas de saldo y captación, indicadores y exportación CSV; registrar `measurement_occurrences` («cero confirmado», ADR-012).
 
 ## Hardware
 | Componente | Estado conocido | Precaución |

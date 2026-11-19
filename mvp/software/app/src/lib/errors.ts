@@ -33,6 +33,20 @@ export type DomainErrorCode =
   | "evidence_duplicate"
   | "verification_unchanged"
   | "movement_batch_mismatch"
+  | "email_invalid"
+  | "user_exists"
+  | "user_not_found"
+  | "role_invalid"
+  | "role_exists"
+  | "role_not_found"
+  | "last_admin"
+  | "last_role"
+  | "cannot_deactivate_self"
+  | "cannot_reset_self"
+  | "password_change_required"
+  | "wrong_current_password"
+  | "password_weak"
+  | "auth_external"
   | "immutable_record"
   | "validation"
   | "unexpected";
@@ -73,6 +87,20 @@ const MESSAGES: Record<DomainErrorCode, string> = {
   evidence_duplicate: "Esa evidencia (tipo y referencia) ya está registrada en este movimiento.",
   verification_unchanged: "La verificación ya tiene ese estado.",
   movement_batch_mismatch: "El movimiento no corresponde al lote indicado.",
+  email_invalid: "Ingrese un correo electrónico válido.",
+  user_exists: "Ya existe un usuario con ese correo.",
+  user_not_found: "No existe el usuario indicado.",
+  role_invalid: "Rol no válido.",
+  role_exists: "El usuario ya tiene ese rol en ese ámbito.",
+  role_not_found: "No existe el rol indicado.",
+  last_admin: "Debe quedar al menos un administrador activo con acceso a todas las zonas.",
+  last_role: "El usuario debe conservar al menos un rol. Para quitarle el acceso, desactívelo.",
+  cannot_deactivate_self: "No puede desactivar su propia cuenta.",
+  cannot_reset_self: "Para cambiar su propia contraseña use «Cambiar contraseña».",
+  password_change_required: "Debe cambiar su contraseña temporal antes de continuar.",
+  wrong_current_password: "La contraseña actual no es correcta.",
+  password_weak: "La contraseña no cumple los requisitos.",
+  auth_external: "Las contraseñas se administran en Supabase Auth (Authentication → Users en el panel de Supabase), no en HubCircular.",
   immutable_record: "Este registro no puede modificarse ni eliminarse.",
   validation: "Revise los campos marcados.",
   unexpected: "Ocurrió un error inesperado. Intente nuevamente; si persiste, avise a un administrador.",
@@ -99,16 +127,22 @@ function defaultStatus(code: DomainErrorCode): number {
     case "unauthenticated":
       return 401;
     case "forbidden":
+    case "password_change_required":
       return 403;
     case "container_not_found":
     case "batch_not_found":
     case "movement_not_found":
     case "destination_not_found":
+    case "user_not_found":
+    case "role_not_found":
       return 404;
     case "idempotency_conflict":
     case "destination_exists":
+    case "user_exists":
+    case "role_exists":
     case "evidence_duplicate":
     case "verification_unchanged":
+    case "auth_external":
       return 409;
     case "unexpected":
       return 500;

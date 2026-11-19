@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { authProviderName } from "@/modules/identity/auth-provider";
 import { endSession } from "@/modules/identity/service";
 import { can, roleLabel } from "@/modules/identity/permissions";
 import type { Actor } from "@/modules/identity/types";
@@ -17,6 +18,8 @@ export function AppShell({ actor, children }: { actor: Actor; children: React.Re
   if (can(actor, "weighing:read")) items.push({ href: "/historial", label: "Historial" });
   if (can(actor, "catalog:read")) items.push({ href: "/contenedores", label: "Contenedores" });
   if (can(actor, "destination:manage")) items.push({ href: "/destinos", label: "Destinos" });
+  if (can(actor, "user:manage")) items.push({ href: "/usuarios", label: "Usuarios" });
+  if (can(actor, "account:password") && authProviderName() === "local") items.push({ href: "/cuenta/clave", label: "Mi contraseña" });
   const roles = [...new Set(actor.roles.map((r) => roleLabel(r.role)))].join(", ");
 
   return (
