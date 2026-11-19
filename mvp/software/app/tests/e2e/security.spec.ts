@@ -6,7 +6,7 @@ async function login(page: Page, email: string, password: string) {
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña").fill(password);
   await page.getByRole("button", { name: "Ingresar" }).click();
-  await page.waitForURL(/\/(registro|historial)(\?|$)/);
+  await page.waitForURL(/\/inicio(\?|$)/);
 }
 
 test.describe("cabeceras de seguridad", () => {

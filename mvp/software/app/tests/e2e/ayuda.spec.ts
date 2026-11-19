@@ -12,7 +12,7 @@ async function login(page: Page, who: keyof typeof USERS) {
   await page.getByLabel("Correo electrónico").fill(USERS[who][0]);
   await page.getByLabel("Contraseña").fill(USERS[who][1]);
   await page.getByRole("button", { name: "Ingresar" }).click();
-  await page.waitForURL(/\/(registro|historial)(\?|$)/);
+  await page.waitForURL(/\/inicio(\?|$)/);
 }
 
 test.describe("ayuda: iconos (i) y glosario", () => {

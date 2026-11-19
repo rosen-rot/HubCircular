@@ -28,7 +28,7 @@ async function login(page: Page, who: keyof typeof USERS) {
   await page.getByLabel("Correo electrónico").fill(USERS[who][0]);
   await page.getByLabel("Contraseña").fill(USERS[who][1]);
   await page.getByRole("button", { name: "Ingresar" }).click();
-  await page.waitForURL(/\/(registro|historial)(\?|$)/);
+  await page.waitForURL(/\/inicio(\?|$)/);
 }
 
 /** Crea un lote DEMO con un neto exacto registrando un pesaje real por la interfaz. */

@@ -24,7 +24,9 @@ async function login(page: Page, who: keyof typeof USERS) {
   await page.getByLabel("Correo electrónico").fill(USERS[who][0]);
   await page.getByLabel("Contraseña").fill(USERS[who][1]);
   await page.getByRole("button", { name: "Ingresar" }).click();
-  await page.waitForURL(/\/(registro|historial)(\?|$)/);
+  await page.waitForURL(/\/inicio(\?|$)/);
+  // La mayoría de estas pruebas parte del formulario de registro; el lector no tiene acceso a él y se queda en el Inicio.
+  if (who !== "reader") await page.goto("/registro");
 }
 
 /** Alertas de la aplicación (excluye el anunciador de rutas que inyecta Next, que también usa role=alert). */
@@ -66,7 +68,7 @@ test.describe("acceso y sesión", () => {
     await page.getByLabel("Correo electrónico").fill(USERS.operator[0]);
     await page.getByLabel("Contraseña").fill(USERS.operator[1]);
     await page.getByRole("button", { name: "Ingresar" }).click();
-    await page.waitForURL(/\/(registro|historial)/);
+    await page.waitForURL(/\/inicio/);
     expect(new URL(page.url()).hostname).toBe("127.0.0.1");
   });
 
@@ -222,7 +224,7 @@ test.describe("roles y ámbito", () => {
 
   test("el lector puede consultar pero no registrar (UI y servidor)", async ({ page }) => {
     await login(page, "reader");
-    await expect(page).toHaveURL(/\/historial/);
+    await expect(page).toHaveURL(/\/inicio/);
     await expect(page.getByRole("link", { name: "Registro", exact: true })).toHaveCount(0);
     await page.goto("/registro");
     await expect(page.getByRole("heading", { name: "Acceso denegado" })).toBeVisible();

@@ -5,7 +5,7 @@ import { PASSWORDS } from "../helpers/db";
 const ADMIN = ["admin@demo.hubcircular.test", PASSWORDS.admin] as const;
 const NEW_PASSWORD = "caballo bateria grapa correcta";
 
-async function login(page: Page, email: string, password: string, expectUrl: RegExp = /\/(registro|historial|cuenta\/clave)(\?|$)/) {
+async function login(page: Page, email: string, password: string, expectUrl: RegExp = /\/(inicio|cuenta\/clave)(\?|$)/) {
   await page.goto("/login");
   await page.getByLabel("Correo electrónico").fill(email);
   await page.getByLabel("Contraseña").fill(password);
@@ -83,8 +83,8 @@ test.describe("gestión de usuarios", () => {
     await page.getByLabel("Contraseña nueva", { exact: true }).fill(NEW_PASSWORD);
     await page.getByLabel("Repita la contraseña nueva").fill(NEW_PASSWORD);
     await page.getByRole("button", { name: "Cambiar contraseña" }).click();
-    await page.waitForURL(/\/registro/);
-    await expect(page.getByRole("heading", { name: "Nuevo pesaje" })).toBeVisible();
+    await page.waitForURL(/\/inicio/);
+    await expect(page.getByRole("heading", { name: "Inicio", level: 1 })).toBeVisible();
     await logout(page);
 
     // La clave temporal ya no sirve; la nueva sí, y ya no obliga a cambiarla
@@ -93,7 +93,7 @@ test.describe("gestión de usuarios", () => {
     await page.getByLabel("Contraseña").fill(temp);
     await page.getByRole("button", { name: "Ingresar" }).click();
     await expect(alertOf(page)).toContainText("No fue posible iniciar sesión");
-    await login(page, "ana.nueva@demo.hubcircular.test", NEW_PASSWORD, /\/registro/);
+    await login(page, "ana.nueva@demo.hubcircular.test", NEW_PASSWORD, /\/inicio/);
   });
 
   test("desactivar cierra la sesión activa; restablecer exige nueva clave temporal", async ({ browser }) => {
@@ -108,7 +108,7 @@ test.describe("gestión de usuarios", () => {
     await userPage.getByLabel("Contraseña nueva", { exact: true }).fill(NEW_PASSWORD);
     await userPage.getByLabel("Repita la contraseña nueva").fill(NEW_PASSWORD);
     await userPage.getByRole("button", { name: "Cambiar contraseña" }).click();
-    await userPage.waitForURL(/\/historial/);
+    await userPage.waitForURL(/\/inicio/);
 
     // Restablecer: nueva clave temporal, sesión del usuario cerrada
     await adminPage.goto("/usuarios");

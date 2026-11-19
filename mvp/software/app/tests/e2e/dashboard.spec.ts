@@ -25,7 +25,7 @@ async function login(page: Page, who: keyof typeof USERS) {
   await page.getByLabel("Correo electrónico").fill(USERS[who][0]);
   await page.getByLabel("Contraseña").fill(USERS[who][1]);
   await page.getByRole("button", { name: "Ingresar" }).click();
-  await page.waitForURL(/\/(registro|historial)(\?|$)/);
+  await page.waitForURL(/\/inicio(\?|$)/);
 }
 
 const todayCl = () => new Intl.DateTimeFormat("en-CA", { timeZone: "America/Santiago" }).format(new Date());
@@ -120,8 +120,8 @@ test.describe("tablero de indicadores", () => {
 
   test("lector: ve el tablero pero no los calendarios", async ({ page }) => {
     await login(page, "reader");
-    await expect(page.getByRole("link", { name: "Tablero" })).toBeVisible();
-    await expect(page.getByRole("link", { name: "Calendarios" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Tablero", exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Calendarios", exact: true })).toHaveCount(0);
     await page.goto(`/dashboard?${PERIOD}`);
     await expect(tile(page, "Reciclable captado")).toContainText("10,000 kg");
     await page.goto("/calendarios");

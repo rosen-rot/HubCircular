@@ -8,7 +8,15 @@
   --color-brand-600: #187049;
   --color-brand-700: #145a3b;
   --color-brand-900: #143d2e;
-  --color-surface: #f5f8f6;
+  --color-surface: #f4f7f5;
+  /* Menú lateral y fondos de tarjetas de resumen (rediseño 2026-11-19) */
+  --color-sidebar: #0d3f30;
+  --color-sidebar-hover: #17563f;
+  --color-sidebar-active: #1f6e51;
+  --color-tile-mint: #e7f5ed;
+  --color-tile-sky: #e6f1fa;
+  --color-tile-amber: #fdf3df;
+  --color-tile-lilac: #eeebf9;
   --font-sans: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 

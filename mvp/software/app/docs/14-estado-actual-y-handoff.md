@@ -3,6 +3,11 @@
 **Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-19 (rediseño, fases 1–2 de 3 — ver `docs/15`):**
+- **Hecho y verificado en Linux + PostgreSQL 16 local:** nuevo marco (menú lateral que se pliega en teléfono, barra superior con búsqueda) y pantalla **`/inicio`** como aterrizaje de todos los roles, con datos reales ya registrados (sin cifras estimadas). **Vitest 355/355 (31 archivos), Playwright 72/72** (con axe-core), tsc/eslint/build limpios; `next dev` sin avisos en escritorio y 390 px. Sin cambios de base de datos.
+- **Pendiente:** fase 3 (lotes y movimientos con panel de detalle, restyling del resto de pantallas); axe a 390 px en las demás pantallas; revisión del usuario/Hub; elementos de los diseños que dependen de datos que no existen (CO₂, CLP, llenado, mapa, alertas, flujo de retiro con transportista, estados de pesaje), listados en `docs/15`.
+- Siguen abiertas H-01/H-05/H-07; extras aplazados sin cambios; sin IoT.
+
 **Corte 2026-11-19 (descarga unificada — ver `docs/25` §9, ADR-028):**
 - **Hecho y verificado en Linux + PostgreSQL 16 local:** botón «Descargar datos» en el tablero («¿Qué quieres descargar?»): **Todo junto** en un Excel de 4 hojas, o una sola tabla en CSV; los CSV conservan su URL y contenido. Nueva dependencia `write-excel-file` (0 vulnerabilidades). **Vitest 349/349 (30 archivos), Playwright 66/66** (con axe-core), tsc/eslint/build limpios; `next dev` sin avisos de hidratación.
 - **Pendiente / no verificado:** apertura en Microsoft Excel real (sí en LibreOffice); rendimiento con 20.000 filas por hoja; Windows nativo; Supabase (no se tocó la base de datos).

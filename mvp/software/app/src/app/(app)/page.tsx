@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { requireActor } from "@/modules/identity/guards";
-import { can } from "@/modules/identity/permissions";
 
+/** Entrada de la aplicación: todos los roles aterrizan en el Inicio. */
 export default async function Home() {
-  const actor = await requireActor();
-  redirect(can(actor, "weighing:create") ? "/registro" : "/historial");
+  await requireActor();
+  redirect("/inicio");
 }

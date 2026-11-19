@@ -23,7 +23,7 @@ async function tryLogin(page: Page, email: string, password: string) {
 }
 async function login(page: Page, email: string, password: string) {
   await tryLogin(page, email, password);
-  await page.waitForURL(/\/(registro|historial)(\?|$)/);
+  await page.waitForURL(/\/inicio(\?|$)/);
 }
 const alertOf = (page: Page) => page.locator("[role=alert]:not(#__next-route-announcer__)");
 
@@ -39,7 +39,7 @@ test.describe("inicio de sesión con Supabase Auth (simulado)", () => {
     await expect(alertOf(page)).toContainText(GENERIC);
     await expect(page).toHaveURL(/\/login/);
     await login(page, ADMIN, ADMIN_SB);
-    await expect(page.getByText("Administrador DEMO · Administrador").first()).toBeVisible();
+    await expect(page.getByText("Administrador DEMO", { exact: true }).first()).toBeVisible();
   });
 
   test("las contraseñas se administran en Supabase: sin «Mi contraseña», sin restablecer, aviso en /cuenta/clave", async ({ page }) => {
@@ -71,7 +71,7 @@ test.describe("inicio de sesión con Supabase Auth (simulado)", () => {
     await expect(alertOf(other)).toContainText(GENERIC);
     await addUser(request, email, "Clave-supabase-nueva-1!");
     await login(other, email, "Clave-supabase-nueva-1!");
-    await expect(other).toHaveURL(/\/historial/); // lector: sin registro
+    await expect(other).toHaveURL(/\/inicio/); // lector: sin enlace de registro
     await expect(other.getByRole("link", { name: "Usuarios", exact: true })).toHaveCount(0);
     await ctx.close();
   });

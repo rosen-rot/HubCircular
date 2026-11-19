@@ -1,9 +1,10 @@
 import { redirect } from "next/navigation";
+import { SearchBox } from "@/components/layout/search-box";
+import { SideNav, type NavItem } from "@/components/layout/side-nav";
 import { authProviderName } from "@/modules/identity/auth-provider";
 import { endSession } from "@/modules/identity/service";
 import { can, roleLabel } from "@/modules/identity/permissions";
 import type { Actor } from "@/modules/identity/types";
-import { NavLinks, type NavItem } from "./nav-links";
 
 async function logout() {
   "use server";
@@ -12,46 +13,51 @@ async function logout() {
 }
 
 export function AppShell({ actor, children }: { actor: Actor; children: React.ReactNode }) {
-  const items: NavItem[] = [];
-  if (can(actor, "weighing:create")) items.push({ href: "/registro", label: "Registro" });
-  if (can(actor, "movement:create")) items.push({ href: "/retiros", label: "Movimientos" });
-  if (can(actor, "indicators:read")) items.push({ href: "/dashboard", label: "Tablero" });
-  if (can(actor, "weighing:read")) items.push({ href: "/historial", label: "Historial" });
-  if (can(actor, "measurement:zero")) items.push({ href: "/calendarios", label: "Calendarios" });
-  if (can(actor, "catalog:read")) items.push({ href: "/contenedores", label: "Contenedores" });
-  if (can(actor, "destination:manage")) items.push({ href: "/destinos", label: "Destinos" });
-  if (can(actor, "user:manage")) items.push({ href: "/usuarios", label: "Usuarios" });
-  items.push({ href: "/ayuda", label: "Ayuda" });
-  if (can(actor, "account:password") && authProviderName() === "local") items.push({ href: "/cuenta/clave", label: "Mi contraseña" });
+  const items: NavItem[] = [{ href: "/inicio", label: "Inicio", icon: "inicio" }];
+  if (can(actor, "weighing:create")) items.push({ href: "/registro", label: "Registro", icon: "registro" });
+  if (can(actor, "movement:create")) items.push({ href: "/retiros", label: "Movimientos", icon: "movimientos" });
+  if (can(actor, "indicators:read")) items.push({ href: "/dashboard", label: "Tablero", icon: "tablero" });
+  if (can(actor, "weighing:read")) items.push({ href: "/historial", label: "Historial", icon: "historial" });
+  if (can(actor, "measurement:zero")) items.push({ href: "/calendarios", label: "Calendarios", icon: "calendarios" });
+  if (can(actor, "catalog:read")) items.push({ href: "/contenedores", label: "Contenedores", icon: "contenedores" });
+  if (can(actor, "destination:manage")) items.push({ href: "/destinos", label: "Destinos", icon: "destinos" });
+  if (can(actor, "user:manage")) items.push({ href: "/usuarios", label: "Usuarios", icon: "usuarios" });
+  items.push({ href: "/ayuda", label: "Ayuda", icon: "ayuda" });
+  if (can(actor, "account:password") && authProviderName() === "local") items.push({ href: "/cuenta/clave", label: "Mi contraseña", icon: "clave" });
   const roles = [...new Set(actor.roles.map((r) => roleLabel(r.role)))].join(", ");
+  const initials = actor.displayName
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((w) => w[0]!.toUpperCase())
+    .join("");
 
   return (
-    <>
-      <header className="bg-brand-900 text-white">
-        <div className="mx-auto flex max-w-6xl flex-col gap-2 px-4 py-3 md:flex-row md:items-center md:justify-between">
-          <div className="flex items-center justify-between gap-4 md:justify-start">
-            <span className="text-lg font-bold">HubCircular</span>
-            <form action={logout} className="md:hidden">
-              <button className="min-h-9 rounded-lg px-3 text-sm font-semibold text-brand-100 underline">Salir</button>
-            </form>
-          </div>
-          <NavLinks items={items} />
-          <div className="hidden items-center gap-3 text-sm md:flex">
-            <span>
-              {actor.displayName} · <span className="text-brand-200">{roles}</span>
+    <div className="lg:grid lg:min-h-screen lg:grid-cols-[16rem_minmax(0,1fr)]">
+      <aside className="bg-sidebar text-white lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col">
+        <SideNav items={items} />
+        <p className="mt-auto hidden px-5 pb-5 text-xs text-emerald-100/80 lg:block">Medir, gestionar y transformar residuos en decisiones.</p>
+      </aside>
+      <div className="min-w-0">
+        <header className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-200 bg-white px-4 py-3 lg:px-8">
+          {can(actor, "weighing:read") ? <SearchBox /> : <span />}
+          <div className="flex items-center gap-3 text-sm">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-100 font-bold text-brand-900" aria-hidden="true">
+              {initials || "?"}
+            </span>
+            <span className="leading-tight">
+              <span className="block font-semibold text-slate-900">{actor.displayName}</span>
+              <span className="block text-slate-600">{roles}</span>
             </span>
             <form action={logout}>
-              <button className="min-h-9 rounded-lg border border-brand-200 px-3 font-semibold hover:bg-brand-700">Salir</button>
+              <button className="min-h-10 rounded-lg border border-slate-300 px-3 font-semibold text-slate-800 hover:bg-slate-50">Salir</button>
             </form>
           </div>
-        </div>
-        <p className="mx-auto max-w-6xl px-4 pb-2 text-xs text-brand-200 md:hidden">
-          {actor.displayName} · {roles}
-        </p>
-      </header>
-      <main id="contenido" className="mx-auto max-w-6xl px-4 py-6">
-        {children}
-      </main>
-    </>
+        </header>
+        <main id="contenido" className="mx-auto max-w-7xl px-4 py-6 lg:px-8">
+          {children}
+        </main>
+      </div>
+    </div>
   );
 }
