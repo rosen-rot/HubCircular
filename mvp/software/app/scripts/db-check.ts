@@ -1,3 +1,4 @@
+import { TLSSocket } from "node:tls";
 import { Client } from "pg";
 import { buildClientConfig, describeTarget, parseTarget } from "../src/lib/db-config";
 import { planMigrations } from "../src/lib/migrator";
@@ -36,9 +37,14 @@ async function main() {
               (select ssl from pg_stat_ssl where pid = pg_backend_pid()) as ssl`,
     );
     console.log(`Servidor: ${info!.v.split(",")[0]} · base «${info!.db}» · rol de conexión «${info!.u}»`);
-    if (info!.ssl) line("OK", "Conexión cifrada (TLS).");
+    // Se mide el tramo de ESTA máquina hacia el servidor/pooler (el que protege la clave). `pg_stat_ssl` solo
+    // describe el tramo interno pooler→base cuando hay un pooler, por eso se muestra únicamente como dato.
+    const stream = (client as unknown as { connection?: { stream?: unknown } }).connection?.stream;
+    const clientTls = stream instanceof TLSSocket && stream.encrypted === true;
+    if (clientTls) line("OK", "Conexión cifrada (TLS) entre este equipo y el servidor.");
     else if (target.local) line("OK", "Conexión local sin TLS (esperado).");
-    else line("ERROR", "Conexión remota SIN TLS.");
+    else line("ERROR", "La conexión desde este equipo NO está cifrada. Revise DB_SSL (debe ser require o verify).");
+    if (!target.local) console.log(`  [INFO] pg_stat_ssl (tramo interno del servidor/pooler): ${info!.ssl === true ? "cifrado" : "no informado como cifrado"}`);
 
     const [role] = await q<{ rolsuper: boolean; rolcreaterole: boolean; rolbypassrls: boolean }>(
       "select rolsuper, rolcreaterole, rolbypassrls from pg_roles where rolname = current_user",
