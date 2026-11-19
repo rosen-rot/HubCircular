@@ -60,8 +60,8 @@ Ver `docs/24-respaldos-y-restauracion.md`: `npm run db:backup` y `npm run db:res
 |---|---|---|---|
 | 1 | Aplicación de 0008 y 0009 en Supabase con `CONFIRM_REMOTE_MIGRATION` | Usuario | **Hecho** el 19-11-2026 (salida real en `docs/15`); no consta respaldo previo |
 | 2 | Primera corrida real de `db:backup` y de `db:restore-check` en Windows | Usuario | **Hecho** el 19-11-2026 (`docs/15`): `db:backup` con pg_dump 18.2 (77 filas, 9 migraciones) y `db:restore-check` OK en un PostgreSQL 18 local (filas, migraciones, políticas y RLS idénticos). Falta probar la restauración en un servidor 17 |
-| 3 | Confirmar en el panel de Supabase qué copias automáticas/PITR incluye el plan (`docs/24` §6) | Usuario | Pendiente |
-| 4 | Decidir el proveedor de identidad (local o Supabase Auth) y, si es Supabase, completar la sección 3 | Usuario/equipo | Pendiente |
+| 3 | Confirmar en el panel de Supabase qué copias automáticas/PITR incluye el plan (`docs/24` §6) | Usuario | **Hecho** (informado): plan gratuito, **sin copias automáticas**; el único respaldo es `db:backup` |
+| 4 | Decidir el proveedor de identidad (local o Supabase Auth) y, si es Supabase, completar la sección 3 | Usuario/equipo | Inclinación del usuario: **local** por ahora (sin cambios; Supabase Auth queda inactivo y sin probar contra el servicio real) |
 | 5 | Servir detrás de HTTPS con `SESSION_COOKIE_SECURE=true` y comprobar las cabeceras con `curl -I` | Usuario | Pendiente (sin despliegue) |
 | 6 | Rol dedicado `hc_login` en lugar de `postgres` en `DATABASE_URL` (`docs/19`) | Usuario | Pendiente (aviso de `db:check:app`) |
 | 7 | Cambiar las claves DEMO y no usar datos DEMO como reales; crear zonas, estaciones y materiales reales | Equipo | Pendiente |

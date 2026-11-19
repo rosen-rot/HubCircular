@@ -139,6 +139,13 @@
 - Límites: restaurado en un PostgreSQL **18** local; la restauración en un servidor 17 (la versión de Supabase) o en un proyecto Supabase nuevo no se ha probado. Limpieza informada por el usuario (salida real): `drop database hc_restore_test` ⇒ DROP DATABASE y servidor local detenido (`-Action stop`). El archivo `.dump` y su manifiesto siguen en `D:\\Respaldos\\HubCircular`.
 - Pendiente: prueba manual de `/usuarios` contra Supabase; confirmar las copias del plan de Supabase; decidir el proveedor de identidad (`docs/23` §3 y §5).
 
+### 2026-11-19 — Prueba manual de /usuarios, copias de Supabase y proveedor de identidad (informado por el usuario)
+- Agente / rama / commit: usuario + Claude (Cowork) · `main`.
+- Prueba manual de `/usuarios` contra Supabase (informada por el usuario): «funciona bien tanto el crear como desactivar usuario». **Sin capturas ni detalle por paso**; no se informó explícitamente la clave temporal con cambio obligatorio ni el bloqueo posterior al desactivar, de modo que queda como informada en términos generales.
+- Copias de Supabase (informado por el usuario): **el proyecto no tiene copias automáticas porque está en el plan gratuito**. Por tanto el único respaldo es el lógico de `db:backup` (`docs/24`); ver la rutina propuesta allí.
+- Proveedor de identidad: el usuario se inclina por mantener **`AUTH_PROVIDER=local`** por ahora (decisión del usuario, no se cambió nada). Supabase Auth queda implementado pero **inactivo y sin probar contra el servicio real**.
+- Próxima acción: Iteración 3 o decisiones con el Hub (H-01/H-05/H-07); antes de datos reales: HTTPS y rol `hc_login` al desplegar.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

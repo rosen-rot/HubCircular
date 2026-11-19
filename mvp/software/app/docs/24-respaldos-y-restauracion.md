@@ -53,6 +53,8 @@ Esta guía **no se ejecuta sin aprobación explícita** y siempre sobre un desti
 
 ## 6. Copias propias de Supabase (lista de verificación del usuario)
 
+> **Informado por el usuario el 19-11-2026:** el proyecto está en el plan gratuito y **no tiene copias automáticas**. Mientras sea así, `npm run db:backup` es el **único** respaldo: hágalo antes de cada migración y, con datos reales, con la frecuencia de la sección 5 (no deje pasar más de una semana).
+
 No se afirma aquí qué incluye cada plan de Supabase: **verifíquelo en el panel** (Project → Database → Backups) y anótelo:
 
 - [ ] ¿Hay copias automáticas diarias y cuántos días se conservan en su plan?
