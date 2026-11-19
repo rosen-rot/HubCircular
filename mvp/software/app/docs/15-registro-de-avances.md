@@ -124,6 +124,13 @@
 - **No informado / sin verificar:** el usuario no compartió la salida de `db:backup`, por lo que **no consta** que se haya hecho un respaldo antes de migrar ni que `db:backup` o `db:restore-check` hayan corrido en Windows; tampoco consta la prueba manual de `/usuarios` ni de la clave temporal contra Supabase, ni que se haya activado Supabase Auth (el proveedor sigue siendo `local` salvo que el usuario indique lo contrario).
 - Próxima acción: primera corrida real de `db:backup` (y `db:restore-check`), prueba manual de `/usuarios` en Supabase, confirmar las copias del plan de Supabase y decidir el proveedor de identidad (`docs/23` §3 y §5).
 
+### 2026-11-19 — Primer respaldo real de Supabase con `db:backup` (ejecutado por el usuario en Windows)
+- Agente / rama / commit: usuario en PowerShell + Claude (Cowork) · `main`.
+- Comandos y resultados (salida real del usuario): `db:backup` con `pg_dump` 18.2 (`C:\Program Files\PostgreSQL\18`, vía `PG_DUMP_PATH`/`PG_RESTORE_PATH`) y `BACKUP_DIR=D:\Respaldos\HubCircular` (variables solo de la sesión de PowerShell) ⇒ «Respaldo OK»: 141887 bytes, sha256 `6d553cc39fb0e5dc…`, 261 objetos, 18 tablas, 77 filas, 9 migraciones; archivo `hubcircular-hc-remoto-postgres-20261119-040207Z.dump` (UTC) fuera del repositorio. Un primer intento sin `BACKUP_DIR` fue rechazado por el script (comportamiento esperado) y `pg_dump` no estaba en el `PATH`.
+- Verificado: `pg_dump` 18.2 puede volcar el servidor PostgreSQL 17.11 de Supabase en Windows con las salvaguardas del script.
+- **Sigue sin verificar:** `db:restore-check` con este archivo (requiere una base **local y vacía**); la restauración no se ha probado con un volcado de Supabase, solo con uno local en Linux. El respaldo es anterior a la prueba manual de `/usuarios` en Supabase, que tampoco consta.
+- Próxima acción: prueba de restauración local y prueba manual de `/usuarios` (`docs/23` §5).
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

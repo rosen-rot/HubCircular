@@ -59,7 +59,7 @@ Ver `docs/24-respaldos-y-restauracion.md`: `npm run db:backup` y `npm run db:res
 | # | Acción | Responsable | Estado |
 |---|---|---|---|
 | 1 | Aplicación de 0008 y 0009 en Supabase con `CONFIRM_REMOTE_MIGRATION` | Usuario | **Hecho** el 19-11-2026 (salida real en `docs/15`); no consta respaldo previo |
-| 2 | Primera corrida real de `db:backup` y de `db:restore-check` en Windows (PostgreSQL 17 cliente) | Usuario | Pendiente |
+| 2 | Primera corrida real de `db:backup` y de `db:restore-check` en Windows | Usuario | `db:backup` **hecho** el 19-11-2026 (pg_dump 18.2, 77 filas, 9 migraciones; `docs/15`); `db:restore-check` pendiente |
 | 3 | Confirmar en el panel de Supabase qué copias automáticas/PITR incluye el plan (`docs/24` §6) | Usuario | Pendiente |
 | 4 | Decidir el proveedor de identidad (local o Supabase Auth) y, si es Supabase, completar la sección 3 | Usuario/equipo | Pendiente |
 | 5 | Servir detrás de HTTPS con `SESSION_COOKIE_SECURE=true` y comprobar las cabeceras con `curl -I` | Usuario | Pendiente (sin despliegue) |

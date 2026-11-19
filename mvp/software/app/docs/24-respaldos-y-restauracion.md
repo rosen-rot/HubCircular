@@ -64,7 +64,7 @@ Las copias del panel **no sustituyen** este respaldo lógico: este se puede rest
 
 ## 7. Límites conocidos
 
-- Probado con PostgreSQL 16 local; la compatibilidad con PostgreSQL 17 de Supabase (cliente 17) la valida el usuario en su primera corrida (el script verifica la versión del cliente antes de volcar).
+- La restauración se probó con PostgreSQL 16 local (Linux). El usuario ejecutó `db:backup` contra Supabase (PostgreSQL 17.11) en Windows con `pg_dump` 18.2 el 19-11-2026 y terminó bien; **falta** probar `db:restore-check` con ese archivo. Un volcado hecho con `pg_dump` 18 puede no restaurarse en un servidor 17 o menor: restáurelo en un PostgreSQL local de versión igual o mayor (el 18 instalado sirve).
 - No respalda los esquemas internos de Supabase ni su Auth (cuando se active ADR-014, los usuarios de Supabase Auth viven en el esquema `auth`, **fuera** de este respaldo; ver docs/23).
 - `--serializable-deferrable` puede esperar unos segundos a un momento sin transacciones conflictivas; con la carga prevista no es relevante.
 - El manifiesto se calcula antes del volcado en una transacción `repeatable read`; si el origen recibe escrituras entre ambos pasos, `db:restore-check` informará diferencias y basta repetir el respaldo.
