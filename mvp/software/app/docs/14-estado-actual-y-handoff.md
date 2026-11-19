@@ -3,9 +3,9 @@
 **Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
-**Corte 2026-11-19 (rediseño, fases 1–2 de 3 — ver `docs/15`):**
-- **Hecho y verificado en Linux + PostgreSQL 16 local:** nuevo marco (menú lateral que se pliega en teléfono, barra superior con búsqueda) y pantalla **`/inicio`** como aterrizaje de todos los roles, con datos reales ya registrados (sin cifras estimadas). **Vitest 355/355 (31 archivos), Playwright 72/72** (con axe-core), tsc/eslint/build limpios; `next dev` sin avisos en escritorio y 390 px. Sin cambios de base de datos.
-- **Pendiente:** fase 3 (lotes y movimientos con panel de detalle, restyling del resto de pantallas); axe a 390 px en las demás pantallas; revisión del usuario/Hub; elementos de los diseños que dependen de datos que no existen (CO₂, CLP, llenado, mapa, alertas, flujo de retiro con transportista, estados de pesaje), listados en `docs/15`.
+**Corte 2026-11-19 (rediseño completo, fases 1–3 — ver `docs/26` y `docs/15`):**
+- **Hecho y verificado en Linux + PostgreSQL 16 local:** nuevo marco (menú lateral que se pliega en teléfono, barra superior con búsqueda), **`/inicio`** como aterrizaje de todos los roles, **`/lotes`** y **`/movimientos`** con panel de detalle y línea de tiempo, `/registro` con resumen de hoy y últimos registros, y encabezados nuevos en el resto. Solo datos ya registrados (sin cifras estimadas). **Vitest 365/365 (32 archivos), Playwright 83/83** (con axe-core, incluido axe y ausencia de desplazamiento horizontal a 390 px en las 13 pantallas del menú), tsc/eslint/build limpios; `next dev` sin avisos en escritorio y 390 px. Sin cambios de base de datos.
+- **Pendiente:** revisión del usuario/Hub; elementos de las imágenes que dependen de datos que no existen (CO₂, CLP, llenado, mapa, alertas, flujo de retiro con transportista, estados de pesaje), listados con su motivo en `docs/26` §4; Windows nativo.
 - Siguen abiertas H-01/H-05/H-07; extras aplazados sin cambios; sin IoT.
 
 **Corte 2026-11-19 (descarga unificada — ver `docs/25` §9, ADR-028):**

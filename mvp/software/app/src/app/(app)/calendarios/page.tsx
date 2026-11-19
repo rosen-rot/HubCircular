@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { CalendarDays } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import Link from "next/link";
 import { Forbidden } from "@/components/forbidden";
 import { InfoTip, Term } from "@/components/help/info-tip";
@@ -41,14 +43,7 @@ export default async function CalendariosPage({ searchParams }: { searchParams: 
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-900">
-          <Term k="calendario">Calendarios de medición</Term>
-        </h1>
-        <p className="text-slate-700">
-          Hoy es {weekdayName(dow)} {dmy(today)} (hora de Chile). Los calendarios definen qué días se espera medir cada contenedor; el tablero calcula la cobertura con ellos.
-        </p>
-      </div>
+      <PageHeader icon={CalendarDays} title={<Term k="calendario">Calendarios de medición</Term>} subtitle={<>Hoy es {weekdayName(dow)} {dmy(today)} (hora de Chile). Los calendarios definen qué días se espera medir cada contenedor; el tablero calcula la cobertura con ellos.</>} />
 
       {ok ? <Alert tone="success" role="status">{ok}</Alert> : null}
       {err ? <Alert tone="error" role="alert">{messageForCode(err)}</Alert> : null}

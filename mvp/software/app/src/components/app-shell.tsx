@@ -15,7 +15,8 @@ async function logout() {
 export function AppShell({ actor, children }: { actor: Actor; children: React.ReactNode }) {
   const items: NavItem[] = [{ href: "/inicio", label: "Inicio", icon: "inicio" }];
   if (can(actor, "weighing:create")) items.push({ href: "/registro", label: "Registro", icon: "registro" });
-  if (can(actor, "movement:create")) items.push({ href: "/retiros", label: "Movimientos", icon: "movimientos" });
+  if (can(actor, "batch:read")) items.push({ href: "/lotes", label: "Lotes", icon: "lotes" });
+  if (can(actor, "movement:read")) items.push({ href: "/movimientos", label: "Movimientos", icon: "movimientos" });
   if (can(actor, "indicators:read")) items.push({ href: "/dashboard", label: "Tablero", icon: "tablero" });
   if (can(actor, "weighing:read")) items.push({ href: "/historial", label: "Historial", icon: "historial" });
   if (can(actor, "measurement:zero")) items.push({ href: "/calendarios", label: "Calendarios", icon: "calendarios" });

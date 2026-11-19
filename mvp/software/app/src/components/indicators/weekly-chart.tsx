@@ -134,7 +134,7 @@ export function WeeklyChart({ weekly, materials, from, to }: Props) {
 
       <details className="rounded-lg border border-slate-200 bg-slate-50 px-3 py-2">
         <summary className="cursor-pointer text-sm font-semibold text-brand-900">Ver tabla de datos</summary>
-        <div className="mt-2 overflow-x-auto">
+        <div className="mt-2 relative overflow-x-auto" tabIndex={0} role="region" aria-label="Tabla de captación semanal (se desplaza horizontalmente)">
           <table className="w-full min-w-[420px] text-left text-sm">
             <caption className="sr-only">Captación semanal por material, en kilogramos</caption>
             <thead>

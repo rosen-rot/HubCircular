@@ -60,7 +60,7 @@ export function InfoTip({ k, className }: { k: GlossaryKey; className?: string }
   }, [open, place]);
 
   return (
-    <details ref={details} onToggle={(ev) => setOpen(ev.currentTarget.open)} className={cn("ml-1 inline-block align-middle", className)}>
+    <details ref={details} onToggle={(ev) => setOpen(ev.currentTarget.open)} className={cn("group ml-1 inline-block align-middle", className)}>
       <summary
         ref={summary}
         aria-label={`Qué significa: ${e.name}`}
@@ -72,7 +72,7 @@ export function InfoTip({ k, className }: { k: GlossaryKey; className?: string }
         ref={panel}
         role="note"
         style={{ left: pos.left, top: pos.top, width: pos.width }}
-        className="fixed z-30 rounded-lg border border-slate-300 bg-white p-3 text-left text-sm font-normal normal-case text-slate-800 shadow-lg"
+        className="fixed z-30 hidden group-open:block rounded-lg border border-slate-300 bg-white p-3 text-left text-sm font-normal normal-case text-slate-800 shadow-lg"
       >
         <p className="font-semibold text-brand-900">{e.name}</p>
         <p className="mt-1">{e.short}</p>

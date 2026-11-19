@@ -175,7 +175,7 @@ export default async function InicioPage({ searchParams }: { searchParams: Promi
           {h.recent.length === 0 ? (
             <p className="mt-2 text-sm text-slate-700">Todavía no hay pesajes registrados.</p>
           ) : (
-            <div className="mt-2 overflow-x-auto" tabIndex={0} role="region" aria-label="Últimos pesajes (se desplaza horizontalmente)">
+            <div className="mt-2 relative overflow-x-auto" tabIndex={0} role="region" aria-label="Últimos pesajes (se desplaza horizontalmente)">
               <table className="w-full text-left text-sm">
                 <caption className="sr-only">Los 6 pesajes más recientes</caption>
                 <thead>

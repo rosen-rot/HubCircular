@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Users } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { Forbidden } from "@/components/forbidden";
 import { Alert, Badge, Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -34,14 +36,9 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
 
   return (
     <div className="mx-auto max-w-4xl space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-900">Usuarios</h1>
-        <p className="text-slate-700">
-          {external
+      <PageHeader icon={Users} title={'Usuarios'} subtitle={<>{external
             ? "Alta, roles y zonas y activación. Las contraseñas se administran en Supabase Auth; cada cambio queda auditado."
-            : "Alta, roles y zonas, activación y restablecimiento de contraseña. Las claves nunca se muestran después de entregarse; cada cambio queda auditado."}
-        </p>
-      </div>
+            : "Alta, roles y zonas, activación y restablecimiento de contraseña. Las claves nunca se muestran después de entregarse; cada cambio queda auditado."}</>} />
       {external ? (
         <Alert tone="info" role="note" data-testid="modo-supabase">
           Modo Supabase Auth: las personas ingresan con su cuenta de Supabase y HubCircular decide sus permisos. Desactivar un perfil cierra sus

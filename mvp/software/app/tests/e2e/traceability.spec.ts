@@ -216,7 +216,8 @@ test.describe("roles", () => {
     await page.getByRole("button", { name: "Salir" }).first().click();
 
     await login(page, "reader");
-    await expect(page.getByRole("link", { name: "Movimientos", exact: true })).toHaveCount(0);
+    // el lector consulta lotes y movimientos, pero no tiene destinos ni formulario de movimiento
+    await expect(page.getByRole("link", { name: "Movimientos", exact: true })).toBeVisible();
     await expect(page.getByRole("link", { name: "Destinos", exact: true })).toHaveCount(0);
     await page.goto(`/lotes/${batchId}`);
     await expect(page.getByTestId("movimiento")).toContainText("Despacho a gestor");

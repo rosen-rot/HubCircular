@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ChartColumn } from "lucide-react";
 import { Forbidden } from "@/components/forbidden";
 import { ExportPicker } from "@/components/indicators/export-picker";
 import { WeeklyChart } from "@/components/indicators/weekly-chart";
@@ -82,9 +83,14 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
     <div className="space-y-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-bold text-brand-900">
-            Tablero de indicadores {demo ? <DemoBadge /> : null}
-          </h1>
+          <div className="flex items-center gap-3">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white" aria-hidden="true">
+              <ChartColumn className="h-6 w-6" />
+            </span>
+            <h1 className="text-2xl font-bold text-brand-900">
+              Tablero de indicadores {demo ? <DemoBadge /> : null}
+            </h1>
+          </div>
           <p className="text-slate-700">
             Del {dmy(filters.from)} al {dmy(filters.to)} · días en hora de Chile (America/Santiago) · masas en kilogramos. Solo se muestra lo que su rol y zona permiten ver.
           </p>
@@ -191,7 +197,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         <h2 id="h-cierre" className="text-xl font-bold text-brand-900">
           <Term k="cierre_contable">Cierre contable del inventario</Term>
         </h2>
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <div className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white" tabIndex={0} role="region" aria-label="Conciliación del inventario (se desplaza horizontalmente)">
           <table className="w-full min-w-[420px] text-left text-sm">
             <caption className="sr-only">Conciliación del inventario del período</caption>
             <tbody className="divide-y divide-slate-200">
@@ -247,7 +253,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         {containerRows.length === 0 ? (
           <Alert tone="info">No hay mediciones esperadas en este período: aún no se han programado calendarios para los contenedores de este ámbito.</Alert>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+          <div className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white" tabIndex={0} role="region" aria-label="Cobertura por contenedor (se desplaza horizontalmente)">
             <table className="w-full min-w-[700px] text-left text-sm">
               <caption className="sr-only">Cobertura de medición por contenedor</caption>
               <thead className="bg-brand-50 text-slate-800">
@@ -303,7 +309,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
         {moves.rows.length === 0 ? (
           <Alert tone="info">No hay movimientos en este período y ámbito.</Alert>
         ) : (
-          <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+          <div className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white" tabIndex={0} role="region" aria-label="Movimientos efectivos (se desplaza horizontalmente)">
             <table className="w-full min-w-[760px] text-left text-sm">
               <caption className="sr-only">Movimientos efectivos del período</caption>
               <thead className="bg-brand-50 text-slate-800">

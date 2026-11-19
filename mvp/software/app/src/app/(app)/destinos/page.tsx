@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Truck } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { Forbidden } from "@/components/forbidden";
 import { InfoTip, Term } from "@/components/help/info-tip";
 import { Badge, Card, DemoBadge } from "@/components/ui/card";
@@ -19,14 +21,7 @@ export default async function DestinosPage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-900">
-          <Term k="destino">Destinos</Term>
-        </h1>
-        <p className="text-slate-700">
-          Catálogo de destinos para despachos y reutilización. Un destino se desactiva, no se elimina: los movimientos anteriores conservan su referencia.
-        </p>
-      </div>
+      <PageHeader icon={Truck} title={<Term k="destino">Destinos</Term>} subtitle={<>Catálogo de destinos para despachos y reutilización. Un destino se desactiva, no se elimina: los movimientos anteriores conservan su referencia.</>} />
       <Card>
         <h2 className="mb-3 text-lg font-semibold">Nuevo destino</h2>
         <DestinationForm />

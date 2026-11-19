@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { CircleHelp } from "lucide-react";
 import { Card } from "@/components/ui/card";
 import { GLOSSARY, GLOSSARY_GROUPS, type GlossaryKey } from "@/lib/glossary";
 import { requireActor } from "@/modules/identity/guards";
@@ -12,7 +13,12 @@ export default async function AyudaPage() {
   return (
     <div className="space-y-6">
       <header>
-        <h1 className="text-2xl font-bold text-brand-900">Ayuda y glosario</h1>
+        <div className="flex items-center gap-3">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-brand-600 text-white" aria-hidden="true">
+            <CircleHelp className="h-6 w-6" />
+          </span>
+          <h1 className="text-2xl font-bold text-brand-900">Ayuda y glosario</h1>
+        </div>
         <p className="mt-1 max-w-3xl text-slate-700">
           Qué significa cada palabra de HubCircular, con ejemplos. En cada pantalla, el icono{" "}
           <span aria-hidden="true" className="inline-flex h-6 w-6 items-center justify-center rounded-full border border-brand-600 text-xs font-bold text-brand-700">

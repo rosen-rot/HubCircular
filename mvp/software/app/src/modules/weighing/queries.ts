@@ -147,3 +147,49 @@ export async function getWeighing(actor: Actor, id: string): Promise<WeighingRec
     { readOnly: true },
   );
 }
+
+export interface TodaySummary {
+  real: { weighings: number; netG: number };
+  demo: { weighings: number; netG: number };
+  /** Últimos pesajes registrados por la propia persona (de cualquier día), más recientes primero. */
+  mine: { id: string; refNo: number; occurredAt: Date; containerCode: string | null; materialName: string; netG: number; dataOrigin: "real" | "demo" }[];
+}
+
+/** Resumen del día (hora de Chile) dentro del ámbito del actor, con origen real y DEMO por separado, y sus últimos registros. */
+export async function getTodaySummary(actor: Actor): Promise<TodaySummary> {
+  return withActor(
+    actor.userId,
+    async (db) => {
+      const t = await db.query<{ data_origin: "real" | "demo"; n: number; g: number }>(
+        `select w.data_origin, count(*)::int as n, coalesce(sum(w.net_g), 0)::bigint as g
+           from hc.weighings w
+          where hc._local_day(w.occurred_at) = hc._today_cl() and hc._in_view(w.zone_id, null)
+          group by w.data_origin`,
+      );
+      const get = (o: "real" | "demo") => {
+        const r = t.rows.find((x) => x.data_origin === o);
+        return { weighings: r?.n ?? 0, netG: Number(r?.g ?? 0) };
+      };
+      const mine = await db.query<{
+        id: string; ref_no: number; occurred_at: Date; container_code: string | null; material_name: string; net_g: number; data_origin: "real" | "demo";
+      }>(
+        `select w.id, w.ref_no, w.occurred_at, c.code as container_code, m.name as material_name, w.net_g, w.data_origin
+           from hc.weighings w
+           left join hc.containers c on c.id = w.container_id
+           join hc.materials m on m.id = w.material_id
+          where w.created_by = $1
+          order by w.occurred_at desc, w.ref_no desc limit 5`,
+        [actor.userId],
+      );
+      return {
+        real: get("real"),
+        demo: get("demo"),
+        mine: mine.rows.map((r) => ({
+          id: r.id, refNo: r.ref_no, occurredAt: r.occurred_at, containerCode: r.container_code,
+          materialName: r.material_name, netG: Number(r.net_g), dataOrigin: r.data_origin,
+        })),
+      };
+    },
+    { readOnly: true },
+  );
+}

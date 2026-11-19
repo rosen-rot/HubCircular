@@ -203,6 +203,16 @@
 - Riesgos y límites: no revisado por el usuario ni por el Hub; las demás pantallas (registro, historial, contenedores, calendarios, tablero…) conservan su diseño interior anterior dentro del nuevo marco y **no se les ha pasado axe a 390 px** (las tablas con desplazamiento horizontal podrían exigir foco por teclado como pasó en Inicio); no probado en Windows nativo ni contra Supabase (sin cambios de base de datos).
 - Próxima acción: fase 3 del rediseño (lotes y movimientos con panel de detalle, restyling del resto) y luego Iteración 4.
 
+### 2026-11-19 — Rediseño de la plataforma, fase 3: Lotes, Movimientos con panel de detalle y restyling
+- Agente / rama / commit: Claude (Cowork) · `main` (commit al entregar).
+- Objetivo: completar el rediseño elegido por el usuario («Diseño + vistas con datos que ya tenemos»). Detalle, mapa de elementos y lista de lo no construido en `docs/26`.
+- Cambios y archivos: `/lotes` y `/movimientos` (listas con filtros, tarjetas y panel de detalle con línea de tiempo; `src/modules/inventory/{filters,queries}.ts`, `src/modules/movements/{filters,queries}.ts`, `src/components/lotes/*`, `src/components/ui/timeline.tsx`); menú con «Lotes» y «Movimientos» (el formulario sigue en `/retiros`); `/registro` con resumen de hoy, mis últimos registros y recordatorio (`getTodaySummary`); encabezados con icono en el resto de pantallas; accesibilidad móvil: regiones con desplazamiento enfocables y `relative`, globos de ayuda ocultos si están cerrados. Sin migración.
+- Comandos y pruebas (resultados reales, Linux + PostgreSQL 16 local): `tsc`, `eslint` y `next build` sin errores; **Vitest 365/365** (32 archivos); **Playwright 83/83** (con axe-core; +11 de `lotes-movimientos.spec.ts`, incl. axe y sin desborde a 390 px en las 13 pantallas del menú); `next dev` en 1280 y 390 px: 0 avisos.
+- Incidencias: ver `docs/26` §6 (desbordes y foco por teclado a 390 px, hallados por las pruebas nuevas).
+- Decisiones: estado del lote derivado (En inventario / Saldo parcial / Sin saldo); origen real por defecto; el panel solo muestra lo registrado.
+- Riesgos y límites: sin revisión del Hub/usuario; Windows nativo y Supabase sin probar (no hubo cambios de base de datos).
+- Próxima acción: que el usuario revise el diseño (`npm run dev`); luego Iteración 4 (IoT simulado) y ajustes tras las respuestas del Hub.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

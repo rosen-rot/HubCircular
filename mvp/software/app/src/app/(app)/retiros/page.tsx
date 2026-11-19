@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { ArrowLeftRight } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import { randomUUID } from "node:crypto";
 import { Forbidden } from "@/components/forbidden";
 import { Alert } from "@/components/ui/card";
@@ -22,13 +24,8 @@ export default async function RetirosPage({ searchParams }: { searchParams: Prom
 
   return (
     <div className="mx-auto max-w-2xl space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-900">Movimientos de inventario</h1>
-        <p className="text-slate-700">
-          Traslados, despachos, reutilización, rechazos y ajustes. Un movimiento cambia el saldo del lote; <strong>no</strong> modifica la captación
-          registrada.
-        </p>
-      </div>
+      <PageHeader icon={ArrowLeftRight} title={'Movimientos de inventario'} subtitle={<>Traslados, despachos, reutilización, rechazos y ajustes. Un movimiento cambia el saldo del lote; <strong>no</strong> modifica la captación
+          registrada.</>} />
       {batches.length === 0 ? (
         <Alert tone="warning">No hay lotes con saldo disponible en su ámbito.</Alert>
       ) : (

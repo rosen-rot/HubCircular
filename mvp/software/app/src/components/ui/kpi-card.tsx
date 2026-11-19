@@ -37,7 +37,7 @@ export function KpiCard({
             {label}
             {help}
           </h3>
-          <p className="text-3xl font-bold tabular-nums text-brand-900">{value}</p>
+          <p className="whitespace-nowrap text-2xl font-bold tabular-nums text-brand-900">{value}</p>
         </div>
       </div>
       {children ? <div className="mt-2 space-y-0.5 text-sm text-slate-700">{children}</div> : null}

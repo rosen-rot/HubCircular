@@ -1,6 +1,8 @@
 import "server-only";
 import { withActor } from "@/lib/db";
 import type { Actor } from "@/modules/identity/types";
+import { santiagoDayRangeToUtc } from "@/lib/time";
+import { parseMovementRef, type MovementFilters, type ValorizationState } from "./filters";
 import type { DestinationType, EvidenceKind, MovementType } from "./schema";
 
 export interface DestinationItem {
@@ -185,4 +187,125 @@ export function valorizationStatus(m: Pick<MovementItem, "type" | "evidence" | "
   const last = m.verifications[m.verifications.length - 1];
   if (last) return last.status;
   return m.evidence.length === 0 ? "pendiente_evidencia" : "pendiente_verificacion";
+}
+
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+// Lista de movimientos (pantalla /movimientos)
+// ─────────────────────────────────────────────────────────────────────────────────────────────
+export const MOVEMENT_PAGE_SIZE = 20;
+
+export interface MovementListItem {
+  id: string;
+  refNo: number;
+  batchId: string;
+  batchRef: number;
+  type: MovementType | "correccion";
+  quantityG: number;
+  fromZone: string | null;
+  toZone: string | null;
+  destinationName: string | null;
+  destinationType: DestinationType | null;
+  occurredAt: Date;
+  createdByName: string;
+  state: ValorizationState | null;
+  dataOrigin: "real" | "demo";
+}
+
+export interface MovementList {
+  rows: MovementListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totals: { dispatches: number; pendingEvidence: number; pendingVerification: number };
+}
+
+/**
+ * Movimientos del origen elegido (RLS por ubicación). El estado de valorización se deriva igual que en la ficha del
+ * lote: corregido > última verificación > con/sin evidencia. Solo los despachos tienen estado.
+ */
+export async function listMovements(actor: Actor, f: MovementFilters): Promise<MovementList> {
+  const params: unknown[] = [f.origin];
+  const where: string[] = ["b.data_origin = $1"];
+  const add = (sql: string, v: unknown) => {
+    params.push(v);
+    where.push(sql.replace("$n", `$${params.length}`));
+  };
+  const range = santiagoDayRangeToUtc(f.from, f.to);
+  if (range.from) add("m.occurred_at >= $n", range.from);
+  if (range.to) add("m.occurred_at < $n", range.to);
+  if (f.type) add("m.type = $n", f.type);
+  const ref = f.ref ? parseMovementRef(f.ref) : null;
+  if (ref?.kind === "movement") add("m.ref_no = $n", ref.n);
+  if (ref?.kind === "batch") add("b.ref_no = $n", ref.n);
+  if (f.state) add("st.state = $n", f.state);
+
+  const from = `
+    from hc.movements m
+    join hc.batches b on b.id = m.batch_id
+    join hc.profiles p on p.id = m.created_by
+    left join hc.zones zf on zf.id = m.from_location_id
+    left join hc.zones zt on zt.id = m.to_location_id
+    left join hc.destinations d on d.id = m.destination_id
+    cross join lateral (
+      select case
+        when m.type <> 'despacho' then null
+        when exists (select 1 from hc.movements c where c.corrects_movement_id = m.id) then 'corregido'
+        else coalesce(
+          (select v.status from hc.movement_verifications v where v.movement_id = m.id order by v.decided_at desc, v.id desc limit 1),
+          case when exists (select 1 from hc.movement_evidence e where e.movement_id = m.id) then 'pendiente_verificacion' else 'pendiente_evidencia' end)
+      end as state) st
+    where ${where.join(" and ")}`;
+
+  return withActor(
+    actor.userId,
+    async (db) => {
+      const t = await db.query<{ n: number; dispatches: number; pe: number; pv: number }>(
+        `select count(*)::int as n, (count(*) filter (where m.type = 'despacho'))::int as dispatches,
+                (count(*) filter (where st.state = 'pendiente_evidencia'))::int as pe,
+                (count(*) filter (where st.state = 'pendiente_verificacion'))::int as pv ${from}`,
+        params,
+      );
+      const rows = await db.query<{
+        id: string; ref_no: number; batch_id: string; batch_ref: number; type: MovementType | "correccion"; quantity_g: number;
+        from_zone: string | null; to_zone: string | null; destination_name: string | null; destination_type: DestinationType | null;
+        occurred_at: Date; created_by_name: string; state: ValorizationState | null; data_origin: "real" | "demo";
+      }>(
+        `select m.id, m.ref_no, m.batch_id, b.ref_no as batch_ref, m.type, m.quantity_g, zf.name as from_zone, zt.name as to_zone,
+                d.name as destination_name, d.type as destination_type, m.occurred_at, p.display_name as created_by_name,
+                st.state, b.data_origin ${from}
+          order by m.occurred_at desc, m.ref_no desc limit ${MOVEMENT_PAGE_SIZE} offset ${(f.page - 1) * MOVEMENT_PAGE_SIZE}`,
+        params,
+      );
+      const x = t.rows[0]!;
+      return {
+        rows: rows.rows.map((r) => ({
+          id: r.id, refNo: r.ref_no, batchId: r.batch_id, batchRef: r.batch_ref, type: r.type, quantityG: Number(r.quantity_g),
+          fromZone: r.from_zone, toZone: r.to_zone, destinationName: r.destination_name, destinationType: r.destination_type,
+          occurredAt: r.occurred_at, createdByName: r.created_by_name, state: r.state, dataOrigin: r.data_origin,
+        })),
+        total: x.n,
+        page: f.page,
+        pageSize: MOVEMENT_PAGE_SIZE,
+        totals: { dispatches: x.dispatches, pendingEvidence: x.pe, pendingVerification: x.pv },
+      };
+    },
+    { readOnly: true },
+  );
+}
+
+/** Un movimiento con su evidencia y verificaciones (para el panel de detalle), o null si no existe / no es visible. */
+export async function getMovementDetail(actor: Actor, id: string): Promise<{ movement: MovementItem; batchId: string; batchRef: number } | null> {
+  if (!/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(id)) return null;
+  const head = await withActor(
+    actor.userId,
+    async (db) =>
+      (await db.query<{ batch_id: string; batch_ref: number }>(
+        "select m.batch_id, b.ref_no as batch_ref from hc.movements m join hc.batches b on b.id = m.batch_id where m.id = $1",
+        [id],
+      )).rows[0] ?? null,
+    { readOnly: true },
+  );
+  if (!head) return null;
+  const movement = (await listBatchMovements(actor, head.batch_id)).find((m) => m.id === id);
+  return movement ? { movement, batchId: head.batch_id, batchRef: head.batch_ref } : null;
 }

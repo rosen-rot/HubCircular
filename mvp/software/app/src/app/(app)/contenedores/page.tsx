@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { Trash2 } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import Link from "next/link";
 import { InfoTip, Term } from "@/components/help/info-tip";
 import { Alert, Badge, DemoBadge } from "@/components/ui/card";
@@ -19,12 +21,7 @@ export default async function ContenedoresPage() {
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-900">
-          <Term k="contenedor">Contenedores</Term>
-        </h1>
-        <p className="text-slate-700">Contenedores visibles en su ámbito. El código del QR apunta a <code>/registro?container=CÓDIGO</code>.</p>
-      </div>
+      <PageHeader icon={Trash2} title={<Term k="contenedor">Contenedores</Term>} subtitle={<>Contenedores visibles en su ámbito. El código del QR apunta a <code>/registro?container=CÓDIGO</code>.</>} />
       <Alert tone="info">
         El QR <strong>solo identifica</strong> el contenedor y precarga el formulario: para registrar hay que iniciar sesión y tener permiso. La administración
         del catálogo (altas, ediciones, inactivación) y la generación de imágenes QR llegan en la siguiente iteración; hoy el catálogo proviene de datos semilla.
@@ -32,7 +29,7 @@ export default async function ContenedoresPage() {
       {containers.length === 0 ? (
         <Alert tone="warning">No hay contenedores configurados en su ámbito.</Alert>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <div className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white" tabIndex={0} role="region" aria-label="Contenedores (se desplaza horizontalmente)">
           <table className="w-full min-w-[720px] text-left text-sm">
             <caption className="sr-only">Contenedores</caption>
             <thead className="bg-brand-50"><tr>

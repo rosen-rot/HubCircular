@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import { History } from "lucide-react";
+import { PageHeader } from "@/components/ui/page-header";
 import Link from "next/link";
 import { Forbidden } from "@/components/forbidden";
 import { InfoTip } from "@/components/help/info-tip";
@@ -47,10 +49,7 @@ export default async function HistorialPage({ searchParams }: { searchParams: Pr
 
   return (
     <div className="space-y-5">
-      <div>
-        <h1 className="text-2xl font-bold text-brand-900">Historial de pesajes</h1>
-        <p className="text-slate-700">Captaciones registradas, de la más reciente a la más antigua. Fechas en hora de Chile.</p>
-      </div>
+      <PageHeader icon={History} title={'Historial de pesajes'} subtitle={<>Captaciones registradas, de la más reciente a la más antigua. Fechas en hora de Chile.</>} />
 
       <Card>
         <form method="get" className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3" aria-label="Filtros">
@@ -108,7 +107,7 @@ export default async function HistorialPage({ searchParams }: { searchParams: Pr
           {hasFilters ? "Ningún pesaje coincide con los filtros." : "Aún no hay pesajes registrados en su ámbito."}
         </Alert>
       ) : (
-        <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
+        <div className="relative overflow-x-auto rounded-2xl border border-slate-200 bg-white" tabIndex={0} role="region" aria-label="Pesajes registrados (se desplaza horizontalmente)">
           <table className="w-full min-w-[820px] text-left text-sm">
             <caption className="sr-only">Pesajes registrados</caption>
             <thead className="bg-brand-50 text-slate-800">
