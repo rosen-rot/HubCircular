@@ -190,7 +190,8 @@
 - Incidencias: en el primer intento el panel de descarga quedaba fuera de la pantalla (a la izquierda) y luego el botón «Descargar» bajo el pliegue; lo detectaron las pruebas E2E y la revisión visual, y se corrigieron con pruebas de posición (escritorio y 390 px).
 - Decisiones tomadas: ADR-028; los CSV sueltos se conservan como opciones del selector (no se quitó ninguna descarga).
 - Riesgos y límites: no probado en Microsoft Excel real ni con 20.000 filas por hoja; no probado en Windows nativo ni contra Supabase.
-- Próxima acción: el usuario prueba «Descargar datos» (Todo junto y una tabla) y abre el Excel; luego resumen H-01/H-05/H-07 para el Hub o Iteración 4.
+- Confirmado por el usuario (2026-11-19, sin captura ni detalle): «se pueden descargar y funciona».
+- Próxima acción: resumen H-01/H-05/H-07 para el Hub o Iteración 4, según prioridad del usuario.
 
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
