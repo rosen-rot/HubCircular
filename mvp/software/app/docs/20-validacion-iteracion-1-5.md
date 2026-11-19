@@ -87,3 +87,20 @@ Repositorio local inicializado en la carpeta del proyecto, rama `main`, **sin re
 5. Operador no ve Laboratorio DEMO; lector no puede registrar; administrador ve ambas zonas.
 6. `db:check` posterior: pesajes DEMO = 1 (más los previos), reales = 0.
 7. Panel de Supabase → API → Exposed schemas: `hc` ausente.
+
+## 9. Resultado de la validación funcional en Supabase (2026-11-18, ejecutada por el usuario)
+
+Probada manualmente en la app local (`npm run dev`) conectada al proyecto Supabase de desarrollo, con datos DEMO. Resultados informados por el usuario; el recuento de la base lo confirma `db:check`.
+
+| Comprobación | Resultado | Evidencia |
+|---|---|---|
+| Seed DEMO cargado y login con usuarios DEMO | ✅ | informado por el usuario |
+| Registro de pesaje (4,250 kg − 0,350 kg ⇒ neto 3,900 kg) | ✅ | informado por el usuario |
+| Persistencia tras recargar la página | ✅ | informado por el usuario; `db:check`: 3 pesajes DEMO |
+| Un lote y un saldo por pesaje | ✅ | `db:check`: 3 pesajes DEMO · 3 saldos de lote · 0 reales |
+| Lector no puede registrar (solo ve historial y contenedores) | ✅ | informado por el usuario |
+| Operador ve solo su zona; administrador ve ambas | ✅ | informado por el usuario |
+| Idempotencia ante doble envío | **No probada en Supabase** (el usuario registró 3 pesajes distintos a propósito). Probada en PostgreSQL local: 10 envíos simultáneos con la misma clave ⇒ 1 pesaje y 1 lote | `tests/integration/weighing.test.ts` (local) |
+| Pesajes reales vs. DEMO | ✅ separados: 0 reales · 3 DEMO | `db:check` |
+
+Pendiente de esta lista: doble envío en Supabase y revisar en el panel que `hc` no figure en *Exposed schemas* (API).

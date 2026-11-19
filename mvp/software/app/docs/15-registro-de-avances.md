@@ -60,6 +60,11 @@
 - Riesgos: `DATABASE_URL` aún usa el usuario `postgres` (ver `hc_login` en `docs/19`); validación funcional en Supabase pendiente (`docs/20`, sección 8).
 - Próxima acción: seed DEMO opcional, `npm run dev` y la lista de validación.
 
+### 2026-11-18 — Validación funcional en Supabase (ejecutada por el usuario)
+- Cambios: carga del seed DEMO en Supabase y pruebas manuales con los tres roles; ver `docs/20` §9.
+- Resultados: persistencia, neto 3,900 kg, 1 lote y 1 saldo por pesaje (`db:check`: 3 DEMO · 3 saldos · 0 reales), lector sin acceso a registro, alcance por zona correcto. **Sin probar en Supabase:** doble envío (probado solo en PostgreSQL local).
+- Próxima acción: probar doble envío, revisar *Exposed schemas* en el panel, y crear el rol `hc_login` antes de datos reales.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:
