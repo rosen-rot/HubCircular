@@ -3,6 +3,12 @@
 **Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-19 (Iteración 3 — tablero, cobertura y «cero confirmado», solo PostgreSQL local — ver `docs/25`):**
+- **Hecho y verificado en Linux + PostgreSQL 16 local:** migración **0010** (calendarios de medición, «cero confirmado», funciones de KPI/inventario/cobertura), `/dashboard` (tarjetas, cierre contable, gráfico semanal SVG propio con tabla, cobertura por contenedor, movimientos de soporte, filtros, aviso DEMO/período incompleto), `/dashboard/export` (CSV de kpis, pesajes, movimientos y cobertura) y `/calendarios` (programar/terminar: administrador; confirmar cero: administrador y operador en su zona). ADR-025 a ADR-027. **Vitest 338/338 (28 archivos), Playwright 53/53** (44 previas + 9 de `dashboard.spec.ts`, con axe-core), tsc/eslint/build limpios; conciliación contra libro conocido y pruebas de mutación (`docs/25` §5).
+- **Pendiente / no verificado:** la migración **0010 NO está aplicada en Supabase** (aplicar solo con aprobación del usuario: respaldo previo → dry-run → `CONFIRM_REMOTE_MIGRATION` → `db:check`; `docs/25` §6); no hay pesajes reales, por lo que las cifras probadas son de fixtures y DEMO; Windows nativo; despliegue/HTTPS.
+- **Siguen abiertas:** H-01, H-05 y H-07 (con valores provisionales). El tablero informa qué indicadores dependen de ellas (inventario/ubicación ← H-01; valorización ← H-05; captación por material ← H-07). Extras aplazados sin cambios; sin IoT; el PDF oficial es interno.
+- **Estado por iteración de `docs/07`:** Iter. 0 ✅ · Iter. 1 ✅ · Iter. 2 ✅ · refuerzo previo a datos reales ✅ (local) · Iter. 3 ✅ (local; 0010 sin aplicar en Supabase) · Iter. 4–6 ⏳.
+
 **Corte 2026-11-19 (seguridad previa a datos reales, solo PostgreSQL local — ver `docs/23`, `docs/24`):**
 - **Hecho y verificado en Linux + PostgreSQL 16 local:** cabeceras CSP (nonce) y HSTS condicionado a HTTPS (ADR-022); `/usuarios` y `/cuenta/clave` con clave temporal mostrada una vez y cambio obligatorio (migración 0008, ADR-023); `db:backup` y `db:restore-check` con restauración real comprobada (ADR-024, `docs/24`); Supabase Auth como segundo proveedor, `AUTH_PROVIDER=local|supabase` (migración 0009, ADR-021). Vitest 288/288, Playwright 44/44 (5 en modo Supabase contra un GoTrue **simulado**), tsc/eslint/build limpios.
 - **Pendiente / no verificado:** las migraciones **0008 y 0009 ya están aplicadas en Supabase** (ejecutadas por el usuario el 2026-11-19; `db:check` sin errores, 9 migraciones, 0 pendientes; `docs/15`), pero el usuario informó que `/usuarios` (crear y desactivar) **funciona bien en Supabase** (sin detalle por paso), que el plan es gratuito y **sin copias automáticas** (el único respaldo es `db:backup`) y que por ahora prefiere el proveedor **local**; **no consta** respaldo previo a esa migración ni la prueba manual de `/usuarios` allí; el **primer respaldo real** de Supabase se hizo después (2026-11-19, 77 filas, 9 migraciones) y su **restauración real en un PostgreSQL 18 local salió OK** con filas, migraciones, políticas y RLS idénticos (`docs/15`); Supabase Auth **no probado contra el servicio real**; respaldo, restauración y cabeceras sin probar en Supabase/producción ni en Windows nativo; confirmar qué copias incluye el plan de Supabase. Lista de control en `docs/23` §5.
@@ -23,7 +29,7 @@
 
 **Corte 2026-11-18 (fin de la sesión de Fase 1):**
 - **Implementado y probado (ver `docs/15`):** proyecto Next.js 16 + TypeScript + Tailwind; 5 migraciones SQL (identidad, catálogo, pesajes/lotes/saldos, funciones de autenticación, RLS y privilegios); autenticación local con roles administrador/operador/lector y ámbito por zona; registro manual de pesaje con validación en servidor, lote atómico, idempotencia y auditoría; historial con filtros (fecha, material, zona, usuario, referencia) y paginación; detalle de pesaje y de lote (saldo por ubicación); listado de contenedores; `POST/GET /api/weighings`; datos semilla DEMO etiquetados; 134 pruebas unitarias/integración + 20 E2E (incl. accesibilidad).
-- **No existe aún:** administración de catálogo y usuarios por interfaz, movimientos/retiros/destinos/evidencias (iteración 2), dashboard y CSV (iteración 3), telemetría/IoT y simulador (iteración 4), reglas de oportunidad (iteración 5), calendario/cobertura, imágenes QR.
+- **No existía aún (a esa fecha):** administración de catálogo y usuarios por interfaz, movimientos/retiros/destinos/evidencias (iteración 2), dashboard y CSV (iteración 3), telemetría/IoT y simulador (iteración 4), reglas de oportunidad (iteración 5), calendario/cobertura, imágenes QR.
 - **No verificado:** ejecución en Windows, contra Supabase, ni despliegue alguno. Sin proyecto Supabase, hosting ni credenciales (sin cambios).
 - **Estado por iteración de `docs/07`:** Iter. 0 ✅ · Iter. 1 ✅ (con las limitaciones anteriores) · Iter. 2–6 ⏳.
 
@@ -34,7 +40,7 @@
 4. Antes de la Iteración 2: conectar y validar Supabase (`docs/19` y lista de `docs/20`, sección 8).
 5. Antes de seguir: aplicar 0007 en Supabase con aprobación del usuario (`docs/22`, sección 5) y repasar con el Hub H-01, H-05 y H-07 (`docs/11`, `docs/21`).
 6. Si se van a usar datos reales: seguir primero `docs/23` §5 (respaldo, aplicar 0008/0009 con aprobación, decidir proveedor de identidad, HTTPS).
-7. Próxima tarea recomendada: **Iteración 3** (`docs/07`): dashboard consistente con las mismas reglas de saldo y captación, indicadores y exportación CSV; registrar `measurement_occurrences` («cero confirmado», ADR-012).
+7. Aplicar 0010 en Supabase solo con aprobación del usuario (`docs/25` §6). Próxima tarea recomendada: Iteración 4 (IoT **simulado**; la telemetría nunca crea captaciones) o, antes, las decisiones H-01/H-05/H-07 con el Hub, de las que dependen las definiciones del tablero.
 
 ## Hardware
 | Componente | Estado conocido | Precaución |

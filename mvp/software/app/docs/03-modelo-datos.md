@@ -44,3 +44,8 @@ Este es un **modelo conceptual para implementar y migrar**, no SQL aplicado. Cre
 
 ## Enfoque de saldo sugerido
 Opciones: libro mayor append-only de movimientos con consultas y bloqueo transaccional, o `batch_location_balances` materializada con restricciones y actualizaciones solo desde función transaccional. Elegir una y documentar prueba de concurrencia. Para retiros parciales se debe identificar cuánto queda y dónde, no únicamente un `status` global del lote.
+
+## Calendarios y «cero confirmado» (Iteración 3, migración 0010)
+- `hc.measurement_schedules`: calendario de medición por contenedor (`weekdays` ISO 1–7, `start_on`, `end_on` inclusive o nulo, autor, `data_origin`). Solo se puede terminar una vez (`end_on`, `ended_by`); no se edita ni se borra.
+- `hc.measurement_zero_confirmations`: «cero confirmado» (contenedor revisado, sin residuos) único por contenedor y día; inmutable. **No es un pesaje**: no crea lote ni masa.
+- No existe una tabla de ocurrencias: las mediciones esperadas y su estado se **derivan** (`hc.coverage_occurrences`). Reemplaza la `measurement_occurrences` prevista antes. Ver `docs/25`, ADR-026.

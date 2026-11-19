@@ -79,3 +79,29 @@ export function santiagoDayRangeToUtc(from?: string, to?: string): { from?: Date
   }
   return out;
 }
+
+/** Fecha de hoy en America/Santiago como YYYY-MM-DD. */
+export function santiagoToday(now: Date = new Date()): string {
+  const p = localParts(now.getTime());
+  const z = (n: number) => String(n).padStart(2, "0");
+  return `${p.y}-${z(p.mo)}-${z(p.d)}`;
+}
+
+/** Suma días a una fecha YYYY-MM-DD (aritmética de calendario, sin zona horaria). */
+export function addDays(date: string, days: number): string {
+  const d = new Date(`${date}T00:00:00Z`);
+  d.setUTCDate(d.getUTCDate() + days);
+  return d.toISOString().slice(0, 10);
+}
+
+/** ¿Es una fecha de calendario válida en formato YYYY-MM-DD? (rechaza 2026-02-30) */
+export function isValidDateString(s: string): boolean {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const d = new Date(`${s}T00:00:00Z`);
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+}
+
+/** Días entre dos fechas YYYY-MM-DD (to − from). */
+export function daysBetween(from: string, to: string): number {
+  return Math.round((Date.parse(`${to}T00:00:00Z`) - Date.parse(`${from}T00:00:00Z`)) / 86_400_000);
+}

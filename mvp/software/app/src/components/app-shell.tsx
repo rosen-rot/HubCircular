@@ -15,7 +15,9 @@ export function AppShell({ actor, children }: { actor: Actor; children: React.Re
   const items: NavItem[] = [];
   if (can(actor, "weighing:create")) items.push({ href: "/registro", label: "Registro" });
   if (can(actor, "movement:create")) items.push({ href: "/retiros", label: "Movimientos" });
+  if (can(actor, "indicators:read")) items.push({ href: "/dashboard", label: "Tablero" });
   if (can(actor, "weighing:read")) items.push({ href: "/historial", label: "Historial" });
+  if (can(actor, "measurement:zero")) items.push({ href: "/calendarios", label: "Calendarios" });
   if (can(actor, "catalog:read")) items.push({ href: "/contenedores", label: "Contenedores" });
   if (can(actor, "destination:manage")) items.push({ href: "/destinos", label: "Destinos" });
   if (can(actor, "user:manage")) items.push({ href: "/usuarios", label: "Usuarios" });

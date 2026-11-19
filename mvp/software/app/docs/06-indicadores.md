@@ -27,3 +27,9 @@ Cada alerta debe detallar umbral, registros de evidencia y fecha. No afirmar cau
 - Tasa de reciclaje/desvío global del edificio sin masa total de residuos comparables.
 - CO₂ evitado sin metodología y factores documentados.
 - Tasa de merma de laboratorios sin consumo de insumos; corresponde a eventual ampliación, no requisito del Desafío 04.
+
+## Implementación en la Iteración 3 (`docs/25`)
+- **Valorización confirmada:** se cuenta por la **fecha del despacho** (cierra H-06, decisión del usuario), nunca por la de la confirmación.
+- **Cobertura:** `(realizado + cero confirmado) ÷ (realizado + cero confirmado + omitido)`; las mediciones de hoy están pendientes y no entran en el denominador. Cero confirmado es completo; ausente es omitido, no cero.
+- **Cierre contable** mostrado y conciliado en pantalla; traslados como «entran/salen del ámbito».
+- Siguen sin calcularse (sin datos o metodología): tasa de reciclaje global, CO₂ evitado, nivel estimado de IoT, reglas de oportunidad.

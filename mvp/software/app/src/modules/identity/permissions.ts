@@ -18,6 +18,9 @@ export type Permission =
   | "batch:read"
   | "catalog:read"
   | "audit:read"
+  | "indicators:read"
+  | "schedule:manage"
+  | "measurement:zero"
   | "user:manage"
   | "account:password";
 
@@ -34,6 +37,9 @@ const MATRIX: Record<Permission, AppRole[]> = {
   "batch:read": ["administrador", "operador", "lector"],
   "catalog:read": ["administrador", "operador", "lector"],
   "audit:read": ["administrador"],
+  "indicators:read": ["administrador", "operador", "lector"],
+  "schedule:manage": ["administrador"],
+  "measurement:zero": ["administrador", "operador"],
   "user:manage": ["administrador"],
   "account:password": ["administrador", "operador", "lector"],
 };

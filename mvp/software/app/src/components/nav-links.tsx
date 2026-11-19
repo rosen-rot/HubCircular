@@ -12,7 +12,7 @@ export interface NavItem {
 export function NavLinks({ items }: { items: NavItem[] }) {
   const pathname = usePathname();
   return (
-    <nav aria-label="Principal" className="-mx-1 flex gap-1 overflow-x-auto px-1">
+    <nav aria-label="Principal" className="-mx-1 flex flex-wrap gap-1 px-1">
       {items.map((it) => {
         const active = pathname === it.href || pathname.startsWith(`${it.href}/`);
         return (

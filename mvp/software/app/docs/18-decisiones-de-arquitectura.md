@@ -142,3 +142,18 @@ Formato: contexto → decisión → consecuencias / cómo revertir. Las decision
 - **Decisión.** `npm run db:backup` (pg_dump formato custom del esquema `hc` + manifiesto con checksum y conteos) hacia una carpeta fuera del repo; `npm run db:restore-check` restaura en una base **local vacía** y compara con el manifiesto. No sustituye las copias propias de Supabase (a confirmar en el panel); las complementa y se puede restaurar y probar sin tocar Supabase.
 - **Salvaguardas.** Rechaza escribir dentro del repo, el puerto 6543, un `pg_dump` más antiguo que el servidor, destinos de restauración no locales o con esquema `hc`; la clave va por `PGPASSWORD`. El respaldo contiene hashes de contraseña: es información sensible.
 - **Verificado:** restauración real en PostgreSQL 16 local; **no** ejecutado contra Supabase.
+
+## ADR-025 · Definiciones de los indicadores del tablero (Iteración 3)
+- **Contexto.** `docs/06` dejaba abiertas la fecha de la valorización (H-06) y la forma de cerrar el inventario.
+- **Decisión.** Cifras «como se conoce hoy»: movimientos efectivos = sin correcciones y sin los originales corregidos; período por fecha local de Chile (`America/Santiago`) del propio registro; valorización confirmada por **fecha de despacho** (decisión del usuario); inventario reconstruido del libro con cierre contable explícito que la pantalla concilia; origen real/DEMO nunca mezclado (por defecto real); ámbito aplicado línea a línea con `actor_in_scope`, no solo por RLS. Cálculo en funciones SQL *invoker* (una sola definición para pantalla y CSV).
+- **Consecuencia aceptada.** Una corrección posterior cambia períodos ya consultados. Las definiciones dependen de H-01, H-05 y H-07 (abiertas) y así se informa en la pantalla.
+- **Alternativas descartadas.** Cálculo en la aplicación (dos definiciones posibles); fecha de confirmación (mueve cifras de períodos cerrados); vistas materializadas (estado extra sin necesidad).
+
+## ADR-026 · Calendarios de medición versionados, cobertura derivada y «cero confirmado» (resuelve H-04)
+- **Decisión.** Días fijos de la semana por contenedor; calendario inmutable salvo su término (como máximo ayer; creación desde hoy) para que lo esperado en el pasado no cambie; mediciones esperadas **derivadas** (sin filas por día ni cron); estado derivado realizado > cero_confirmado > omitido/pendiente; «cero confirmado» solo de hoy, sin pesaje del día, con ámbito, idempotente e inmutable, y **no es un pesaje** (no crea lote ni masa). Solo el administrador programa; administrador y operador confirman cero; el lector solo mira. Reemplaza la tabla `measurement_occurrences` prevista en ADR-012.
+- **Consecuencia aceptada.** No se puede confirmar cero retroactivamente ni programar hacia atrás; un día sin pesaje ni cero queda «omitido» (ausente ≠ cero).
+- **Alternativas descartadas.** Filas de ocurrencias generadas por tarea programada (requiere cron y puede divergir); calendarios editables (reescriben el historial de lo esperado); ventana de ±1 día.
+
+## ADR-027 · Gráficos en SVG propio, sin Recharts (modifica la previsión de ADR-001)
+- **Decisión.** El gráfico semanal es un componente servidor en SVG con leyenda, `<title>` por segmento, tabla de datos equivalente y paleta categórica validada con el validador del skill de visualización (separación CVD adyacente y piso de visión normal aprobados; el contraste bajo de tres tonos se compensa con leyenda y tabla). Sin dependencia nueva.
+- **Consecuencia aceptada.** Sin tooltip interactivo propio ni animaciones; cada gráfico nuevo requiere código nuevo.

@@ -4,7 +4,7 @@
 
 **Objetivo:** desarrollar una plataforma web de gestión, trazabilidad y análisis de residuos, preparada para el prototipo físico basado en ESP32.
 
-**Estado del software (2026-11-18):** Fase 1 implementada (autenticación con roles, registro manual de pesajes con lote atómico, historial, lotes y contenedores) y probada; ver «Puesta en marcha» y `docs/14-estado-actual-y-handoff.md`. Iteración 2 (trazabilidad: movimientos, destinos, evidencia por texto y verificación) implementada y probada en PostgreSQL local (`docs/22`). Antes de datos reales (2026-11-19; probado en PostgreSQL local, migraciones 0008/0009 ya aplicadas en Supabase): cabeceras CSP/HSTS, gestión de usuarios por interfaz con clave temporal, respaldo y restauración, y Supabase Auth como segundo proveedor (`docs/23`, `docs/24`). Iteraciones 3–6 de `docs/07` pendientes. El paquete conserva además la documentación y referencias originales.
+**Estado del software (2026-11-18):** Fase 1 implementada (autenticación con roles, registro manual de pesajes con lote atómico, historial, lotes y contenedores) y probada; ver «Puesta en marcha» y `docs/14-estado-actual-y-handoff.md`. Iteración 2 (trazabilidad: movimientos, destinos, evidencia por texto y verificación) implementada y probada en PostgreSQL local (`docs/22`). Antes de datos reales (2026-11-19; probado en PostgreSQL local, migraciones 0008/0009 ya aplicadas en Supabase): cabeceras CSP/HSTS, gestión de usuarios por interfaz con clave temporal, respaldo y restauración, y Supabase Auth como segundo proveedor (`docs/23`, `docs/24`). Iteración 3 (tablero de indicadores, cobertura de medición y «cero confirmado»; `docs/25`) implementada y probada en PostgreSQL local, con su migración 0010 **sin aplicar aún en Supabase**. Iteraciones 4–6 de `docs/07` pendientes. El paquete conserva además la documentación y referencias originales.
 
 ## Inicio rápido
 1. Descomprime en una carpeta permanente de trabajo.
@@ -44,6 +44,7 @@
 | `docs/20-validacion-iteracion-1-5.md` | Evidencia y resultados de la Iteración 1.5 |
 | `docs/21-analisis-decisiones-pendientes.md` | Análisis de H-01, H-05 y H-07 (decisiones **abiertas**) |
 | `docs/22-validacion-iteracion-2.md` | Evidencia y validación de la Iteración 2 (trazabilidad) |
+| `docs/25-dashboard-y-cobertura-iteracion-3.md` | Iteración 3: tablero, definiciones de indicadores, calendarios, «cero confirmado», CSV y cómo aplicar 0010 |
 | `docs/23-seguridad-previa-a-datos-reales.md` | Cabeceras, usuarios, Supabase Auth y lista de control antes de datos reales |
 | `docs/24-respaldos-y-restauracion.md` | Plan de respaldos, restauración y prueba de restauración |
 | `diseno/HubCircular_Dashboard_MVP.png` | Maqueta conceptual, no web construida |

@@ -47,6 +47,14 @@ export type DomainErrorCode =
   | "wrong_current_password"
   | "password_weak"
   | "auth_external"
+  | "weekdays_invalid"
+  | "schedule_start_invalid"
+  | "schedule_overlap"
+  | "schedule_not_found"
+  | "schedule_already_ended"
+  | "schedule_end_invalid"
+  | "not_expected_today"
+  | "weighing_exists"
   | "immutable_record"
   | "validation"
   | "unexpected";
@@ -101,6 +109,14 @@ const MESSAGES: Record<DomainErrorCode, string> = {
   wrong_current_password: "La contraseña actual no es correcta.",
   password_weak: "La contraseña no cumple los requisitos.",
   auth_external: "Las contraseñas se administran en Supabase Auth (Authentication → Users en el panel de Supabase), no en HubCircular.",
+  weekdays_invalid: "Seleccione al menos un día de la semana (lunes a domingo).",
+  schedule_start_invalid: "La fecha de inicio debe ser hoy o posterior (máximo 366 días hacia adelante).",
+  schedule_overlap: "El contenedor ya tiene un calendario vigente en esas fechas. Termine el actual antes de crear otro.",
+  schedule_not_found: "No existe el calendario indicado.",
+  schedule_already_ended: "Ese calendario ya está terminado.",
+  schedule_end_invalid: "La fecha de término no puede ser anterior a ayer ni anterior al inicio del calendario.",
+  not_expected_today: "Hoy no hay una medición esperada para este contenedor, por lo que no se puede confirmar «cero».",
+  weighing_exists: "Ya hay un pesaje de este contenedor hoy; no corresponde confirmar «cero».",
   immutable_record: "Este registro no puede modificarse ni eliminarse.",
   validation: "Revise los campos marcados.",
   unexpected: "Ocurrió un error inesperado. Intente nuevamente; si persiste, avise a un administrador.",
@@ -135,6 +151,7 @@ function defaultStatus(code: DomainErrorCode): number {
     case "destination_not_found":
     case "user_not_found":
     case "role_not_found":
+    case "schedule_not_found":
       return 404;
     case "idempotency_conflict":
     case "destination_exists":
@@ -143,6 +160,8 @@ function defaultStatus(code: DomainErrorCode): number {
     case "evidence_duplicate":
     case "verification_unchanged":
     case "auth_external":
+    case "schedule_overlap":
+    case "schedule_already_ended":
       return 409;
     case "unexpected":
       return 500;
