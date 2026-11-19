@@ -22,6 +22,8 @@
 | Verde | A+ |
 | Blanco | A− |
 
+Esta tabla corresponde a una celda de **4 cables**. La celda recibida tiene **3 cables**: antes de conectarla hay que identificar sus cables y completar el puente (ver [Componentes y Estado](2_componentes_estado.md#22-la-celda-recibida-tiene-3-cables)).
+
 Los colores pueden variar según el fabricante: hay que confirmarlos con la hoja de datos de la celda recibida. Si el peso aumenta en negativo al cargar la celda, se invierten A+ y A− (o el signo del factor de calibración).
 
 ## 3.3 Sensor ultrasónico HC-SR04 → ESP32

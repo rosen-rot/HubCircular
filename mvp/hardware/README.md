@@ -5,7 +5,8 @@
 **Tecnología:** ESP32 DevKit + celda de carga + HX711 + sensor ultrasónico, programado en C/C++ con Arduino IDE  
 **Alcance de la demo:** 1 contenedor construido por el equipo
 
-**Fecha de Emisión:** 10 de noviembre de 2026
+**Fecha de Emisión:** 10 de noviembre de 2026  
+**Última actualización:** 19 de noviembre de 2026
 
 ---
 

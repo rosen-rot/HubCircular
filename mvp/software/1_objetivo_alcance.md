@@ -2,40 +2,44 @@
 
 ## 1.1 Objetivo
 
-Recibir por Wi-Fi las lecturas del contenedor con balanza, convertirlas en **ingresos y retiros en kg** y mostrarlas en un **dashboard que se actualiza solo**.
+Una **plataforma web** para registrar, dar trazabilidad y analizar los residuos reciclables del Hub, que además **reciba por Wi-Fi las lecturas del contenedor con balanza** y las muestre en vivo.
 
-## 1.2 Qué incluye el MVP (debe estar listo)
+## 1.2 Qué ya está construido (al 19 de noviembre)
+
+Probado con **datos ficticios** (etiquetados DEMO), no con mediciones reales del Hub.
+
+| ID | Función | Descripción | Estado |
+| :-- | :-- | :-- | :-- |
+| **S1** | Inicio de sesión y roles | Administrador, operador y lector, cada uno con permisos distintos. Gestión de usuarios desde la interfaz. | ✅ Construido |
+| **S2** | Registro de pesajes | Pesaje con bruto, tara y neto (el neto lo calcula el servidor). Cada pesaje crea un **lote**. | ✅ Construido |
+| **S3** | Trazabilidad | Movimientos de cada lote (traslado, retiro, reutilización, rechazo, ajuste), destinos y evidencia. El saldo nunca queda negativo. | ✅ Construido |
+| **S4** | Tablero de indicadores | Kg captados, despachados y en inventario, con filtros, cobertura de medición y "cero confirmado" (no medir no es lo mismo que cero). | ✅ Construido |
+| **S5** | Descarga de datos | Excel con 4 hojas o una tabla en CSV, como evidencia para el informe. | ✅ Construido |
+| **S6** | Ayuda | Página de ayuda con glosario e íconos (i) con explicaciones. | ✅ Construido |
+
+## 1.3 Qué falta para la feria (debe estar listo el 26 de noviembre)
 
 | ID | Función | Descripción |
 | :-- | :-- | :-- |
-| **S1** | Recibir lecturas | Endpoint `POST /api/lecturas` que recibe el peso estable y el nivel de llenado enviados por el ESP32. |
-| **S2** | Guardar los datos | Base de datos SQLite con contenedores, dispositivos, lecturas y eventos. |
-| **S3** | Reglas de medición | Calcular ingresos y retiros sin doble conteo y descartar el ruido de la celda. |
-| **S4** | Dashboard | Página web con el estado del contenedor, los kg por día, el historial y la conexión del sensor en vivo. |
-| **S5** | Simulador | Script que envía lecturas por la misma API, para desarrollar sin hardware, probar las reglas y servir de plan B. |
-
-## 1.3 Qué incluye si queda tiempo
-
-| ID | Función |
-| :-- | :-- |
-| **S6** | Exportar eventos a CSV, como evidencia para los anexos del informe. |
-| **S7** | Aviso visual cuando el contenedor supera el 80 % de llenado. |
-| **S8** | Peso promedio por bolsa. |
+| **S7** | Recibir lecturas del ESP32 | Endpoint `POST /api/iot/v1/readings`, autenticado con una clave por dispositivo (ver [API](3_api_datos.md)). |
+| **S8** | Detectar ingresos | Convertir las lecturas de peso en ingresos y retiros sin doble conteo (ver [Reglas](4_reglas_medicion.md)). |
+| **S9** | Panel en vivo | Estado del contenedor, conexión del sensor y últimas lecturas, actualizándose solo (ver [Dashboard](5_dashboard.md)). |
+| **S10** | Simulador | Script que envía lecturas por la misma API, para probar sin hardware y servir de plan B (ver [Simulador](6_simulador_plan_b.md)). |
 
 ## 1.4 Qué queda fuera (fase 2)
 
-* Inicio de sesión y roles.
-* Varios contenedores, pisos o edificios (el modelo de datos ya lo permite, pero no se muestra).
-* Códigos QR, lotes y trazabilidad hacia el gestor.
-* Recomendaciones automáticas y tendencias semanales o mensuales.
-* Publicación en internet.
+* Códigos QR.
+* Recomendaciones automáticas (reglas de oportunidad) y alertas.
+* Varios contenedores con sensor.
+* CO₂ evitado y valorización en pesos: requieren factores y precios validados.
+* Publicación en internet para uso real del Hub.
 
-> Para el pitch: *"el MVP mide y muestra; la fase 2 gestiona y recomienda"*.
+> Para el pitch: *"el contenedor mide solo; la plataforma ordena, da trazabilidad y muestra los indicadores"*.
 
 ## 1.5 Supuestos
 
-* El ESP32 envía el **peso total sobre la balanza** solo cuando la lectura está estable; el **servidor** calcula ingresos y retiros (ver [Reglas de Medición](4_reglas_medicion.md) y el [firmware del ESP32](../hardware/4_firmware.md)).
-* El servidor y el ESP32 están en la **misma red Wi-Fi** (ver [Arquitectura y Red Local](2_arquitectura.md)).
+* El ESP32 envía el **peso estable**; el **servidor** decide si hubo un ingreso o un retiro (ver [Reglas de Medición](4_reglas_medicion.md) y el [firmware del ESP32](../hardware/4_firmware.md)).
+* Las lecturas del sensor se guardan **separadas** de los pesajes confirmados, para que un dato del sensor nunca se cuente dos veces en los indicadores.
 
 ---
 

@@ -20,7 +20,7 @@ Un **contenedor que se pesa solo**. Cada bolsa que se deposita aparece en un pan
 | Caso concreto | El PLA de las impresoras 3D y los desechos de resina **no se gestionan**: se acumulan sin registro ni destino. | [Visita al Hub, semana 7](../semana_7/3_informacion_recopilada.md) | ✅ Fuente primaria |
 | Oportunidad | El Hub quiere reutilizar ese plástico, por ejemplo en **planchas de plástico reciclado**. | [Visita al Hub, semana 7](../semana_7/3_informacion_recopilada.md) | ✅ Fuente primaria |
 | Afectados | Administración del Hub (sin datos para presupuestos ni directrices municipales) y personal de aseo (sin procedimientos, teme más carga). | [Semana 4](../semana_4/2_a_quien_le_ocurre.md) | Diagnóstico del equipo |
-| Solución | Celda de carga + HX711 + ESP32 + sensor ultrasónico → wifi → servidor FastAPI + SQLite → panel en vivo. | [MVP](../../mvp/README.md) | 📐 Diseñado |
+| Solución | Celda de carga + HX711 + ESP32 + sensor ultrasónico → wifi → plataforma web (Next.js + PostgreSQL) → panel en vivo. | [MVP](../../mvp/README.md) | 🟡 Plataforma construida; falta la conexión con el contenedor |
 | Decisión | Se compararon 3 alternativas (pesaje manual con QR, sensor de conteo, pesaje automático). | [Semana 10](../semana_10/propuestas_de_solucion/README.md) | ✅ Documentado |
 | Reglas | Peso estable, solo diferencias (sin doble conteo), umbral de ruido de 50 g, retiro automático. | [Reglas de medición](../../mvp/software/4_reglas_medicion.md) | 📐 Diseñado |
 | Pruebas | Criterios definidos: error ≤ ±20 g o ±2 %, 100 % de bolsas sin duplicados, < 10 s hasta el panel. | [Hardware](../../mvp/hardware/7_validacion.md) · [Software](../../mvp/software/7_validacion.md) | ⏳ Sin ejecutar |
