@@ -76,7 +76,8 @@ Repositorio local inicializado en la carpeta del proyecto, rama `main`, **sin re
 | Ejecución en Windows nativo (`npm ci`, `dev`, `localhost:3000`, scripts `.ps1`) | Solo el usuario; el asistente no tiene PowerShell |
 | Pruebas de integración/E2E en Windows | Requiere PostgreSQL local portable (`docs/19`, sección 5) |
 | Supabase Auth | Decisión tomada (ADR-014), implementación no iniciada |
-| Rol `hc_login` en Supabase, CSP/HSTS, UI de usuarios | Antes de datos reales |
+| ~~Rol `hc_login` en Supabase~~ | **Hecho** (sección 10) |
+| CSP/HSTS, UI de usuarios, copias de seguridad | Antes de datos reales |
 
 ## 8. Lista de validación a ejecutar tras migrar en Supabase (no destructiva)
 
@@ -104,3 +105,10 @@ Probada manualmente en la app local (`npm run dev`) conectada al proyecto Supaba
 | Pesajes reales vs. DEMO | ✅ separados: 0 reales · 3 DEMO | `db:check` |
 
 Pendiente de esta lista: doble envío en Supabase y revisar en el panel que `hc` no figure en *Exposed schemas* (API).
+
+## 10. Rol de login dedicado `hc_login` en Supabase (2026-11-18, ejecutado por el usuario)
+
+- El usuario creó `hc_login` en SQL Editor (`noinherit nosuperuser nocreatedb nocreaterole nobypassrls`, miembro de `hc_app`), cambió solo `DATABASE_URL` a `hc_login.<referencia>` y dejó `MIGRATION_DATABASE_URL` con el usuario de migración.
+- Resultado informado por el usuario: `npm run db:check:app` correcto y la aplicación funciona con el rol nuevo. **La salida de `db:check:app` no fue compartida con el asistente**; la afirmación se basa en el informe del usuario.
+- Efecto: la aplicación ya no conecta como `postgres`; no puede volver a un rol privilegiado ante una inyección SQL hipotética. El riesgo residual de la sección 5 queda mitigado.
+- La clave de `hc_login` solo existe en `.env.local` y en el gestor de contraseñas del usuario; no figura en el repositorio ni en el chat.

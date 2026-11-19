@@ -65,6 +65,11 @@
 - Resultados: persistencia, neto 3,900 kg, 1 lote y 1 saldo por pesaje (`db:check`: 3 DEMO · 3 saldos · 0 reales), lector sin acceso a registro, alcance por zona correcto. **Sin probar en Supabase:** doble envío (probado solo en PostgreSQL local).
 - Próxima acción: probar doble envío, revisar *Exposed schemas* en el panel, y crear el rol `hc_login` antes de datos reales.
 
+### 2026-11-18 — Rol `hc_login` en Supabase (ejecutado por el usuario)
+- Cambios: nuevo `scripts/db-check-app.ts` (`npm run db:check:app`, solo lectura; probado en PostgreSQL local en 4 escenarios); guía en `docs/19`; el usuario creó `hc_login` y cambió `DATABASE_URL`.
+- Resultado: informado por el usuario como correcto (la salida no se compartió). `docs/20` §10.
+- Pendiente antes de datos reales: CSP/HSTS, gestión de usuarios por UI, copias de seguridad, doble envío probado en Supabase, y decisiones H-01/H-05/H-07 con el Hub.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:
