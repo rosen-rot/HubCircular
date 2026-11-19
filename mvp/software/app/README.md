@@ -1,26 +1,24 @@
-# HubCircular · Paquete V2 para Claude Code y Codex
+# HubCircular · Plataforma web (MVP de software)
 
 **Proyecto:** Desafío 04, Capstone Intermedio 2026, Universidad Mayor; contraparte indicada en documentación original: Hub Providencia / Municipalidad de Providencia.
 
 **Objetivo:** desarrollar una plataforma web de gestión, trazabilidad y análisis de residuos, preparada para el prototipo físico basado en ESP32.
 
-**Estado del software (2026-11-18):** Fase 1 implementada (autenticación con roles, registro manual de pesajes con lote atómico, historial, lotes y contenedores) y probada; ver «Puesta en marcha» y `docs/14-estado-actual-y-handoff.md`. Iteración 2 (trazabilidad: movimientos, destinos, evidencia por texto y verificación) implementada y probada en PostgreSQL local (`docs/22`). Antes de datos reales (2026-11-19; probado en PostgreSQL local, migraciones 0008/0009 ya aplicadas en Supabase): cabeceras CSP/HSTS, gestión de usuarios por interfaz con clave temporal, respaldo y restauración, y Supabase Auth como segundo proveedor (`docs/23`, `docs/24`). Iteración 3 (tablero de indicadores, cobertura de medición y «cero confirmado»; `docs/25`) implementada y probada en PostgreSQL local, con su migración 0010 ya aplicada en Supabase por el usuario (19-11-2026) y probadas a mano por el usuario allí; luego se agregaron nombres más claros, iconos (i) y la página `/ayuda` con glosario (`docs/25` §8). Después se agregó «Descargar datos» (Excel con 4 hojas o una tabla en CSV; `docs/25` §9). Luego se rediseñó la interfaz según las imágenes del Hub (menú lateral, Inicio, Lotes y Movimientos con panel de detalle; `docs/26`). Iteraciones 4–6 de `docs/07` pendientes. El paquete conserva además la documentación y referencias originales.
+> **Ubicación en el repositorio.** Esta carpeta (`mvp/software/app/`) contiene el código fuente de la plataforma. La descripción de diseño del MVP de software está en los documentos de `mvp/software/` (carpeta superior). El historial de commits del desarrollo se conserva completo en Git.
+
+> **Autoría.** Software desarrollado por **Carlos Concha** ([@Krl-oz](https://github.com/Krl-oz)), con asistencia de Claude Code.
+
+**Estado del software (2026-11-18):** Fase 1 implementada (autenticación con roles, registro manual de pesajes con lote atómico, historial, lotes y contenedores) y probada; ver «Puesta en marcha» y `docs/14-estado-actual-y-handoff.md`. Iteración 2 (trazabilidad: movimientos, destinos, evidencia por texto y verificación) implementada y probada en PostgreSQL local (`docs/22`). Antes de datos reales (2026-11-19; probado en PostgreSQL local, migraciones 0008/0009 ya aplicadas en Supabase): cabeceras CSP/HSTS, gestión de usuarios por interfaz con clave temporal, respaldo y restauración, y Supabase Auth como segundo proveedor (`docs/23`, `docs/24`). Iteración 3 (tablero de indicadores, cobertura de medición y «cero confirmado»; `docs/25`) implementada y probada en PostgreSQL local, con su migración 0010 ya aplicada en Supabase por el usuario (19-11-2026) y probadas a mano por el usuario allí; luego se agregaron nombres más claros, iconos (i) y la página `/ayuda` con glosario (`docs/25` §8). Después se agregó «Descargar datos» (Excel con 4 hojas o una tabla en CSV; `docs/25` §9). Luego se rediseñó la interfaz según las imágenes del Hub (menú lateral, Inicio, Lotes y Movimientos con panel de detalle; `docs/26`). Iteraciones 4–6 de `docs/07` pendientes. 
 
 ## Inicio rápido
-1. Descomprime en una carpeta permanente de trabajo.
-2. Abre **la carpeta raíz del proyecto** (`HubCircular`) en Claude Code (escritorio) o Codex.
-3. Usa `PROMPT_MAESTRO_HUBCIRCULAR_V2.md`; Claude Code dispone de `CLAUDE.md` y Codex de `AGENTS.md`. Estos archivos apuntan a una misma guía, no a dos proyectos independientes.
-4. Lee primero `docs/14-estado-actual-y-handoff.md` y `docs/15-registro-de-avances.md`; luego los requisitos, modelo de datos, API y plan de implementación.
-5. Implementa primero registro **manual** de pesajes, lotes e inventario; telemetría IoT se simula hasta que el hardware esté validado.
-6. Antes de publicar GitHub u otro repositorio, protege referencias internas (`referencias/`, especialmente PDF oficial), secretos y datos personales. Un repositorio **privado** es la opción conservadora mientras no haya autorización de publicación.
+1. Lee primero `docs/14-estado-actual-y-handoff.md` y `docs/15-registro-de-avances.md`; luego los requisitos, modelo de datos, API y plan de implementación.
+2. Para ejecutar la aplicación, sigue «Puesta en marcha (desarrollo local)» más abajo. Todos los comandos se ejecutan **dentro de esta carpeta** (`mvp/software/app/`).
+3. El registro de pesajes es **manual**; la telemetría IoT se simula hasta que el hardware esté validado.
+4. No subas secretos (`.env.local`), respaldos de base de datos ni material de uso interno del curso.
 
 ## Documentación principal
 | Ruta | Uso |
 |---|---|
-| `PROMPT_MAESTRO_HUBCIRCULAR_V2.md` | Instrucciones completas y comunes para Claude Code y Codex |
-| `AGENTS.md` | Entrada y reglas para Codex |
-| `CLAUDE.md` | Entrada y reglas para Claude Code |
-| `PROMPT_INICIAL_CODEX.md` | Prompt V1 original, conservado por compatibilidad |
 | `docs/00-vision-y-alcance.md` | Visión, requisitos del MVP y fuera de alcance |
 | `docs/01-requisitos-y-aceptacion.md` | Funciones, condiciones y aceptación |
 | `docs/02-arquitectura.md` | Arquitectura propuesta |
@@ -37,7 +35,6 @@
 | `docs/13-historias-de-usuario.md` | Historias y prioridades |
 | `docs/14-estado-actual-y-handoff.md` | **Estado verificado** y contexto para cambio de herramienta |
 | `docs/15-registro-de-avances.md` | Bitácora única entre herramientas |
-| `docs/16-guia-claude-y-codex.md` | Cómo trabajar con ambas herramientas en el mismo repositorio |
 | `docs/17-auditoria-documental.md` | Auditoría de Fase 0: hallazgos, riesgos y matriz de cobertura por requisito |
 | `docs/18-decisiones-de-arquitectura.md` | Registro de decisiones (ADR) de la implementación |
 | `docs/19-configuracion-windows-supabase.md` | Windows sin Docker y conexión segura a Supabase (sin secretos) |
@@ -49,8 +46,6 @@
 | `docs/23-seguridad-previa-a-datos-reales.md` | Cabeceras, usuarios, Supabase Auth y lista de control antes de datos reales |
 | `docs/24-respaldos-y-restauracion.md` | Plan de respaldos, restauración y prueba de restauración |
 | `diseno/HubCircular_Dashboard_MVP.png` | Maqueta conceptual, no web construida |
-| `referencias/HubCircular_Propuesta_Completa_Actualizada_2026.md` | Propuesta histórica conservada sin reescritura |
-| `referencias/Fichas_Desafios_Capstone_2026.pdf` | Ficha oficial interna, **no publicar sin permiso** |
 
 ## Puesta en marcha (desarrollo local)
 
