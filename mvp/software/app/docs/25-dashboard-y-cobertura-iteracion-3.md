@@ -1,6 +1,6 @@
 # 25 · Iteración 3 — Tablero de indicadores, cobertura de medición y «cero confirmado»
 
-**Corte:** 19 de noviembre de 2026, Chile. Todo lo de este documento se implementó y probó **en el entorno Linux de la sesión con PostgreSQL 16 local**. La migración **0010 NO está aplicada en Supabase**: requiere aprobación explícita del usuario (sección 6). Lo verificado y lo no verificado está en las secciones 5 y 7.
+**Corte:** 19 de noviembre de 2026, Chile. Todo lo de este documento se implementó y probó **en el entorno Linux de la sesión con PostgreSQL 16 local**; la aplicación de 0010 en Supabase la hizo el usuario. La migración **0010 fue aplicada en Supabase por el usuario el 2026-11-19** (sección 6); el tablero y los calendarios **no se han probado a mano contra Supabase**. Lo verificado y lo no verificado está en las secciones 5 y 7.
 
 ## 1. Qué se entregó
 
@@ -61,7 +61,9 @@ Todas las cifras son «lo conocido hoy»: un movimiento corregido y su correcci�
 | Camino de actualización | 0009→0010 aplicado sobre una base local con datos; `db:check` y `db:check:app` sin errores |
 | Revisión visual | capturas reales de `/dashboard` y `/calendarios` revisadas; corregidos el menú, filtros truncados y ancho de fecha |
 
-## 6. Cómo aplicar 0010 en Supabase (solo con aprobación del usuario)
+## 6. Aplicación de 0010 en Supabase (ejecutada por el usuario, 2026-11-19)
+
+Resultado informado con salida real: respaldo previo OK (18 tablas, 90 filas, 9 migraciones); `--dry-run` mostró solo 0010 pendiente; `db:migrate` con `CONFIRM_REMOTE_MIGRATION` ⇒ «Migraciones aplicadas: 0010»; `db:check` sin errores (10 migraciones, 0 pendientes, RLS en las 20 tablas de `hc`, `anon`/`authenticated` sin privilegios, 6 pesajes DEMO, 1 movimiento DEMO, ningún saldo negativo); `db:check:app` con `hc_login` sin errores ni avisos. Secuencia seguida (se conserva como procedimiento):
 
 1. **Respaldo previo** (el plan gratuito no tiene copias): `npm run db:backup` (`docs/24`).
 2. `npm run db:migrate -- --dry-run` debe mostrar **solo 0010** pendiente.
@@ -73,7 +75,7 @@ La migración solo agrega objetos y no modifica datos existentes. Si algo falla,
 
 ## 7. Límites y no verificado
 
-- **0010 sin aplicar en Supabase**; el tablero no se probó contra Supabase ni en Windows nativo; sin despliegue ni HTTPS reales.
+- El tablero, los calendarios y el CSV **no se han probado a mano contra Supabase** (0010 está aplicada, pero no consta la prueba de pantallas); tampoco en Windows nativo; sin despliegue ni HTTPS reales.
 - Las cifras con **datos reales** no existen todavía: el piloto no tiene pesajes reales; los valores probados son de fixtures y DEMO.
 - Dependencia de decisiones abiertas con el Hub (H-01, H-05, H-07) y de la definición de «jornada»: la cobertura usa días fijos de la semana y el día calendario de Chile; un contenedor medido fuera de calendario no cuenta como medición esperada.
 - Una corrección se fecha al momento de corregir (hoy), pero anula al original en **su** período: el detalle exportado muestra ambos con `efectivo = no`.

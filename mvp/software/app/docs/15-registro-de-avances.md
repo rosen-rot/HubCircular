@@ -155,6 +155,13 @@
 - Riesgos, bloqueos y cambios no confirmados: **0010 NO aplicada en Supabase** (aplicar solo con aprobación: respaldo → dry-run → `CONFIRM_REMOTE_MIGRATION` → `db:check`; `docs/25` §6); sin pesajes reales (cifras probadas con fixtures/DEMO); sin probar en Supabase, Windows nativo ni desplegado; H-01/H-05/H-07 siguen abiertas y condicionan las definiciones; una corrección posterior cambia períodos ya consultados.
 - Próxima acción: el usuario decide si aplica 0010 (con respaldo previo) y prueba `/dashboard` y `/calendarios`; decisiones H-01/H-05/H-07 con el Hub; luego Iteración 4 (IoT simulado).
 
+### 2026-11-19 — Migración 0010 aplicada en Supabase (ejecutada por el usuario)
+- Agente / rama / commit: usuario en PowerShell + Claude (Cowork) · `main`.
+- Comandos y resultados (salida real del usuario): `db:backup` con `BACKUP_DIR=D:\Respaldos\HubCircular` y pg_dump 18.2 ⇒ «Respaldo OK»: 142234 bytes, sha256 `e08f7d85548e2e4b…`, 261 objetos, 18 tablas, **90 filas**, 9 migraciones (`hubcircular-hc-remoto-postgres-20261119-124134Z.dump`, fuera del repositorio); `db:migrate -- --dry-run` ⇒ solo 0010 pendiente; `db:migrate` con `CONFIRM_REMOTE_MIGRATION` ⇒ «Migraciones aplicadas: 0010_dashboard_coverage.sql»; `db:check` ⇒ sin errores: PostgreSQL 17.11, TLS, `SET LOCAL ROLE hc_app` correcto, RLS en las 20 tablas de `hc`, `anon`/`authenticated` sin privilegios, 10 migraciones y 0 pendientes, `Pesajes: 0 reales · 6 DEMO · 6 saldos`, `Movimientos: 0 reales · 1 DEMO · 4 destinos · 1 evidencias · 1 verificaciones`, ningún saldo negativo; `db:check:app` con `hc_login` ⇒ sin errores ni avisos (sin atributos privilegiados, solo puede cambiar a `hc_app`).
+- Incidencias sin efecto: un primer `db:backup` falló por falta de `BACKUP_DIR` (variable solo de la sesión de PowerShell; el script lo rechazó como está previsto) y se escribió `db:migrate` sin `npm run` (comando inexistente; no se ejecutó nada).
+- **No informado / sin verificar:** `db:restore-check` con este respaldo (no se pidió); la prueba manual de `/dashboard`, `/calendarios` y los CSV contra Supabase; no se han creado calendarios ni «ceros» en Supabase (según `db:check` no se informa su conteo).
+- Próxima acción: prueba manual (administrador: Tablero con origen DEMO y Calendarios; confirmar «cero» y ver cobertura 100 % del día); decisiones H-01/H-05/H-07 con el Hub; después Iteración 4.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:
