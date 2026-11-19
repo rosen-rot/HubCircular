@@ -1,0 +1,15 @@
+# 12 · Glosario
+- **Captación:** ingreso neto de un material reciclable medido y confirmado.
+- **Pesaje:** medición de masa con bruto, tara y neto; puede ser manual o apoyada por sensor.
+- **Telemetría:** lectura de sensor; **no** equivale a una nueva captación.
+- **Lote:** unidad trazable de material homogéneo nacida de una captación.
+- **Movimiento:** traslado, despacho, reutilización, rechazo o ajuste referenciado a un lote.
+- **Inventario:** existencia actual por material, lote y ubicación.
+- **Despachado:** material entregado a destino externo, sin asumir valorización verificada.
+- **Valorización confirmada:** salida con respaldo evaluado/validado, no solo intención.
+- **Tara:** masa del recipiente/plataforma que debe restarse de bruto.
+- **Cobertura:** mediciones realizadas respecto a las esperadas.
+- **Cero confirmado:** se realizó medición y el resultado fue cero; distinto de dato faltante.
+- **QR:** identificador de contenedor para facilitar acceso, **no** autenticación.
+- **MVP:** conjunto mínimo de funciones para validar el desafío oficial.
+- **HUB-ESP32-001:** identificador ilustrativo, no ID real registrado.

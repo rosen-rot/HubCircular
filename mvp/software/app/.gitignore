@@ -1,0 +1,35 @@
+# dependencias y build
+node_modules/
+.next/
+out/
+coverage/
+playwright-report/
+test-results/
+*.tsbuildinfo
+next-env.d.ts
+
+# secretos y entorno local (usar .env.example como plantilla)
+.env
+.env.*
+!.env.example
+*.pem
+*.crt
+*.key
+.supabase/
+supabase/.temp/
+.vercel/
+
+# material interno / de gran tamaño: NO publicar sin autorización (ver docs/18, ADR-009)
+# Si el repositorio es PRIVADO y el equipo lo autoriza, elimine estas dos líneas.
+*.zip
+referencias/*.pdf
+
+# volcados de BD, sistema operativo y editores
+*.dump
+*.sql.gz
+*.bak
+*.log
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
