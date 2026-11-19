@@ -95,6 +95,13 @@
   - Sin API REST de movimientos ni archivos de evidencia; sin dashboard/CSV.
 - Próxima acción (usuario): `docs/22` sección 5 para aplicar 0007 en Supabase (solo con su aprobación) y probar `/retiros` con los datos DEMO. Después: Iteración 3.
 
+### 2026-11-18 — Migración 0007 aplicada en Supabase (ejecutada por el usuario)
+- Agente / rama / commit: usuario en PowerShell + Claude (Cowork) · `main`.
+- Objetivo: aplicar la migración 0007 (trazabilidad) en el proyecto Supabase de desarrollo con aprobación explícita.
+- Comandos y resultados (salida real del usuario): `db:migrate -- --dry-run` ⇒ 1 pendiente (0007); `db:migrate` sin confirmación ⇒ bloqueado por el candado remoto (sin escribir); con `CONFIRM_REMOTE_MIGRATION` ⇒ «Migraciones aplicadas: 0007»; `db:check` posterior sin errores: 7 migraciones, 0 pendientes, RLS en las 18 tablas de `hc`, `SET LOCAL ROLE hc_app` correcto, `anon`/`authenticated` sin privilegios, «Movimientos: 0 reales · 0 DEMO · 0 destinos», «Ningún saldo de lote es negativo».
+- Pesajes existentes en Supabase: 0 reales · 6 DEMO · 6 saldos (los pesajes DEMO de la validación manual).
+- Pendiente: cargar los 3 destinos DEMO (`db:seed` con `CONFIRM_REMOTE_SEED`; restablece contraseñas DEMO) y probar `/retiros` en Supabase con los tres roles. Sin probar aún en Supabase: movimientos, evidencia y verificación (solo en PostgreSQL local).
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

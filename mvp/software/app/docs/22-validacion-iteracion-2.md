@@ -32,7 +32,7 @@ La línea base de «171» incluye el contenedor MIXTO DEMO añadido tras la Iter
 Otras pruebas de `docs/08`: ajuste solo administrador y con motivo; corrección conserva autor, motivo y referencia, una sola vez, y es idempotente; no se revierte si el saldo no alcanza; verificación con historial; RLS por zona (incluido que el lote queda visible tras un traslado); inmutabilidad (HC423); `hc_app` no escribe directamente; `anon`/`authenticated` sin privilegios; ningún destino DEMO con lote real.
 
 ## 4. Límites y riesgos
-- **Supabase:** la migración 0007 **no** se ha aplicado allí. Hasta que el usuario la apruebe y ejecute, la base remota sigue en 0006.
+- **Supabase:** la migración 0007 **fue aplicada por el usuario** el 18-11-2026 y `db:check` quedó sin errores (7 migraciones, 0 pendientes, ningún saldo negativo). Los movimientos, la evidencia y la verificación **aún no se han probado en Supabase**, solo en PostgreSQL local.
 - **Windows nativo:** no verificado (igual que en 1.5).
 - **Decisiones abiertas:** H-01 (ubicación = zona, provisional), H-05 (valorización = verificación, provisional), H-07 (sin excepciones de material). Cambiarlas no obliga a rehacer los saldos.
 - **Zonas visibles:** un operador solo ve como destino de traslado zonas de su ámbito (RLS de `zones`); la función de BD sí permite trasladar a cualquier zona activa si se conoce su identificador. Revisar con el Hub si los traslados entre zonas deben ser exclusivos del administrador.
