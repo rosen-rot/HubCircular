@@ -70,6 +70,7 @@ Usuarios DEMO (rol, ámbito): `admin@demo.hubcircular.test` (administrador, toda
 | `npm test` | Vitest (unitarias + integración contra PostgreSQL real; usa `TEST_DATABASE_URL`, por defecto `postgres://postgres@127.0.0.1:54329/postgres`; crea y borra bases efímeras `hc_test_*`) |
 | `npm run test:e2e` | build + Playwright (Chromium) sobre la compilación de producción y la BD `hc_e2e`; requiere `npx playwright install chromium` la primera vez |
 | `npm run db:check` | diagnóstico de solo lectura de la base destino (no imprime claves) |
+| `npm run db:check:app` | comprueba la conexión que usa la app (`DATABASE_URL`): privilegios del rol y bajada a `hc_app` (solo lectura) |
 | `npm run db:reset` | **solo local**: elimina el esquema `hc`; se niega siempre a actuar sobre hosts no locales (incluido Supabase) |
 
 Las pruebas de integración y E2E necesitan un PostgreSQL **local** con permiso para crear bases (`TEST_DATABASE_URL`); se niegan a ejecutarse contra cualquier host remoto, incluido Supabase. En Windows sin Docker: `scripts/windows/postgres-local.ps1` (ver `docs/19`, sección 5).

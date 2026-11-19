@@ -133,16 +133,36 @@ drop role if exists hc_app;
 
 No existe script ni comando npm para esto contra Supabase (`npm run db:reset` se niega a actuar sobre cualquier host no local). Antes de datos reales: activar copias de seguridad del proyecto (Database → Backups; depende del plan) y probar una restauración.
 
-### Endurecimiento recomendado antes de datos reales: rol de login dedicado
+### Endurecimiento recomendado antes de datos reales: rol de login dedicado `hc_login`
 
-Hoy la aplicación se conecta como `postgres` y baja a `hc_app` con `SET LOCAL ROLE` en cada transacción. Funciona, pero una inyección SQL hipotética podría ejecutar `RESET ROLE` y volver a `postgres`. Con un rol de login dedicado, **ni siquiera eso es posible**. En **SQL Editor** (escribe tú la clave en la consulta; no queda en el repositorio):
+Hoy la aplicación se conecta como `postgres` y baja a `hc_app` con `SET LOCAL ROLE` en cada transacción. Funciona, pero una inyección SQL hipotética podría ejecutar `RESET ROLE` y volver a `postgres`. Con un rol de login dedicado, **ni siquiera eso es posible**: `hc_login` no tiene privilegios propios y solo puede cambiar a `hc_app`.
 
-```sql
-create role hc_login login password '<ESCRIBA_AQUI_UNA_CLAVE_LARGA>' noinherit nosuperuser nocreatedb nocreaterole nobypassrls;
-grant hc_app to hc_login;
-```
+1. **Antes de tocar nada**, copia tu `DATABASE_URL` actual (la de `postgres.<referencia>`) a `MIGRATION_DATABASE_URL` en `.env.local`. Desde ahora `DATABASE_URL` no podrá migrar.
+2. Genera una clave larga y segura sin caracteres especiales (no necesita codificación en la URL) y guárdala en tu gestor de contraseñas; no la pegues en el chat:
 
-Después, en `.env.local`, cambia solo `DATABASE_URL` al usuario `hc_login.<referencia>` (con el pooler) y deja `MIGRATION_DATABASE_URL` con `postgres.<referencia>`. Comportamiento verificado en PostgreSQL 16 local: sin `SET ROLE`, `hc_login` recibe `permission denied for schema hc`; con `SET LOCAL ROLE hc_app` opera con RLS; `current_user` no vuelve a ser superusuario. **No verificado en Supabase**.
+   ```powershell
+   node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"
+   ```
+
+3. En el panel de Supabase abre **SQL Editor → New query**, pega esto reemplazando `<CLAVE>` por la clave generada y ejecútalo. La clave solo queda en esa consulta del panel, no en el repositorio:
+
+   ```sql
+   create role hc_login login password '<CLAVE>' noinherit nosuperuser nocreatedb nocreaterole nobypassrls;
+   grant hc_app to hc_login;
+   ```
+
+   Si ya lo ejecutaste antes y necesitas cambiar la clave: `alter role hc_login password '<CLAVE_NUEVA>';`.
+4. En `.env.local` cambia **solo** `DATABASE_URL`: el usuario pasa a `hc_login.<referencia>` y la clave a la nueva (mismo host y puerto del Session pooler). `MIGRATION_DATABASE_URL` conserva `postgres.<referencia>`.
+5. Verifica la conexión de la aplicación (solo lectura):
+
+   ```powershell
+   npm run db:check:app
+   ```
+
+   Debe mostrar: `«hc_login» no tiene atributos privilegiados`, `Sin SET ROLE, «hc_login» no puede usar el esquema hc`, `Solo puede cambiar a hc_app`, `SET LOCAL ROLE hc_app funciona` y `Resultado: sin errores ni avisos`.
+6. Reinicia `npm run dev` y registra un pesaje DEMO para confirmar que la app funciona con el rol nuevo. `npm run db:check` sigue usando la conexión de migración.
+
+Comportamiento verificado en PostgreSQL 16 local con `db:check:app` en cuatro escenarios: `hc_login` correcto ⇒ sin errores; conectando como `postgres` ⇒ aviso de rol privilegiado; sin membresía en `hc_app` ⇒ error; miembro de un rol privilegiado ⇒ error. En Supabase se valida con el paso 5.
 
 ### Revisiones en el panel que el código no puede hacer
 
