@@ -179,7 +179,8 @@
 - Corrección: esos 13 `<p>` pasan a `<div>` (registro, retiros, detalle de lote y sus paneles, tablero, calendarios). Sin cambios de comportamiento ni de base de datos.
 - Verificación (resultados reales, Linux): comprobación en **modo desarrollo** (`next dev`) con Chromium capturando la consola en `/registro`, `/retiros`, `/historial`, `/contenedores`, `/destinos`, `/usuarios`, `/dashboard`, `/calendarios`, `/ayuda`, detalle de lote y `/retiros?lote=…`: **0 avisos de hidratación/anidación**; la misma comprobación, con el `<p>` de `/registro` restaurado a propósito, detecta **17** avisos (el detector funciona). Nueva prueba unitaria estática: ningún `<p>` puede contener `InfoTip` ni `Term`. `tsc`, `eslint` y `next build` sin errores; **Vitest 344/344** (29 archivos); **Playwright 61/61**.
 - Límite: la comprobación en modo desarrollo se hizo a mano (script desechable), no está automatizada en la suite; la prueba estática cubre solo este patrón (`<p>` con iconos).
-- Próxima acción: el usuario vuelve a correr `npm run dev` y confirma que el aviso desapareció.
+- Confirmado por el usuario (2026-11-19, sin captura): tras la corrección, `npm run dev` en Windows «se ve todo sin ningún error».
+- Próxima acción: resumen de H-01/H-05/H-07 para el Hub o unir los CSV, según prioridad del usuario.
 
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
