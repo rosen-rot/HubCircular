@@ -74,6 +74,11 @@
 - Cambios: `docs/21` (actualización) y `docs/11` registran que el Hub no pesa ni gestiona reciclables, que probablemente llegan materiales mezclados y que existen contenedores globales mezclados. Información verbal del equipo, **no confirmada por el Hub**. H-01, H-05 y H-07 siguen **abiertas**.
 - Próxima acción: enviar al Hub el correo revisado (quién retira hoy los residuos, uso de contenedores globales, lugar de acopio) y decidir el alcance del piloto.
 
+### 2026-11-18 — Contenedor global mixto (DEMO)
+- Cambios: `db/seed/demo.ts` (material `DEMO-MIXTO`, estación `DEMO-Z01-GLOBAL`, contenedor `DEMO-Z01-GLOBAL-MIXTO` sin tara nominal); `tests/integration/mixed-container.test.ts` (4 pruebas nuevas); ajustados los recuentos esperados en `queries.test.ts` y `rls.test.ts`; ADR-018.
+- Pruebas (Linux, PostgreSQL 16): typecheck y lint limpios; Vitest **16 archivos, 171/171**; E2E **20/20**. Sin cambios de migraciones ni de código de aplicación.
+- Pendiente: en Supabase aún no se vuelve a ejecutar `db:seed`; hacerlo restablece las claves de los 3 usuarios DEMO (usar `SEED_*_PASSWORD` si se quieren fijar).
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

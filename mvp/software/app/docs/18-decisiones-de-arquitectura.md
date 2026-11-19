@@ -89,3 +89,10 @@ Formato: contexto → decisión → consecuencias / cómo revertir. Las decision
 
 ## ADR-017 · Portabilidad Windows de las migraciones
 - **Decisión.** `.gitattributes` fija LF en `*.sql` y el migrador normaliza CRLF→LF antes de calcular el checksum: un `git clone` en Windows no genera falsos «migración modificada». Con LF el checksum es idéntico al anterior, de modo que no invalida bases ya migradas.
+
+## ADR-018 · Contenedor global mixto y material «MIXTO» (solo datos DEMO por ahora)
+- **Contexto.** El equipo informó (verbal, no confirmado por el Hub) que existen contenedores globales con residuos mezclados y que probablemente llegan materiales distintos a los contenedores. El usuario pidió incorporarlo ya, con la posibilidad de cambiarlo o quitarlo después.
+- **Decisión.** Sin cambios de esquema ni de código de aplicación: el seed DEMO agrega el material `DEMO-MIXTO` («Mixto / no clasificable (demo)»), la estación `DEMO-Z01-GLOBAL` y el contenedor `DEMO-Z01-GLOBAL-MIXTO` en la zona Cowork DEMO, **sin tara nominal** (se desconoce el peso del contenedor; el operador la ingresa en cada pesaje). El pesaje deriva el material del contenedor, como siempre.
+- **Regla para el futuro.** Los indicadores de «reciclable capturado» **no deben mezclar** el material mixto con el segregado (se filtra por material); se aplicará al construir el dashboard (iteración 3).
+- **No incluido (siguen aplazados):** carga de un material o contenedor *reales* (faltan zonas y estaciones reales y datos del Hub), despachos sin destino, excepción de material en el pesaje. Para quitarlo: eliminar las líneas marcadas en `db/seed/demo.ts` y los registros demo asociados (con aprobación; los pesajes son inmutables, por lo que un contenedor con pesajes solo puede desactivarse).
+- **Verificado:** `tests/integration/mixed-container.test.ts` (4 pruebas) y 171/171 Vitest + 20/20 E2E en Linux. Pendiente en Supabase: volver a ejecutar `db:seed` (ver `docs/19`).

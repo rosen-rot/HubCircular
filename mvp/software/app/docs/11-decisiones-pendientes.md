@@ -42,9 +42,10 @@ Detalle completo en `docs/17-auditoria-documental.md`; decisiones de diseño en 
 El Hub no pesa ni gestiona residuos reciclables actualmente; probablemente llegan materiales distintos a los contenedores; existen contenedores globales con residuos mezclados. Detalle y efecto sobre H-01, H-05 y H-07 en `docs/21`. Nuevo punto abierto: alcance del piloto respecto de los contenedores globales mezclados.
 
 ## Aplazado por decisión del usuario (2026-11-18): no añadir extras todavía
-No se implementa nada de esto hasta que el usuario lo indique; no bloquea la Iteración 1.5 ni el estado actual.
-- Material de catálogo «MIXTO / NO CLASIFICABLE» y un contenedor global que lo use (carga de datos reales, sin cambios de código).
-- Alcance del piloto: ¿solo contenedores segregados o también los globales mezclados? (si se pesan, separarlos en los indicadores).
-- Despachos con destino «por definir» y sin verificación de valorización (Iteración 2), mientras no exista gestor.
-- Excepción justificada de material en el pesaje (H-07, alternativa 2).
+Actualización del mismo día: el usuario pidió incorporar el primero («por las dudas; si luego se quiere cambiar o quitar, se quita»). Los demás siguen aplazados hasta nueva indicación.
+- ✅ **Incorporado (solo DEMO, ADR-018):** material `DEMO-MIXTO` y contenedor global `DEMO-Z01-GLOBAL-MIXTO` sin tara nominal.
+- ⏳ Versión **real** del material/contenedor mixto (requiere zonas y estaciones reales del Hub).
+- ⏳ Alcance del piloto: ¿solo contenedores segregados o también los globales mezclados? (si se pesan, separarlos en los indicadores).
+- ⏳ Despachos con destino «por definir» y sin verificación de valorización (Iteración 2), mientras no exista gestor.
+- ⏳ Excepción justificada de material en el pesaje (H-07, alternativa 2).
 Detalle y razonamiento en `docs/21`.

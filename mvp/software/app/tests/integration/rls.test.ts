@@ -35,7 +35,7 @@ describe("RLS: lectura por rol y ámbito de zona (docs/08: «operador no lee zon
       expect(containers).not.toContain("DEMO-Z02-EST01-ALUMINIO");
       const zones = (await c.query("select name from hc.zones")).rows.map((r) => r.name);
       expect(zones).toEqual(["Cowork DEMO"]);
-      expect((await c.query("select id from hc.stations")).rows).toHaveLength(1);
+      expect((await c.query("select id from hc.stations")).rows).toHaveLength(2); // estación 01 y contenedor global de Cowork
     });
   });
 

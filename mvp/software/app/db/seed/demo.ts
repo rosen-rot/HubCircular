@@ -39,6 +39,8 @@ export async function seedDemo(db: Client, opts: SeedOptions): Promise<void> {
 
     const s01 = await upsertStation(db, z01, "DEMO-Z01-EST01", "Estación 01 · Cowork (demo)");
     const s02 = await upsertStation(db, z02, "DEMO-Z02-EST01", "Estación 01 · Laboratorio (demo)");
+    // Contenedor global donde se junta de todo (información del equipo, 2026-11-18; no confirmada por el Hub). Ver docs/21.
+    const sGlobal = await upsertStation(db, z01, "DEMO-Z01-GLOBAL", "Contenedor global · Cowork (demo)");
 
     const mat: Record<string, string> = {};
     for (const [code, name] of [
@@ -46,6 +48,8 @@ export async function seedDemo(db: Client, opts: SeedOptions): Promise<void> {
       ["PET", "Botellas PET (demo)"],
       ["PEAD", "Envases PEAD (demo)"],
       ["ALUMINIO", "Latas de aluminio (demo)"],
+      // Material para contenedores sin material único. Los indicadores de «reciclable capturado» NO deben mezclarlo con el segregado.
+      ["DEMO-MIXTO", "Mixto / no clasificable (demo)"],
     ] as const) {
       mat[code] = await upsertMaterial(db, code, name);
     }
@@ -53,6 +57,8 @@ export async function seedDemo(db: Client, opts: SeedOptions): Promise<void> {
     await upsertContainer(db, s01, mat.CARTON!, "DEMO-Z01-EST01-CARTON", 1200);
     await upsertContainer(db, s01, mat.PET!, "DEMO-Z01-EST01-PET", 350);
     await upsertContainer(db, s02, mat.ALUMINIO!, "DEMO-Z02-EST01-ALUMINIO", 500);
+    // Sin tara nominal: se desconoce el peso del contenedor global; el operador la ingresa en cada pesaje.
+    await upsertContainer(db, sGlobal, mat["DEMO-MIXTO"]!, "DEMO-Z01-GLOBAL-MIXTO", null);
 
     const hashOpts = opts.fastHash ? { N: 2 ** 10, r: 8, p: 1 } : {};
     for (const key of ["admin", "operator", "reader"] as const) {
@@ -114,7 +120,7 @@ async function upsertMaterial(db: Client, code: string, name: string): Promise<s
   return r.rows[0]!.id;
 }
 
-async function upsertContainer(db: Client, stationId: string, materialId: string, code: string, tareG: number): Promise<void> {
+async function upsertContainer(db: Client, stationId: string, materialId: string, code: string, tareG: number | null): Promise<void> {
   await db.query(
     `insert into hc.containers (station_id, material_id, code, tare_g, data_origin) values ($1, $2, $3, $4, 'demo')
      on conflict (code) do nothing`,

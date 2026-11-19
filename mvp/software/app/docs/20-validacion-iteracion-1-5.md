@@ -116,3 +116,7 @@ Pendiente de esta lista: doble envío en Supabase y revisar en el panel que `hc`
 ## 11. Aclaración sobre el doble envío (2026-11-18)
 
 El usuario comprobó en la app conectada a Supabase que **no es posible hacer doble clic**: al primer clic el botón se deshabilita y muestra «Registrando». Es la primera barrera (interfaz). La segunda es la clave de idempotencia en la base de datos, que cubre lo que la interfaz no puede evitar (reintento de red, dos pestañas, recarga durante el envío, cliente de API). Esa segunda barrera está probada en PostgreSQL local (10 envíos simultáneos con la misma clave ⇒ 1 pesaje y 1 lote) y **no se ejercitó directamente contra Supabase**; el esquema y la función son idénticos allí (migraciones 0001–0006 aplicadas y `db:check` sin errores).
+
+## 12. Actualización posterior: contenedor global mixto (DEMO)
+
+Tras agregar el material `DEMO-MIXTO` y el contenedor `DEMO-Z01-GLOBAL-MIXTO` al seed (ADR-018), el resultado en Linux es: typecheck y lint limpios; Vitest **16 archivos, 171 pruebas: 171 pasan, 0 fallan, 0 omitidas** (4 nuevas en `mixed-container.test.ts`; 3 expectativas de recuento actualizadas porque el seed ahora tiene un contenedor y un material más); E2E **20/20**. Las cifras de la sección 2 corresponden al estado anterior. En Supabase el seed aún no se ha vuelto a ejecutar.

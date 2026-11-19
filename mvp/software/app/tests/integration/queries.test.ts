@@ -147,17 +147,17 @@ describe("lote y saldo", () => {
 describe("catálogo visible", () => {
   it("lista solo contenedores utilizables en el ámbito del actor", async () => {
     const op = await cat.listContainers(operator, { onlyUsable: true });
-    expect(op.map((c) => c.code).sort()).toEqual(["DEMO-Z01-EST01-CARTON", "DEMO-Z01-EST01-PET"]);
+    expect(op.map((c) => c.code).sort()).toEqual(["DEMO-Z01-EST01-CARTON", "DEMO-Z01-EST01-PET", "DEMO-Z01-GLOBAL-MIXTO"]);
     expect(op.every((c) => c.dataOrigin === "demo")).toBe(true);
     const all = await cat.listContainers(admin);
-    expect(all).toHaveLength(3);
+    expect(all).toHaveLength(4);
     const tare = all.find((c) => c.code === "DEMO-Z01-EST01-CARTON")!.tareG;
     expect(tare).toBe(1200);
   });
   it("opciones de filtro respetan el ámbito", async () => {
     const o = await cat.loadFilterOptions(operator);
     expect(o.zones.map((z) => z.name)).toEqual(["Cowork DEMO"]);
-    expect(o.materials.length).toBe(4);
+    expect(o.materials.length).toBe(5);
     void PASSWORDS;
   });
 });
