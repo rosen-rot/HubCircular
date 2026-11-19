@@ -70,6 +70,10 @@
 - Resultado: informado por el usuario como correcto (la salida no se compartió). `docs/20` §10.
 - Pendiente antes de datos reales: CSP/HSTS, gestión de usuarios por UI, copias de seguridad, doble envío probado en Supabase, y decisiones H-01/H-05/H-07 con el Hub.
 
+### 2026-11-18 — Información del equipo sobre la operación del Hub
+- Cambios: `docs/21` (actualización) y `docs/11` registran que el Hub no pesa ni gestiona reciclables, que probablemente llegan materiales mezclados y que existen contenedores globales mezclados. Información verbal del equipo, **no confirmada por el Hub**. H-01, H-05 y H-07 siguen **abiertas**.
+- Próxima acción: enviar al Hub el correo revisado (quién retira hoy los residuos, uso de contenedores globales, lugar de acopio) y decidir el alcance del piloto.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

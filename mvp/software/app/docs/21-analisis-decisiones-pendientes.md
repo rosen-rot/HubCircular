@@ -2,6 +2,21 @@
 
 > **Ninguna de estas decisiones está resuelta.** Este documento ordena alternativas y recomienda, pero la decisión corresponde al Hub Providencia y al equipo. Lo implementado hoy es provisional y está marcado como tal en `docs/11`, `docs/17` y `docs/18`. Los textos de `docs/01`–`docs/06` y la ficha oficial no se modifican para ajustarlos al código. Fecha: 2026-11-18.
 
+## Actualización 2026-11-18 · información aportada por el equipo (no confirmada por el Hub)
+
+Un integrante del equipo informó, de forma verbal y sin que el Hub lo haya confirmado por escrito, lo siguiente:
+
+1. El Hub **no pesa** sus residuos y **no tiene una gestión de residuos reciclables** como tal: el proceso lo introduce el piloto.
+2. Es **probable** que lleguen residuos de otro material a los contenedores; no se sabe cuándo ocurre.
+3. Existen **contenedores globales** donde se almacenan muchas cosas **mezcladas**, como un basurero común.
+
+Efecto sobre cada decisión (ninguna queda resuelta):
+
+- **H-01.** No hay acopio ni bodegas existentes que representar: la estructura la define el piloto. El supuesto «ubicación = zona» (ADR-005) sigue siendo el más simple y no choca con lo informado. Se revisa solo si el equipo decide crear un punto de acopio común distinto de las zonas de captación.
+- **H-05.** Sin gestión de reciclables previa, **no se sabe si habrá un gestor externo ni qué comprobante entregaría**. Mientras no exista un destino definido, la valorización confirmada no se puede modelar con evidencia real: el despacho de la iteración 2 debería poder registrarse con destino «por definir» y sin verificación. La pregunta al Hub cambia: quién retira hoy los residuos del edificio y si aceptarían coordinar un gestor de reciclables.
+- **H-07.** Gana peso: es **probable** que el caso ocurra. Además, los contenedores globales mezclados plantean el caso de un contenedor **sin material único**. Sin cambiar el código se puede modelar un material de catálogo «MIXTO / NO CLASIFICABLE» y un contenedor global con ese material (el pesaje deriva el material del contenedor); hay que cargarlo como dato real con `data_origin = 'real'` (no hay interfaz de administración de catálogo todavía). La excepción justificada (alternativa 2) sigue pendiente, pero deja de ser opcional si se quieren pesar contenedores de material único con contaminación frecuente.
+- **Alcance a decidir por el equipo (nueva pregunta):** ¿el piloto pesa solo los contenedores segregados que el equipo instale, o también los globales mezclados (por ejemplo, para medir cuánto reciclable se pierde)? Si se pesan los globales, los indicadores deben distinguirlos de la captación segregada para no inflar «reciclable capturado».
+
 ---
 
 ## H-01 · «Ubicación» de inventario = zona

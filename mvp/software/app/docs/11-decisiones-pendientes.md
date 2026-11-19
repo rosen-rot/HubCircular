@@ -37,3 +37,6 @@ Detalle completo en `docs/17-auditoria-documental.md`; decisiones de diseño en 
 | Política de contraseñas, alta/baja de usuarios y recuperación de acceso | Sin UI en Fase 1 (usuarios por seed) | Equipo | 2 |
 | Cabeceras HTTP de seguridad (CSP, HSTS) | Se incluyen `nosniff`, `X-Frame-Options`, `Referrer-Policy`; **CSP y HSTS pendientes** (dependen del hosting) | Equipo | 6 |
 
+
+## Información aportada por el equipo el 2026-11-18 (no confirmada por el Hub)
+El Hub no pesa ni gestiona residuos reciclables actualmente; probablemente llegan materiales distintos a los contenedores; existen contenedores globales con residuos mezclados. Detalle y efecto sobre H-01, H-05 y H-07 en `docs/21`. Nuevo punto abierto: alcance del piloto respecto de los contenedores globales mezclados.
