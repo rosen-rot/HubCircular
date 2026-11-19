@@ -1,0 +1,15 @@
+# PostgreSQL local para desarrollo (opcional si usa otro PostgreSQL ≥ 14 o un proyecto Supabase).
+# Uso: docker compose up -d   |   docker compose down
+services:
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-CAMBIAR_ESTA_CLAVE}
+      POSTGRES_DB: hubcircular
+    ports:
+      - "127.0.0.1:5432:5432"
+    volumes:
+      - hubcircular-pg:/var/lib/postgresql/data
+volumes:
+  hubcircular-pg:
