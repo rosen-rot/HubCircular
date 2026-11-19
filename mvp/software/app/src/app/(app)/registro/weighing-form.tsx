@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { InfoTip, Term } from "@/components/help/info-tip";
 import { Alert, DemoBadge } from "@/components/ui/card";
 import { Field, Input, Select, Textarea, describedBy } from "@/components/ui/field";
 import { formatGrams, formatKg, parseKgToGrams, previewNetGrams } from "@/modules/weighing/units";
@@ -84,7 +85,7 @@ export function WeighingForm({
         </div>
       ) : null}
 
-      <Field id="containerCode" label="Contenedor" error={errors.containerCode} hint="Si llegó por un QR, el contenedor ya viene seleccionado. El QR solo identifica el contenedor; no otorga permisos.">
+      <Field id="containerCode" label="Contenedor" help="contenedor" error={errors.containerCode} hint="Si llegó por un QR, el contenedor ya viene seleccionado. El QR solo identifica el contenedor; no otorga permisos.">
         <Select
           id="containerCode"
           name="containerCode"
@@ -106,7 +107,7 @@ export function WeighingForm({
       {container ? (
         <div className="rounded-lg bg-brand-50 p-3 text-sm" aria-live="polite">
           <p>
-            <span className="font-semibold">Material:</span> {container.materialName} · <span className="font-semibold">Zona:</span> {container.zoneName}{" "}
+            <span className="font-semibold"><Term k="material">Material:</Term></span> {container.materialName} · <span className="font-semibold"><Term k="zona">Zona:</Term></span> {container.zoneName}{" "}
             {container.demo ? <DemoBadge /> : null}
           </p>
           {container.demo ? (
@@ -116,7 +117,7 @@ export function WeighingForm({
       ) : null}
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <Field id="grossKg" label="Peso bruto (kg)" error={errors.grossKg} hint="Recipiente + material. Use coma o punto: 6,40">
+        <Field id="grossKg" label="Peso bruto: recipiente + material (kg)" help="bruto" error={errors.grossKg} hint="Lo que marca la balanza con todo junto. Use coma o punto: 6,40">
           <Input
             id="grossKg"
             name="grossKg"
@@ -129,7 +130,7 @@ export function WeighingForm({
             aria-describedby={describedBy("grossKg", true, errors.grossKg)}
           />
         </Field>
-        <Field id="tareKg" label="Tara (kg)" error={errors.tareKg} hint="Peso del recipiente vacío.">
+        <Field id="tareKg" label="Tara: recipiente vacío (kg)" help="tara" error={errors.tareKg} hint="Peso del recipiente solo, sin material. Se propone la tara de referencia del contenedor.">
           <Input
             id="tareKg"
             name="tareKg"
@@ -148,7 +149,9 @@ export function WeighingForm({
       </div>
 
       <div className="rounded-lg border border-slate-300 bg-white p-4" aria-live="polite" data-testid="net-preview">
-        <p className="text-sm text-slate-700">Peso neto (vista previa)</p>
+        <p className="text-sm text-slate-700">
+          <Term k="neto">Peso neto: solo el material (vista previa)</Term>
+        </p>
         {net.kind === "ok" ? (
           <p className="text-2xl font-bold text-brand-900">
             {formatKg(net.grams)} <span className="text-base font-normal text-slate-600">({formatGrams(net.grams)})</span>
@@ -164,7 +167,7 @@ export function WeighingForm({
       <details className="rounded-lg border border-slate-300 bg-white p-4" open={Boolean(errors.occurredAtLocal)}>
         <summary className="cursor-pointer text-sm font-semibold">Fecha y hora del pesaje (opcional: por defecto, ahora)</summary>
         <div className="mt-3">
-          <Field id="occurredAtLocal" label="Fecha y hora (hora de Chile)" error={errors.occurredAtLocal} hint="Solo si el pesaje se hizo antes de registrarlo.">
+          <Field id="occurredAtLocal" label="Fecha y hora (hora de Chile)" help="hora_chile" error={errors.occurredAtLocal} hint="Solo si el pesaje se hizo antes de registrarlo.">
             <Input
               id="occurredAtLocal"
               name="occurredAtLocal"
@@ -178,16 +181,19 @@ export function WeighingForm({
         </div>
       </details>
 
-      <label className="flex min-h-11 items-center gap-3 text-sm font-semibold">
-        <input
-          type="checkbox"
-          name="contaminationObserved"
-          checked={contamination}
-          onChange={(e) => setContamination(e.target.checked)}
-          className="h-5 w-5"
-        />
-        Contaminación visible en el material
-      </label>
+      <div className="flex flex-wrap items-center">
+        <label className="flex min-h-11 items-center gap-3 text-sm font-semibold">
+          <input
+            type="checkbox"
+            name="contaminationObserved"
+            checked={contamination}
+            onChange={(e) => setContamination(e.target.checked)}
+            className="h-5 w-5"
+          />
+          Contaminación visible en el material
+        </label>
+        <InfoTip k="contaminacion" />
+      </div>
 
       <Field id="notes" label="Observaciones (opcional)" error={errors.notes} hint="Máximo 500 caracteres.">
         <Textarea

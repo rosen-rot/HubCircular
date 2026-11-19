@@ -62,14 +62,14 @@ export function CreateUserForm({ zones }: { zones: { id: string; name: string }[
         <Field id="nu-name" label="Nombre" error={e.name}>
           <Input id="nu-name" name="name" autoComplete="off" required maxLength={120} aria-invalid={Boolean(e.name)} aria-describedby={describedBy("nu-name", false, e.name)} />
         </Field>
-        <Field id="nu-role" label="Rol" error={e.role}>
+        <Field id="nu-role" label="Rol" error={e.role} hint="Administrador: todo. Operador: registra pesajes y movimientos. Lector: solo consulta. Detalle en Ayuda.">
           <Select id="nu-role" name="role" defaultValue="operador" aria-invalid={Boolean(e.role)} aria-describedby={describedBy("nu-role", false, e.role)}>
             {ROLES.map((r) => (
               <option key={r} value={r}>{ROLE_LABEL[r]}</option>
             ))}
           </Select>
         </Field>
-        <Field id="nu-zone" label="Zona" error={e.zoneId} hint="El operador necesita una zona. «Todas» da acceso a todas las zonas.">
+        <Field id="nu-zone" label="Zona" help="ambito" error={e.zoneId} hint="El operador necesita una zona. «Todas» da acceso a todas las zonas.">
           <Select id="nu-zone" name="zoneId" defaultValue="" aria-invalid={Boolean(e.zoneId)} aria-describedby={describedBy("nu-zone", true, e.zoneId)}>
             <option value="">Todas las zonas</option>
             {zones.map((z) => (

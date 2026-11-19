@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { randomUUID } from "node:crypto";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { InfoTip, Term } from "@/components/help/info-tip";
+import { MOVEMENT_TIP } from "@/lib/glossary";
 import { Alert, Badge, Card, DemoBadge } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { formatSantiago } from "@/lib/time";
@@ -65,17 +67,19 @@ export default async function LotePage({
 
       <Card>
         <dl className="grid gap-3 sm:grid-cols-2">
-          <div><dt className="text-sm font-semibold text-slate-700">Material</dt><dd>{b.materialName}</dd></div>
-          <div><dt className="text-sm font-semibold text-slate-700">Zona de origen</dt><dd>{b.originZoneName ?? "—"}</dd></div>
-          <div><dt className="text-sm font-semibold text-slate-700">Captación inicial (no cambia)</dt><dd className="font-semibold">{formatKg(b.initialG)} ({formatGrams(b.initialG)})</dd></div>
-          <div><dt className="text-sm font-semibold text-slate-700">Saldo disponible</dt><dd className="font-semibold" data-testid="saldo-total">{formatKg(b.totalBalanceG)} ({formatGrams(b.totalBalanceG)})</dd></div>
+          <div><dt className="text-sm font-semibold text-slate-700">Material<InfoTip k="material" /></dt><dd>{b.materialName}</dd></div>
+          <div><dt className="text-sm font-semibold text-slate-700">Zona de origen<InfoTip k="zona" /></dt><dd>{b.originZoneName ?? "—"}</dd></div>
+          <div><dt className="text-sm font-semibold text-slate-700">Captación inicial (no cambia)<InfoTip k="captacion" /></dt><dd className="font-semibold">{formatKg(b.initialG)} ({formatGrams(b.initialG)})</dd></div>
+          <div><dt className="text-sm font-semibold text-slate-700">Saldo disponible<InfoTip k="saldo" /></dt><dd className="font-semibold" data-testid="saldo-total">{formatKg(b.totalBalanceG)} ({formatGrams(b.totalBalanceG)})</dd></div>
           <div><dt className="text-sm font-semibold text-slate-700">Creado</dt><dd>{formatSantiago(b.createdAt)}</dd></div>
-          <div><dt className="text-sm font-semibold text-slate-700">Pesaje de origen</dt><dd><Link className="font-mono text-brand-700 underline" href={`/pesajes/${b.weighingId}`}>{formatWeighingRef(b.weighingRef)}</Link></dd></div>
+          <div><dt className="text-sm font-semibold text-slate-700">Pesaje de origen<InfoTip k="pesaje" /></dt><dd><Link className="font-mono text-brand-700 underline" href={`/pesajes/${b.weighingId}`}>{formatWeighingRef(b.weighingRef)}</Link></dd></div>
         </dl>
       </Card>
 
       <Card>
-        <h2 className="mb-2 text-lg font-semibold">Saldo por ubicación</h2>
+        <h2 className="mb-2 text-lg font-semibold">
+          <Term k="saldo">Saldo por ubicación</Term>
+        </h2>
         <table className="w-full text-left text-sm">
           <thead className="text-slate-700"><tr><th scope="col" className="py-1">Ubicación (zona)</th><th scope="col" className="py-1 text-right">Saldo</th></tr></thead>
           <tbody className="divide-y divide-slate-200">
@@ -92,7 +96,9 @@ export default async function LotePage({
       </Card>
 
       <Card>
-        <h2 className="mb-2 text-lg font-semibold">Trazabilidad: movimientos</h2>
+        <h2 className="mb-2 text-lg font-semibold">
+          <Term k="movimiento">Trazabilidad: movimientos</Term>
+        </h2>
         {movements.length === 0 ? (
           <p className="text-slate-700">Este lote aún no tiene movimientos; todo su saldo sigue donde se captó.</p>
         ) : (
@@ -106,8 +112,14 @@ export default async function LotePage({
                   <div className="flex flex-wrap items-center gap-2">
                     <span className="font-mono font-semibold">{label}</span>
                     <Badge>{MOVEMENT_LABEL[m.type]}</Badge>
+                    <InfoTip k={MOVEMENT_TIP[m.type]} className="-ml-1" />
                     <span className="font-semibold tabular-nums">{formatKg(m.quantityG)}</span>
-                    {st ? <Badge tone={STATUS_LABEL[st].tone}>{STATUS_LABEL[st].text}</Badge> : null}
+                    {st ? (
+                      <>
+                        <Badge tone={STATUS_LABEL[st].tone}>{STATUS_LABEL[st].text}</Badge>
+                        <InfoTip k={st === "confirmada" ? "valorizacion" : st === "corregido" ? "correccion" : "sin_decision"} className="-ml-1" />
+                      </>
+                    ) : null}
                     {corrected ? <Badge>Corregido por {formatMovementRef(m.correctedByRef!)}</Badge> : null}
                     {m.correctsRef !== null ? <Badge>Corrige {formatMovementRef(m.correctsRef)}</Badge> : null}
                   </div>
@@ -119,7 +131,9 @@ export default async function LotePage({
 
                   {m.type === "despacho" ? (
                     <div className="mt-2 text-sm">
-                      <p className="font-semibold">Evidencia ({m.evidence.length})</p>
+                      <p className="font-semibold">
+                        Evidencia ({m.evidence.length})<InfoTip k="evidencia" />
+                      </p>
                       {m.evidence.length === 0 ? (
                         <p className="text-slate-700">Sin evidencia registrada. Un despacho sin evidencia no se declara valorizado.</p>
                       ) : (
@@ -134,7 +148,9 @@ export default async function LotePage({
                       )}
                       {m.verifications.length > 0 ? (
                         <>
-                          <p className="mt-2 font-semibold">Historial de verificación</p>
+                          <p className="mt-2 font-semibold">
+                            Historial de verificación<InfoTip k="valorizacion" />
+                          </p>
                           <ul className="list-disc pl-5">
                             {m.verifications.map((v) => (
                               <li key={v.id}>
@@ -152,7 +168,7 @@ export default async function LotePage({
 
                   {canCorrect && m.type !== "correccion" && !corrected ? (
                     <details className="mt-2">
-                      <summary className="cursor-pointer text-sm font-semibold text-brand-700">Corregir…</summary>
+                      <summary className="cursor-pointer text-sm font-semibold text-brand-700">Corregir (deshacer este movimiento)…</summary>
                       <CorrectForm batchId={b.id} movementId={m.id} refLabel={label} idempotencyKey={randomUUID()} />
                     </details>
                   ) : null}

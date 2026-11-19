@@ -21,6 +21,7 @@ export function AppShell({ actor, children }: { actor: Actor; children: React.Re
   if (can(actor, "catalog:read")) items.push({ href: "/contenedores", label: "Contenedores" });
   if (can(actor, "destination:manage")) items.push({ href: "/destinos", label: "Destinos" });
   if (can(actor, "user:manage")) items.push({ href: "/usuarios", label: "Usuarios" });
+  items.push({ href: "/ayuda", label: "Ayuda" });
   if (can(actor, "account:password") && authProviderName() === "local") items.push({ href: "/cuenta/clave", label: "Mi contraseña" });
   const roles = [...new Set(actor.roles.map((r) => roleLabel(r.role)))].join(", ");
 

@@ -8,6 +8,8 @@ import { Field, Input, Select } from "@/components/ui/field";
 import { formatSantiago, santiagoToday } from "@/lib/time";
 import { requireActorWith } from "@/modules/identity/guards";
 import { can } from "@/modules/identity/permissions";
+import { InfoTip, Term } from "@/components/help/info-tip";
+import type { GlossaryKey } from "@/lib/glossary";
 import { COVERAGE_LABEL, summarizeCoverage, type CoverageStatus } from "@/modules/indicators/coverage";
 import { filtersToParams, includesToday, parseIndicatorFilters } from "@/modules/indicators/filters";
 import { getIndicators, listPeriodMovements, loadIndicatorOptions } from "@/modules/indicators/queries";
@@ -22,10 +24,13 @@ type SP = Record<string, string | string[] | undefined>;
 
 const dmy = (d: string) => `${d.slice(8, 10)}-${d.slice(5, 7)}-${d.slice(0, 4)}`;
 
-function Tile({ title, value, children, tone = "neutral" }: { title: string; value: string; children?: React.ReactNode; tone?: "neutral" | "warn" }) {
+function Tile({ title, help, value, children, tone = "neutral" }: { title: string; help: GlossaryKey; value: string; children?: React.ReactNode; tone?: "neutral" | "warn" }) {
   return (
     <Card className={tone === "warn" ? "border-amber-400" : undefined}>
-      <h3 className="text-sm font-semibold text-slate-700">{title}</h3>
+      <h3 className="text-sm font-semibold text-slate-700">
+        {title}
+        <InfoTip k={help} />
+      </h3>
       <p className="mt-1 text-3xl font-bold tabular-nums text-brand-900">{value}</p>
       {children ? <div className="mt-2 space-y-0.5 text-sm text-slate-700">{children}</div> : null}
     </Card>
@@ -123,7 +128,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <Field id="to" label="Hasta">
             <Input id="to" name="to" type="date" defaultValue={filters.to} max={today} />
           </Field>
-          <Field id="zone" label="Zona">
+          <Field id="zone" label="Zona" help="zona">
             <Select id="zone" name="zone" defaultValue={filters.zoneId ?? ""}>
               <option value="">Todas</option>
               {options.zones.map((z) => (
@@ -139,7 +144,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               ))}
             </Select>
           </Field>
-          <Field id="origin" label="Origen de los datos">
+          <Field id="origin" label="Origen de los datos" help="origen_datos">
             <Select id="origin" name="origin" defaultValue={filters.origin}>
               <option value="real">Reales</option>
               <option value="demo">DEMO (demostración)</option>
@@ -155,31 +160,31 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       <section aria-labelledby="h-resumen" className="space-y-3">
         <h2 id="h-resumen" className="text-xl font-bold text-brand-900">Resumen del período</h2>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          <Tile title="Reciclable captado" value={formatKg(k.capturedG)}>
-            <p>{k.weighings} pesaje{k.weighings === 1 ? "" : "s"} · {k.contaminated} con contaminación observada</p>
+          <Tile title="Reciclable captado" help="reciclable_captado" value={formatKg(k.capturedG)}>
+            <p>{k.weighings} pesaje{k.weighings === 1 ? "" : "s"} · {k.contaminated} con contaminación observada<InfoTip k="contaminacion" /></p>
             <p>
               <Link className="font-semibold text-brand-700 underline" href={`/historial?${historyQuery.toString()}`}>Ver pesajes</Link>
             </p>
           </Tile>
-          <Tile title="Despachado a gestor" value={formatKg(k.dispatchedG)}>
-            <p>Valorización confirmada: <strong>{formatKg(k.dispatchedConfirmedG)}</strong></p>
+          <Tile title="Despachado a gestor" help="despacho" value={formatKg(k.dispatchedG)}>
+            <p>Valorización confirmada<InfoTip k="valorizacion" />: <strong>{formatKg(k.dispatchedConfirmedG)}</strong></p>
             <p>Verificación rechazada: {formatKg(k.dispatchedRejectedG)}</p>
-            <p>Sin decisión: {formatKg(k.dispatchedPendingG)}{k.dispatchedPendingNoEvidenceG > 0 ? ` (de ellos ${formatKg(k.dispatchedPendingNoEvidenceG)} sin evidencia)` : ""}</p>
+            <p>Sin decisión<InfoTip k="sin_decision" />: {formatKg(k.dispatchedPendingG)}{k.dispatchedPendingNoEvidenceG > 0 ? ` (de ellos ${formatKg(k.dispatchedPendingNoEvidenceG)} sin evidencia)` : ""}</p>
             <p className="text-slate-600">Fecha del despacho, no de la confirmación.</p>
           </Tile>
-          <Tile title="Reutilizado" value={formatKg(k.reusedG)}>
-            <p>Respaldado con evidencia: <strong>{formatKg(k.reusedBackedG)}</strong></p>
+          <Tile title="Reutilizado" help="reutilizacion" value={formatKg(k.reusedG)}>
+            <p>Respaldado con evidencia<InfoTip k="evidencia" />: <strong>{formatKg(k.reusedBackedG)}</strong></p>
             <p>Solo registrado: {formatKg(k.reusedG - k.reusedBackedG)}</p>
           </Tile>
-          <Tile title="Rechazado" value={formatKg(k.rejectedG)}>
+          <Tile title="Rechazado" help="rechazo" value={formatKg(k.rejectedG)}>
             <p>Material que salió del inventario por rechazo.</p>
           </Tile>
-          <Tile title="Inventario al cierre" value={formatKg(k.closingG)}>
+          <Tile title="Inventario al cierre" help="inventario" value={formatKg(k.closingG)}>
             <p>Al inicio del período: {formatKg(k.openingG)}</p>
             <p>Hoy (actual): <strong>{formatKg(k.currentG)}</strong></p>
           </Tile>
-          <Tile title="Cobertura de medición" value={cov.percent === null ? "Sin datos" : `${String(cov.percent).replace(".", ",")} %`} tone={cov.omitted > 0 ? "warn" : "neutral"}>
-            <p>{cov.realized} con pesaje · {cov.zeroConfirmed} cero confirmado · {cov.omitted} omitida{cov.omitted === 1 ? "" : "s"}</p>
+          <Tile title="Cobertura de medición" help="cobertura" value={cov.percent === null ? "Sin datos" : `${String(cov.percent).replace(".", ",")} %`} tone={cov.omitted > 0 ? "warn" : "neutral"}>
+            <p>{cov.realized} con pesaje · {cov.zeroConfirmed} revisado{cov.zeroConfirmed === 1 ? "" : "s"} sin residuos (cero) · {cov.omitted} sin revisar (omitida{cov.omitted === 1 ? "" : "s"})</p>
             {cov.pending > 0 ? <p>{cov.pending} pendiente{cov.pending === 1 ? "" : "s"} de hoy (fuera del cálculo)</p> : null}
             {cov.evaluated === 0 ? <p>No hay calendarios con mediciones esperadas en este período y ámbito.</p> : null}
           </Tile>
@@ -187,7 +192,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
       </section>
 
       <section aria-labelledby="h-cierre" className="space-y-3">
-        <h2 id="h-cierre" className="text-xl font-bold text-brand-900">Cierre contable del inventario</h2>
+        <h2 id="h-cierre" className="text-xl font-bold text-brand-900">
+          <Term k="cierre_contable">Cierre contable del inventario</Term>
+        </h2>
         <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white">
           <table className="w-full min-w-[420px] text-left text-sm">
             <caption className="sr-only">Conciliación del inventario del período</caption>
@@ -231,7 +238,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
 
       <section aria-labelledby="h-cobertura" className="space-y-3">
         <div className="flex flex-wrap items-center justify-between gap-2">
-          <h2 id="h-cobertura" className="text-xl font-bold text-brand-900">Cobertura por contenedor</h2>
+          <h2 id="h-cobertura" className="text-xl font-bold text-brand-900">
+            <Term k="cobertura">Cobertura por contenedor</Term>
+          </h2>
           {can(actor, "schedule:manage") || can(actor, "measurement:zero") ? (
             <Button asChild variant="outline"><Link href="/calendarios">Calendarios y «cero confirmado»</Link></Button>
           ) : null}
@@ -247,13 +256,13 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <caption className="sr-only">Cobertura de medición por contenedor</caption>
               <thead className="bg-brand-50 text-slate-800">
                 <tr>
-                  <th scope="col" className="px-3 py-2">Contenedor</th>
+                  <th scope="col" className="px-3 py-2">Contenedor<InfoTip k="contenedor" /></th>
                   <th scope="col" className="px-3 py-2">Zona</th>
-                  <th scope="col" className="px-3 py-2 text-right">Con pesaje</th>
-                  <th scope="col" className="px-3 py-2 text-right">Cero confirmado</th>
-                  <th scope="col" className="px-3 py-2 text-right">Omitidas</th>
-                  <th scope="col" className="px-3 py-2 text-right">Pendientes</th>
-                  <th scope="col" className="px-3 py-2 text-right">Cobertura</th>
+                  <th scope="col" className="px-3 py-2 text-right">Con pesaje<InfoTip k="con_pesaje" /></th>
+                  <th scope="col" className="px-3 py-2 text-right">Revisado, sin residuos (cero)<InfoTip k="cero" /></th>
+                  <th scope="col" className="px-3 py-2 text-right">Sin revisar (omitidas)<InfoTip k="omitida" /></th>
+                  <th scope="col" className="px-3 py-2 text-right">Pendientes de hoy<InfoTip k="pendiente" /></th>
+                  <th scope="col" className="px-3 py-2 text-right">Cobertura<InfoTip k="cobertura" /></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -308,7 +317,7 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
                   <th scope="col" className="px-3 py-2">Lote / material</th>
                   <th scope="col" className="px-3 py-2">Origen → destino</th>
                   <th scope="col" className="px-3 py-2 text-right">Cantidad</th>
-                  <th scope="col" className="px-3 py-2">Valorización</th>
+                  <th scope="col" className="px-3 py-2">Valorización<InfoTip k="valorizacion" /></th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-200">
@@ -348,6 +357,10 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
               <strong>Decisiones abiertas con el Hub</strong> que podrían cambiar estas definiciones: ubicación = zona (H-01), valorización como verificación sin segunda salida (H-05) y material único por contenedor sin excepciones (H-07). Las cifras de inventario y ubicaciones dependen de H-01; las de valorización, de H-05; las de captación por material, de H-07.
             </li>
           </ul>
+          <p className="mt-3 text-sm">
+            ¿Algún término no queda claro? Mire el icono (i) junto a cada cifra o el{" "}
+            <Link className="font-semibold text-brand-700 underline" href="/ayuda">glosario de Ayuda</Link>.
+          </p>
         </Card>
       </section>
     </div>

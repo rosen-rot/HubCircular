@@ -31,9 +31,9 @@ async function login(page: Page, who: keyof typeof USERS) {
 const appAlert = (page: Page) => page.locator("[role=alert]:not(#__next-route-announcer__)");
 
 async function fillWeighing(page: Page, o: { container?: string; gross: string; tare: string; notes?: string }) {
-  if (o.container) await page.getByLabel("Contenedor").selectOption(o.container);
-  await page.getByLabel("Peso bruto (kg)").fill(o.gross);
-  await page.getByLabel("Tara (kg)").fill(o.tare);
+  if (o.container) await page.getByLabel("Contenedor", { exact: true }).selectOption(o.container);
+  await page.getByLabel("Peso bruto: recipiente + material (kg)").fill(o.gross);
+  await page.getByLabel("Tara: recipiente vacío (kg)").fill(o.tare);
   if (o.notes) await page.getByLabel("Observaciones (opcional)").fill(o.notes);
 }
 
@@ -108,7 +108,7 @@ test.describe("registro manual (flujo principal del operador)", () => {
     // el lote existe con el saldo correcto
     await row.getByRole("link", { name: /L-\d{6}/ }).click();
     await expect(page.getByRole("heading", { level: 1 })).toContainText("Lote L-");
-    await expect(page.getByText("Saldo disponible").locator("..")).toContainText("3,900 kg");
+    await expect(page.getByTestId("saldo-total")).toContainText("3,900 kg");
   });
 
   test("valida en servidor: tara ≥ bruto no registra nada y explica el error", async ({ page }) => {
@@ -121,7 +121,7 @@ test.describe("registro manual (flujo principal del operador)", () => {
     await expect(appAlert(page)).toContainText("tara debe ser menor");
     expect((await sql<{ n: number }>("select count(*)::int n from hc.weighings"))[0]!.n).toBe(before);
     // lo ingresado se conserva para corregir
-    await expect(page.getByLabel("Peso bruto (kg)")).toHaveValue("0,300");
+    await expect(page.getByLabel("Peso bruto: recipiente + material (kg)")).toHaveValue("0,300");
   });
 
   test("rechaza texto, negativos, demasiados decimales y más de 1.000 kg", async ({ page }) => {
@@ -167,8 +167,8 @@ test.describe("registro manual (flujo principal del operador)", () => {
     await expect(page).toHaveURL(/\/login\?next=/); // el QR no otorga acceso
     await login(page, "operator");
     await page.goto("/registro?container=DEMO-Z01-EST01-PET");
-    await expect(page.getByLabel("Contenedor")).toHaveValue("DEMO-Z01-EST01-PET");
-    await expect(page.getByLabel("Tara (kg)")).toHaveValue("0,35");
+    await expect(page.getByLabel("Contenedor", { exact: true })).toHaveValue("DEMO-Z01-EST01-PET");
+    await expect(page.getByLabel("Tara: recipiente vacío (kg)")).toHaveValue("0,35");
     await expect(page.getByText("Contenedor de demostración")).toBeVisible();
   });
 
@@ -191,7 +191,7 @@ test.describe("registro manual (flujo principal del operador)", () => {
 test.describe("roles y ámbito", () => {
   test("operador (ámbito Cowork) no ve contenedores ni pesajes del Laboratorio", async ({ page }) => {
     await login(page, "operator");
-    const options = await page.getByLabel("Contenedor").locator("option").allTextContents();
+    const options = await page.getByLabel("Contenedor", { exact: true }).locator("option").allTextContents();
     expect(options.join("|")).toContain("DEMO-Z01-EST01-CARTON");
     expect(options.join("|")).not.toContain("DEMO-Z02");
     await page.goto("/contenedores");
@@ -207,7 +207,7 @@ test.describe("roles y ámbito", () => {
     // forzar el código por la URL no sirve: se advierte y no se preselecciona
     await page.goto("/registro?container=DEMO-Z02-EST01-ALUMINIO");
     await expect(appAlert(page)).toContainText("no corresponde a un contenedor activo");
-    await expect(page.getByLabel("Contenedor")).toHaveValue("");
+    await expect(page.getByLabel("Contenedor", { exact: true })).toHaveValue("");
   });
 
   test("el administrador ve todo y puede registrar en el Laboratorio", async ({ page }) => {

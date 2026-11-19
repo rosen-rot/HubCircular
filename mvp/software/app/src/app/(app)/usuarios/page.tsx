@@ -98,7 +98,7 @@ export default async function UsuariosPage({ searchParams }: { searchParams: Pro
                         ))}
                       </Select>
                     </Field>
-                    <Field id={`ar-zone-${u.userId}`} label="Zona">
+                    <Field id={`ar-zone-${u.userId}`} label="Zona" help="ambito">
                       <Select id={`ar-zone-${u.userId}`} name="zoneId" defaultValue="">
                         <option value="">Todas las zonas</option>
                         {zones.map((z) => (

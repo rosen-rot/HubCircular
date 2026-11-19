@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Forbidden } from "@/components/forbidden";
+import { InfoTip } from "@/components/help/info-tip";
 import { Alert, Badge, Card, DemoBadge } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Field, Input, Select } from "@/components/ui/field";
@@ -112,14 +113,14 @@ export default async function HistorialPage({ searchParams }: { searchParams: Pr
             <caption className="sr-only">Pesajes registrados</caption>
             <thead className="bg-brand-50 text-slate-800">
               <tr>
-                <th scope="col" className="px-3 py-2">Pesaje</th>
+                <th scope="col" className="px-3 py-2">Pesaje<InfoTip k="pesaje" /></th>
                 <th scope="col" className="px-3 py-2">Fecha</th>
                 <th scope="col" className="px-3 py-2">Contenedor / material</th>
-                <th scope="col" className="px-3 py-2">Zona</th>
-                <th scope="col" className="px-3 py-2 text-right">Bruto</th>
-                <th scope="col" className="px-3 py-2 text-right">Tara</th>
-                <th scope="col" className="px-3 py-2 text-right">Neto</th>
-                <th scope="col" className="px-3 py-2">Lote</th>
+                <th scope="col" className="px-3 py-2">Zona<InfoTip k="zona" /></th>
+                <th scope="col" className="px-3 py-2 text-right">Bruto<InfoTip k="bruto" /></th>
+                <th scope="col" className="px-3 py-2 text-right">Tara (envase)<InfoTip k="tara" /></th>
+                <th scope="col" className="px-3 py-2 text-right">Neto (material)<InfoTip k="neto" /></th>
+                <th scope="col" className="px-3 py-2">Lote<InfoTip k="lote" /></th>
                 <th scope="col" className="px-3 py-2">Registró</th>
               </tr>
             </thead>
@@ -137,7 +138,7 @@ export default async function HistorialPage({ searchParams }: { searchParams: Pr
                     <span className="font-mono text-xs">{w.containerCode ?? "—"}</span>
                     <br />
                     {w.materialName}
-                    {w.contaminationObserved ? <> <Badge tone="warn">contaminación</Badge></> : null}
+                    {w.contaminationObserved ? <> <Badge tone="warn" title="Se vio basura u otro material mezclado">contaminación</Badge></> : null}
                   </td>
                   <td className="px-3 py-2">{w.zoneName ?? "—"}</td>
                   <td className="px-3 py-2 text-right tabular-nums">{formatKg(w.grossG)}</td>

@@ -71,13 +71,34 @@ Resultado informado con salida real: respaldo previo OK (18 tablas, 90 filas, 9 
 4. `npm run db:check` y `npm run db:check:app`: 10 migraciones, 0 pendientes, RLS en las 20 tablas.
 5. Probar a mano `/dashboard` (origen DEMO) y `/calendarios`; crear un calendario DEMO y confirmar «cero».
 
+**Prueba manual (informada por el usuario, 2026-11-19, sin capturas):** con origen real el tablero dice «aún no hay pesajes reales»; creó un calendario y confirmó «cero» hoy; en origen DEMO el tablero muestra 100 % de cobertura; los CSV «están bien todos». No informó el detalle por archivo.
+
 La migración solo agrega objetos y no modifica datos existentes. Si algo falla, restaurar con la prueba de `docs/24` y no borrar registros para «arreglar» migraciones.
 
 ## 7. Límites y no verificado
 
-- El tablero, los calendarios y el CSV **no se han probado a mano contra Supabase** (0010 está aplicada, pero no consta la prueba de pantallas); tampoco en Windows nativo; sin despliegue ni HTTPS reales.
+- El tablero, los calendarios y el CSV fueron **probados a mano por el usuario contra Supabase** (§6, sin detalle por paso); **no** en Windows nativo, y sin despliegue ni HTTPS reales. En Supabase el calendario y el «cero» creados en esa prueba quedan como datos de prueba.
 - Las cifras con **datos reales** no existen todavía: el piloto no tiene pesajes reales; los valores probados son de fixtures y DEMO.
 - Dependencia de decisiones abiertas con el Hub (H-01, H-05, H-07) y de la definición de «jornada»: la cobertura usa días fijos de la semana y el día calendario de Chile; un contenedor medido fuera de calendario no cuenta como medición esperada.
 - Una corrección se fecha al momento de corregir (hoy), pero anula al original en **su** período: el detalle exportado muestra ambos con `efectivo = no`.
 - No hay alertas ni reglas de oportunidad (Iteración 5) ni telemetría (Iteración 4). El gráfico no tiene tooltip interactivo propio (se usa el `<title>` nativo del navegador) ni modo oscuro (la aplicación no lo tiene).
 - Reutilización y rechazo no tienen verificación propia; «respaldado» significa solo que existe una evidencia de texto.
+
+## 8. Mejora posterior: ayuda y glosario (2026-11-19)
+
+Pedido del usuario tras probar a mano: había palabras que no entendía («cero», «tara», entre otras). Se resolvió con tres cosas, sin cambiar reglas de negocio ni base de datos:
+
+- **Nombres más claros** (con el término oficial entre paréntesis cuando hace falta): «Peso bruto: recipiente + material», «Tara: recipiente vacío», «Peso neto: solo el material», «Tara de referencia» (antes «Tara nominal»), «Cero confirmado (revisado, sin residuos)», «Omitido (sin revisar)», botón «Confirmar cero: hoy revisé y está vacío».
+- **Icono (i) accesible** junto a cada término de registro, historial, detalle de pesaje y lote, movimientos, contenedores, destinos, usuarios, tablero y calendarios. Es un `<details>/<summary>` nativo con `aria-label` «Qué significa: …», se abre con teclado, se cierra con Escape o al pulsar fuera, y el globo se posiciona siempre dentro de la ventana (también dentro de tablas con desplazamiento). Componentes: `src/components/help/info-tip.tsx` (`InfoTip`, `Term`) y la propiedad opcional `help` de `Field`.
+- **Página `/ayuda`** («Ayuda y glosario», en el menú, para todo usuario con sesión) con cada término, su explicación corta, el detalle con ejemplos y un ancla `#clave`. Todo el texto sale de **un solo módulo**, `src/lib/glossary.ts` (≈45 términos en 6 grupos), de modo que icono y página no se contradicen.
+
+Los textos del glosario son una redacción nueva, en lenguaje simple; los términos que dependen de decisiones abiertas con el Hub (p. ej. «zona = ubicación», H-01) lo dicen.
+
+Pruebas (Linux + PostgreSQL 16 local): `tsc`, `eslint` y `next build` sin errores; **Vitest 343/343** (29 archivos; +5 de `tests/unit/glossary.test.ts`: estructura de cada entrada, claves seguras como ancla, todo `k=`/`help=` usado en `src/` existe en el glosario); **Playwright 61/61** (+8 de `tests/e2e/ayuda.spec.ts`: acceso sin sesión, lector ve /ayuda, uso solo con teclado, la casilla de contaminación no se marca al pulsar el icono, el enlace «Más detalle» abre el término correcto, Escape y clic fuera, globo dentro de la ventana y sin recorte en tablas, y axe-core sin violaciones en /ayuda y en registro, tablero, calendarios y contenedores). Se actualizaron las pruebas E2E que dependían de textos renombrados (etiquetas de tara/bruto, botón de cero, «1 revisado sin residuos (cero)»). Revisión visual con capturas de registro, tablero, contenedores y móvil (390 px).
+
+Límite: el globo requiere JavaScript para posicionarse y cerrarse con Escape/clic fuera; sin JavaScript sigue abriéndose y cerrándose con `<details>`. No se probó con un lector de pantalla real, solo con axe-core y navegación por teclado.
+
+## 9. Mejoras pendientes (registradas, **no implementadas**)
+
+- **Unir los CSV.** Hoy el tablero exporta archivos separados (indicadores, pesajes, movimientos, cobertura). El usuario quiere **juntarlos próximamente**; eligió dejarlo anotado y no hacerlo ahora. Antes de implementarlo hay que decidir la forma: un solo CSV «largo» con una columna de tipo de registro, un libro Excel con una hoja por tabla, o un ZIP; y cómo conservar las garantías actuales (masas en gramos enteros, `;` + BOM + CRLF, hora de Chile con zona, neutralización de fórmulas, tope de 20.000 filas, respeto del ámbito y del origen real/DEMO). Los cuatro CSV actuales no deben dejar de funcionar hasta que el reemplazo esté probado.
+

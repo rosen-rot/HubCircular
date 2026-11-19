@@ -52,9 +52,9 @@ test.describe("cabeceras de seguridad", () => {
     await login(page, "operador@demo.hubcircular.test", PASSWORDS.operator);
     await page.goto("/registro");
     // La vista previa del neto es JavaScript de cliente: si la CSP bloqueara los scripts, no funcionaría.
-    await page.getByLabel("Contenedor").selectOption("DEMO-Z01-EST01-CARTON");
-    await page.getByLabel("Peso bruto (kg)").fill("2,000");
-    await page.getByLabel("Tara (kg)").fill("0,500");
+    await page.getByLabel("Contenedor", { exact: true }).selectOption("DEMO-Z01-EST01-CARTON");
+    await page.getByLabel("Peso bruto: recipiente + material (kg)").fill("2,000");
+    await page.getByLabel("Tara: recipiente vacío (kg)").fill("0,500");
     await expect(page.getByTestId("net-preview")).toContainText("1,500 kg");
     await page.getByRole("button", { name: "Confirmar pesaje" }).click();
     await expect(page).toHaveURL(/\/pesajes\//);

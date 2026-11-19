@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Forbidden } from "@/components/forbidden";
+import { InfoTip, Term } from "@/components/help/info-tip";
 import { Badge, Card, DemoBadge } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { requireActorWith } from "@/modules/identity/guards";
@@ -19,7 +20,9 @@ export default async function DestinosPage() {
   return (
     <div className="mx-auto max-w-3xl space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-brand-900">Destinos</h1>
+        <h1 className="text-2xl font-bold text-brand-900">
+          <Term k="destino">Destinos</Term>
+        </h1>
         <p className="text-slate-700">
           Catálogo de destinos para despachos y reutilización. Un destino se desactiva, no se elimina: los movimientos anteriores conservan su referencia.
         </p>
@@ -37,7 +40,7 @@ export default async function DestinosPage() {
             <thead className="text-slate-700">
               <tr>
                 <th scope="col" className="py-1">Nombre</th>
-                <th scope="col" className="py-1">Tipo</th>
+                <th scope="col" className="py-1">Tipo<InfoTip k="gestor" /></th>
                 <th scope="col" className="py-1">Estado</th>
                 <th scope="col" className="py-1 text-right">Acción</th>
               </tr>

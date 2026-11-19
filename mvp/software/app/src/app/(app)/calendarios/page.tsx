@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Forbidden } from "@/components/forbidden";
+import { InfoTip, Term } from "@/components/help/info-tip";
 import { Button } from "@/components/ui/button";
 import { Alert, Badge, Card, DemoBadge } from "@/components/ui/card";
 import { Field, Input, Textarea } from "@/components/ui/field";
@@ -41,7 +42,9 @@ export default async function CalendariosPage({ searchParams }: { searchParams: 
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-bold text-brand-900">Calendarios de medición</h1>
+        <h1 className="text-2xl font-bold text-brand-900">
+          <Term k="calendario">Calendarios de medición</Term>
+        </h1>
         <p className="text-slate-700">
           Hoy es {weekdayName(dow)} {dmy(today)} (hora de Chile). Los calendarios definen qué días se espera medir cada contenedor; el tablero calcula la cobertura con ellos.
         </p>
@@ -51,7 +54,9 @@ export default async function CalendariosPage({ searchParams }: { searchParams: 
       {err ? <Alert tone="error" role="alert">{messageForCode(err)}</Alert> : null}
 
       <section aria-labelledby="h-hoy" className="space-y-3">
-        <h2 id="h-hoy" className="text-xl font-bold text-brand-900">Mediciones esperadas hoy</h2>
+        <h2 id="h-hoy" className="text-xl font-bold text-brand-900">
+          <Term k="medicion_esperada">Mediciones esperadas hoy</Term>
+        </h2>
         {todayData.items.length === 0 ? (
           <Alert tone="info">Hoy no hay mediciones esperadas en su ámbito.</Alert>
         ) : (
@@ -65,6 +70,7 @@ export default async function CalendariosPage({ searchParams }: { searchParams: 
                   </div>
                   <p>
                     <Badge tone={o.status === "pendiente" ? "neutral" : "ok"}>{COVERAGE_LABEL[o.status]}</Badge>
+                    <InfoTip k={o.status === "pendiente" ? "pendiente" : o.status === "realizado" ? "con_pesaje" : "cero"} />
                     {o.status === "realizado" ? <span className="ml-2 text-sm">{o.weighings} pesaje{o.weighings === 1 ? "" : "s"} hoy</span> : null}
                     {o.status === "cero_confirmado" && o.zeroNote ? <span className="ml-2 text-sm">Nota: {o.zeroNote}</span> : null}
                   </p>
@@ -76,7 +82,10 @@ export default async function CalendariosPage({ searchParams }: { searchParams: 
                         <Field id={`note-${c.id}`} label="Nota (opcional)" hint="Use «cero» solo si revisó el contenedor y no había residuos.">
                           <Textarea id={`note-${c.id}`} name="note" rows={2} maxLength={500} />
                         </Field>
-                        <Button type="submit" variant="outline">Confirmar cero (revisado, sin residuos)</Button>
+                        <div className="flex flex-wrap items-center">
+                          <Button type="submit" variant="outline">Confirmar cero: hoy revisé y está vacío</Button>
+                          <InfoTip k="cero" />
+                        </div>
                       </form>
                     </div>
                   ) : null}
@@ -89,7 +98,9 @@ export default async function CalendariosPage({ searchParams }: { searchParams: 
 
       {canManage ? (
         <section aria-labelledby="h-cal" className="space-y-3">
-          <h2 id="h-cal" className="text-xl font-bold text-brand-900">Calendarios por contenedor</h2>
+          <h2 id="h-cal" className="text-xl font-bold text-brand-900">
+            <Term k="calendario">Calendarios por contenedor</Term>
+          </h2>
           <p className="text-sm text-slate-700">
             Los días son fijos de la semana. Un calendario no se edita hacia atrás: se crea desde hoy o después, y al terminarlo la fecha de término es como máximo ayer, para que lo esperado en días pasados no cambie. Para cambiar los días, termine el calendario actual y cree uno nuevo.
           </p>

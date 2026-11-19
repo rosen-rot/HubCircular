@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { InfoTip, Term } from "@/components/help/info-tip";
 import { Alert, Badge, DemoBadge } from "@/components/ui/card";
 import { Forbidden } from "@/components/forbidden";
 import { listContainers } from "@/modules/catalog/queries";
@@ -19,7 +20,9 @@ export default async function ContenedoresPage() {
   return (
     <div className="space-y-5">
       <div>
-        <h1 className="text-2xl font-bold text-brand-900">Contenedores</h1>
+        <h1 className="text-2xl font-bold text-brand-900">
+          <Term k="contenedor">Contenedores</Term>
+        </h1>
         <p className="text-slate-700">Contenedores visibles en su ámbito. El código del QR apunta a <code>/registro?container=CÓDIGO</code>.</p>
       </div>
       <Alert tone="info">
@@ -33,8 +36,8 @@ export default async function ContenedoresPage() {
           <table className="w-full min-w-[720px] text-left text-sm">
             <caption className="sr-only">Contenedores</caption>
             <thead className="bg-brand-50"><tr>
-              <th scope="col" className="px-3 py-2">Código</th><th scope="col" className="px-3 py-2">Material</th><th scope="col" className="px-3 py-2">Estación</th>
-              <th scope="col" className="px-3 py-2">Zona</th><th scope="col" className="px-3 py-2 text-right">Tara nominal</th><th scope="col" className="px-3 py-2">Estado</th><th scope="col" className="px-3 py-2"><span className="sr-only">Acción</span></th>
+              <th scope="col" className="px-3 py-2">Código</th><th scope="col" className="px-3 py-2">Material<InfoTip k="material" /></th><th scope="col" className="px-3 py-2">Estación<InfoTip k="estacion" /></th>
+              <th scope="col" className="px-3 py-2">Zona<InfoTip k="zona" /></th><th scope="col" className="px-3 py-2 text-right">Tara de referencia<InfoTip k="tara_ref" /></th><th scope="col" className="px-3 py-2">Estado</th><th scope="col" className="px-3 py-2"><span className="sr-only">Acción</span></th>
             </tr></thead>
             <tbody className="divide-y divide-slate-200">
               {containers.map((c) => (

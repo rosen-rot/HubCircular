@@ -38,8 +38,8 @@ export function summarizeCoverage(occ: Occurrence[]): CoverageSummary {
 
 export const COVERAGE_LABEL: Record<CoverageStatus, string> = {
   realizado: "Realizado",
-  cero_confirmado: "Cero confirmado",
-  omitido: "Omitido",
+  cero_confirmado: "Cero confirmado (revisado, sin residuos)",
+  omitido: "Omitido (sin revisar)",
   pendiente: "Pendiente (hoy)",
 };
 

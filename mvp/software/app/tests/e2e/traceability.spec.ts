@@ -34,9 +34,9 @@ async function login(page: Page, who: keyof typeof USERS) {
 /** Crea un lote DEMO con un neto exacto registrando un pesaje real por la interfaz. */
 async function createBatch(page: Page, netG: number, container = "DEMO-Z01-EST01-CARTON"): Promise<string> {
   await page.goto("/registro");
-  await page.getByLabel("Contenedor").selectOption(container);
-  await page.getByLabel("Peso bruto (kg)").fill(((netG + 350) / 1000).toString().replace(".", ","));
-  await page.getByLabel("Tara (kg)").fill("0,350");
+  await page.getByLabel("Contenedor", { exact: true }).selectOption(container);
+  await page.getByLabel("Peso bruto: recipiente + material (kg)").fill(((netG + 350) / 1000).toString().replace(".", ","));
+  await page.getByLabel("Tara: recipiente vacío (kg)").fill("0,350");
   await page.getByRole("button", { name: "Confirmar pesaje" }).click();
   await expect(page).toHaveURL(/\/pesajes\//);
   const rows = await sql<{ id: string }>("select id from hc.batches where initial_g = $1", [netG]);
@@ -137,7 +137,7 @@ test.describe("traslado, corrección y verificación", () => {
     expect(after).toEqual(before);
 
     // Corrección: movimiento nuevo de efecto inverso, con motivo; el original permanece.
-    await page.getByText("Corregir…").click();
+    await page.getByText("Corregir (deshacer este movimiento)…").click();
     await page.getByLabel("Motivo de la corrección").fill("traslado a la zona equivocada");
     await page.getByRole("button", { name: "Registrar corrección" }).click();
     await expect(page.getByRole("status").filter({ hasText: "Corrección registrada" })).toBeVisible();
@@ -178,7 +178,7 @@ test.describe("traslado, corrección y verificación", () => {
     await expect(page.getByTestId("saldo-total")).toContainText("0,678 kg");
 
     // Con valorización confirmada no se puede corregir sin rechazar antes la verificación.
-    await page.getByText("Corregir…").click();
+    await page.getByText("Corregir (deshacer este movimiento)…").click();
     await page.getByLabel("Motivo de la corrección").fill("registrado por error");
     await page.getByRole("button", { name: "Registrar corrección" }).click();
     await expect(page.locator("[role=alert]:not(#__next-route-announcer__)")).toContainText("valorización confirmada");
@@ -284,7 +284,7 @@ test.describe("accesibilidad (axe-core) de las pantallas de trazabilidad", () =>
     await expect(page).toHaveURL(/\/lotes\//);
     for (const path of [`/retiros?lote=${batchId}`, "/destinos", `/lotes/${batchId}`]) {
       await page.goto(path);
-      if (path.startsWith("/lotes/")) await page.getByText("Corregir…").click();
+      if (path.startsWith("/lotes/")) await page.getByText("Corregir (deshacer este movimiento)…").click();
       const results = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
       const serious = results.violations.filter((v) => v.impact === "serious" || v.impact === "critical");
       expect(serious.map((v) => `${path} ${v.id}: ${v.help} (${v.nodes.length})`)).toEqual([]);

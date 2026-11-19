@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { InfoTip } from "@/components/help/info-tip";
 import { Alert, Card, DemoBadge } from "@/components/ui/card";
+import type { GlossaryKey } from "@/lib/glossary";
 import { Button } from "@/components/ui/button";
 import { formatSantiago } from "@/lib/time";
 import { requireActor } from "@/modules/identity/guards";
@@ -25,19 +27,19 @@ export default async function PesajePage({
   const w = can(actor, "weighing:read") ? await getWeighing(actor, id) : null;
   if (!w) notFound();
 
-  const rows: [string, React.ReactNode][] = [
+  const rows: [string, React.ReactNode, GlossaryKey?][] = [
     ["Referencia del pesaje", <span key="r" className="font-mono">{formatWeighingRef(w.refNo)}</span>],
-    ["Lote", w.batchId && w.batchRef ? <Link key="l" className="font-mono font-semibold text-brand-700 underline" href={`/lotes/${w.batchId}`}>{formatBatchRef(w.batchRef)}</Link> : "—"],
-    ["Contenedor", w.containerCode ?? "—"],
-    ["Material", w.materialName],
-    ["Zona", w.zoneName ?? "—"],
-    ["Peso bruto", `${formatKg(w.grossG)} (${formatGrams(w.grossG)})`],
-    ["Tara", `${formatKg(w.tareG)} (${formatGrams(w.tareG)})`],
-    ["Peso neto (captación)", <strong key="n">{formatKg(w.netG)} ({formatGrams(w.netG)})</strong>],
-    ["Fecha del pesaje (hora de Chile)", formatSantiago(w.occurredAt)],
+    ["Lote", w.batchId && w.batchRef ? <Link key="l" className="font-mono font-semibold text-brand-700 underline" href={`/lotes/${w.batchId}`}>{formatBatchRef(w.batchRef)}</Link> : "—", "lote"],
+    ["Contenedor", w.containerCode ?? "—", "contenedor"],
+    ["Material", w.materialName, "material"],
+    ["Zona", w.zoneName ?? "—", "zona"],
+    ["Peso bruto (recipiente + material)", `${formatKg(w.grossG)} (${formatGrams(w.grossG)})`, "bruto"],
+    ["Tara (recipiente vacío)", `${formatKg(w.tareG)} (${formatGrams(w.tareG)})`, "tara"],
+    ["Peso neto (solo el material)", <strong key="n">{formatKg(w.netG)} ({formatGrams(w.netG)})</strong>, "neto"],
+    ["Fecha del pesaje (hora de Chile)", formatSantiago(w.occurredAt), "hora_chile"],
     ["Registrado", `${formatSantiago(w.createdAt)} por ${w.createdByName ?? "—"}`],
     ["Origen del registro", w.source === "manual" ? "Pesaje manual" : "Confirmación de lectura IoT"],
-    ["Contaminación visible", w.contaminationObserved ? "Sí" : "No"],
+    ["Contaminación visible", w.contaminationObserved ? "Sí" : "No", "contaminacion"],
     ["Observaciones", w.notes ?? "—"],
   ];
 
@@ -59,9 +61,12 @@ export default async function PesajePage({
       </div>
       <Card>
         <dl className="divide-y divide-slate-200">
-          {rows.map(([k, v]) => (
+          {rows.map(([k, v, help]) => (
             <div key={k} className="grid gap-1 py-2 sm:grid-cols-3">
-              <dt className="text-sm font-semibold text-slate-700">{k}</dt>
+              <dt className="text-sm font-semibold text-slate-700">
+                {k}
+                {help ? <InfoTip k={help} /> : null}
+              </dt>
               <dd className="sm:col-span-2">{v}</dd>
             </div>
           ))}

@@ -1,4 +1,6 @@
 import * as React from "react";
+import { InfoTip } from "@/components/help/info-tip";
+import type { GlossaryKey } from "@/lib/glossary";
 import { cn } from "@/lib/utils";
 
 const control =
@@ -29,17 +31,27 @@ export function Field({
   label,
   hint,
   error,
+  help,
   children,
 }: {
   id: string;
   label: string;
   hint?: string;
+  /** Término del glosario: agrega un icono (i) junto a la etiqueta. */
+  help?: GlossaryKey;
   error?: string;
   children: React.ReactNode;
 }) {
   return (
     <div>
-      <Label htmlFor={id}>{label}</Label>
+      {help ? (
+        <div className="mb-1 flex flex-wrap items-center">
+          <Label htmlFor={id} className="mb-0">{label}</Label>
+          <InfoTip k={help} />
+        </div>
+      ) : (
+        <Label htmlFor={id}>{label}</Label>
+      )}
       {children}
       {hint && !error ? (
         <p id={`${id}-hint`} className="mt-1 text-sm text-slate-600">

@@ -162,6 +162,17 @@
 - **No informado / sin verificar:** `db:restore-check` con este respaldo (no se pidió); la prueba manual de `/dashboard`, `/calendarios` y los CSV contra Supabase; no se han creado calendarios ni «ceros» en Supabase (según `db:check` no se informa su conteo).
 - Próxima acción: prueba manual (administrador: Tablero con origen DEMO y Calendarios; confirmar «cero» y ver cobertura 100 % del día); decisiones H-01/H-05/H-07 con el Hub; después Iteración 4.
 
+### 2026-11-19 — Prueba manual de la Iteración 3 y mejora de ayuda (iconos (i), nombres claros y /ayuda)
+- Agente / rama / commit: Claude (Cowork) · `main` (commit al entregar).
+- Prueba manual (informada por el usuario, sin capturas): en Supabase, con origen real el tablero dice «aún no hay pesajes reales»; creó un calendario y confirmó «cero» hoy; en origen DEMO el tablero muestra 100 % de cobertura; todos los CSV están bien. Dejó dos mejoras: (1) explicar los términos («cero», «tara» y otros) con un icono de información o nombres más entendibles; (2) juntar los CSV más adelante.
+- Alcance elegido por el usuario: nombres claros + icono (i) + página de glosario, en toda la aplicación; CSV: **solo dejarlo anotado**.
+- Cambios y archivos: `src/lib/glossary.ts` (glosario único), `src/components/help/info-tip.tsx` (`InfoTip`, `Term`), `Field` con propiedad `help`, página `/ayuda` y ítem «Ayuda» del menú; iconos (i) y nombres claros en registro, detalle de pesaje y lote, movimientos, historial, contenedores, destinos, usuarios, tablero y calendarios; `COVERAGE_LABEL` renombrado; pruebas `tests/unit/glossary.test.ts` y `tests/e2e/ayuda.spec.ts`; pruebas E2E ajustadas a los textos nuevos; `docs/25` §8–§9, `docs/14`, README. Sin cambios de base de datos ni de reglas de negocio (no hay migración nueva).
+- Comandos y pruebas (resultados reales, Linux + PostgreSQL 16 local): `tsc --noEmit`, `eslint .` y `next build` sin errores; **Vitest 343/343** (29 archivos); **Playwright 61/61** (con axe-core). Detalle en `docs/25` §8. Primer intento de Playwright: 21 fallos que eran de las pruebas, no de la aplicación (etiquetas buscadas por subcadena que ahora también coinciden con el `aria-label` del icono; un texto interrumpido por un icono); se corrigieron las pruebas con coincidencia exacta y selectores estables. Revisión visual: el globo se cortaba en el borde derecho y dentro de las tablas ⇒ se reescribió su posicionamiento (siempre dentro de la ventana).
+- Decisiones tomadas: un solo glosario para iconos y página; términos oficiales conservados entre paréntesis (aparecen en documentos y exportaciones); «Corregir…» pasa a «Corregir (deshacer este movimiento)…».
+- Pendiente anotado (no implementado): **unir los CSV** (`docs/25` §9).
+- Riesgos, bloqueos y cambios no confirmados: no se probó con lector de pantalla real; los textos del glosario deben ser revisados por el equipo (p. ej. si el Hub prefiere otras palabras); H-01/H-05/H-07 siguen abiertas; sin pesajes reales; sin probar en Windows nativo ni desplegado. El calendario y el «cero» que el usuario creó en Supabase son datos de prueba.
+- Próxima acción: el usuario revisa los nombres e iconos nuevos en pantalla y dice si algún término sigue sin entenderse; decisiones H-01/H-05/H-07 con el Hub; luego Iteración 4 (IoT simulado) o unir los CSV, según prioridad.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

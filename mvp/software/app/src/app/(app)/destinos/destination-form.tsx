@@ -14,10 +14,10 @@ export function DestinationForm() {
     <form action={action} className="space-y-4" noValidate>
       {state.ok ? <Alert tone="success" role="status">{state.ok}</Alert> : null}
       {errors.form ? <Alert tone="error" role="alert">{errors.form}</Alert> : null}
-      <Field id="name" label="Nombre del destino" error={errors.name} hint="Ej.: nombre del gestor autorizado.">
+      <Field id="name" label="Nombre del destino" help="destino" error={errors.name} hint="Ej.: nombre del gestor autorizado.">
         <Input id="name" name="name" required maxLength={120} autoComplete="off" aria-invalid={Boolean(errors.name)} aria-describedby={describedBy("name", true, errors.name)} />
       </Field>
-      <Field id="type" label="Tipo" error={errors.type}>
+      <Field id="type" label="Tipo" help="gestor" error={errors.type}>
         <Select id="type" name="type" required defaultValue="gestor" aria-invalid={Boolean(errors.type)} aria-describedby={describedBy("type", false, errors.type)}>
           {DESTINATION_TYPES.map((t) => (
             <option key={t} value={t}>{DESTINATION_LABEL[t]}</option>

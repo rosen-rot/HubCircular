@@ -2,6 +2,7 @@
 
 import { useActionState, useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
+import { Term } from "@/components/help/info-tip";
 import { Alert, DemoBadge } from "@/components/ui/card";
 import { Field, Input, Select, Textarea, describedBy } from "@/components/ui/field";
 import { DESTINATION_LABEL, MOVEMENT_LABEL, MOVEMENT_TYPES, type DestinationType, type MovementType } from "@/modules/movements/schema";
@@ -103,7 +104,7 @@ export function MovementForm({
         </div>
       ) : null}
 
-      <Field id="batchId" label="Lote" error={errors.batchId}>
+      <Field id="batchId" label="Lote" help="lote" error={errors.batchId}>
         <Select
           id="batchId"
           name="batchId"
@@ -130,7 +131,9 @@ export function MovementForm({
 
       {batch ? (
         <div className="rounded-lg bg-brand-50 p-3 text-sm" aria-live="polite">
-          <p className="font-semibold">Saldo por ubicación {batch.dataOrigin === "demo" ? <DemoBadge /> : null}</p>
+          <p className="font-semibold">
+            <Term k="saldo">Saldo por ubicación</Term> {batch.dataOrigin === "demo" ? <DemoBadge /> : null}
+          </p>
           <ul className="mt-1">
             {batch.balances.map((b) => (
               <li key={b.zoneId}>
@@ -141,7 +144,7 @@ export function MovementForm({
         </div>
       ) : null}
 
-      <Field id="type" label="Tipo de movimiento" error={errors.type} hint={type ? HELP[type] : undefined}>
+      <Field id="type" label="Tipo de movimiento" help="movimiento" error={errors.type} hint={type ? HELP[type] : undefined}>
         <Select
           id="type"
           name="type"
@@ -173,7 +176,7 @@ export function MovementForm({
       ) : null}
 
       {batch && type && needsFrom ? (
-        <Field id="from" label={type === "traslado" ? "Ubicación de origen" : "Ubicación"} error={errors.from} hint="Zona donde está el material.">
+        <Field id="from" label={type === "traslado" ? "Ubicación de origen" : "Ubicación"} help="zona" error={errors.from} hint="Zona donde está el material.">
           <Select
             id="from"
             name="from"
@@ -193,7 +196,7 @@ export function MovementForm({
       ) : null}
 
       {batch && type && needsTo ? (
-        <Field id="to" label={type === "traslado" ? "Ubicación de destino" : "Ubicación"} error={errors.to}>
+        <Field id="to" label={type === "traslado" ? "Ubicación de destino" : "Ubicación"} help="zona" error={errors.to}>
           <Select
             id="to"
             name="to"
@@ -219,6 +222,7 @@ export function MovementForm({
         <Field
           id="destinationId"
           label="Destino"
+          help="destino"
           error={errors.destinationId}
           hint={destOptions.length === 0 ? "No hay destinos activos de este tipo. Pida a un administrador que cree uno." : undefined}
         >
@@ -282,7 +286,7 @@ export function MovementForm({
       <details className="rounded-lg border border-slate-300 bg-white p-4" open={Boolean(errors.occurredAtLocal)}>
         <summary className="cursor-pointer text-sm font-semibold">Fecha y hora del movimiento (opcional: por defecto, ahora)</summary>
         <div className="mt-3">
-          <Field id="occurredAtLocal" label="Fecha y hora (hora de Chile)" error={errors.occurredAtLocal} hint="Solo si el movimiento ocurrió antes de registrarlo.">
+          <Field id="occurredAtLocal" label="Fecha y hora (hora de Chile)" help="hora_chile" error={errors.occurredAtLocal} hint="Solo si el movimiento ocurrió antes de registrarlo.">
             <Input
               id="occurredAtLocal"
               name="occurredAtLocal"

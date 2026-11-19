@@ -3,9 +3,16 @@
 **Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-19 (prueba manual de la Iteración 3 y mejora de ayuda — ver `docs/25` §8–§9):**
+- **Hecho y verificado en Linux + PostgreSQL 16 local:** glosario único (`src/lib/glossary.ts`), icono (i) accesible junto a los términos de toda la aplicación, nombres más claros («Tara: recipiente vacío», «Cero confirmado (revisado, sin residuos)», «Tara de referencia»…) y página `/ayuda` en el menú. Sin migración ni cambios de reglas. **Vitest 343/343 (29 archivos), Playwright 61/61** (con axe-core), tsc/eslint/build limpios.
+- **Informado por el usuario:** probó a mano tablero, calendarios y CSV contra Supabase y «todo está como se describe» (sin capturas ni detalle por paso).
+- **Pendiente / no verificado:** lector de pantalla real; Windows nativo; despliegue/HTTPS; revisión de los textos por el equipo/Hub. **Mejora anotada sin implementar: unir los CSV** (`docs/25` §9).
+- **Siguen abiertas:** H-01, H-05 y H-07; extras aplazados sin cambios; sin IoT; el PDF oficial es interno.
+- **Estado por iteración de `docs/07`:** Iter. 0–3 ✅ (la 3 también probada a mano en Supabase) · Iter. 4–6 ⏳.
+
 **Corte 2026-11-19 (Iteración 3 — tablero, cobertura y «cero confirmado», solo PostgreSQL local — ver `docs/25`):**
 - **Hecho y verificado en Linux + PostgreSQL 16 local:** migración **0010** (calendarios de medición, «cero confirmado», funciones de KPI/inventario/cobertura), `/dashboard` (tarjetas, cierre contable, gráfico semanal SVG propio con tabla, cobertura por contenedor, movimientos de soporte, filtros, aviso DEMO/período incompleto), `/dashboard/export` (CSV de kpis, pesajes, movimientos y cobertura) y `/calendarios` (programar/terminar: administrador; confirmar cero: administrador y operador en su zona). ADR-025 a ADR-027. **Vitest 338/338 (28 archivos), Playwright 53/53** (44 previas + 9 de `dashboard.spec.ts`, con axe-core), tsc/eslint/build limpios; conciliación contra libro conocido y pruebas de mutación (`docs/25` §5).
-- **Pendiente / no verificado:** la migración **0010 ya está aplicada en Supabase** (ejecutada por el usuario el 2026-11-19 con respaldo previo de 90 filas; `db:check` y `db:check:app` sin errores, 10 migraciones, RLS en 20 tablas; `docs/15`, `docs/25` §6), pero **no consta la prueba manual** de `/dashboard`, `/calendarios` y CSV contra Supabase; no hay pesajes reales, por lo que las cifras probadas son de fixtures y DEMO; Windows nativo; despliegue/HTTPS.
+- **Pendiente / no verificado:** la migración **0010 ya está aplicada en Supabase** (ejecutada por el usuario el 2026-11-19 con respaldo previo de 90 filas; `db:check` y `db:check:app` sin errores, 10 migraciones, RLS en 20 tablas; `docs/15`, `docs/25` §6); la prueba manual de `/dashboard`, `/calendarios` y CSV contra Supabase fue informada después como correcta (ver el corte superior); no hay pesajes reales, por lo que las cifras probadas son de fixtures y DEMO; Windows nativo; despliegue/HTTPS.
 - **Siguen abiertas:** H-01, H-05 y H-07 (con valores provisionales). El tablero informa qué indicadores dependen de ellas (inventario/ubicación ← H-01; valorización ← H-05; captación por material ← H-07). Extras aplazados sin cambios; sin IoT; el PDF oficial es interno.
 - **Estado por iteración de `docs/07`:** Iter. 0 ✅ · Iter. 1 ✅ · Iter. 2 ✅ · refuerzo previo a datos reales ✅ (local) · Iter. 3 ✅ (local; 0010 aplicada en Supabase, pantallas sin probar a mano allí) · Iter. 4–6 ⏳.
 
@@ -40,7 +47,7 @@
 4. Antes de la Iteración 2: conectar y validar Supabase (`docs/19` y lista de `docs/20`, sección 8).
 5. Antes de seguir: aplicar 0007 en Supabase con aprobación del usuario (`docs/22`, sección 5) y repasar con el Hub H-01, H-05 y H-07 (`docs/11`, `docs/21`).
 6. Si se van a usar datos reales: seguir primero `docs/23` §5 (respaldo, aplicar 0008/0009 con aprobación, decidir proveedor de identidad, HTTPS).
-7. Probar a mano el tablero y los calendarios contra Supabase (`docs/25`). Próxima tarea recomendada: Iteración 4 (IoT **simulado**; la telemetría nunca crea captaciones) o, antes, las decisiones H-01/H-05/H-07 con el Hub, de las que dependen las definiciones del tablero.
+7. (Hecho por el usuario el 2026-11-19: tablero, calendarios y CSV probados en Supabase.) Revisar los textos de `/ayuda` y los iconos (i). Próxima tarea recomendada: Iteración 4 (IoT **simulado**; la telemetría nunca crea captaciones) o, antes, las decisiones H-01/H-05/H-07 con el Hub, de las que dependen las definiciones del tablero.
 
 ## Hardware
 | Componente | Estado conocido | Precaución |

@@ -66,7 +66,7 @@ test.describe("tablero de indicadores", () => {
     await expect(tile(page, "Reciclable captado")).toContainText("10,000 kg");
     await expect(tile(page, "Reciclable captado")).toContainText("3 pesajes");
     await expect(tile(page, "Despachado a gestor")).toContainText("2,000 kg");
-    await expect(tile(page, "Despachado a gestor")).toContainText("Sin decisión: 2,000 kg (de ellos 2,000 kg sin evidencia)");
+    await expect(tile(page, "Despachado a gestor")).toContainText(/Sin decisión.*: 2,000 kg \(de ellos 2,000 kg sin evidencia\)/s);
     await expect(tile(page, "Inventario al cierre")).toContainText("8,000 kg");
     // Cierre contable: 0 + 10.000 − 2.000 = 8.000 g y la conciliación coincide
     const table = page.getByRole("table", { name: "Conciliación del inventario del período" });
@@ -195,7 +195,7 @@ test.describe("calendarios de medición y cero confirmado", () => {
     await page.goto("/calendarios");
     await expect(page.getByRole("form", { name: /Crear calendario/ })).toHaveCount(0); // el operador no programa
     await page.getByRole("form", { name: `Confirmar cero en ${PET}` }).getByLabel("Nota (opcional)").fill("contenedor vacío al cierre");
-    await page.getByRole("button", { name: "Confirmar cero (revisado, sin residuos)" }).click();
+    await page.getByRole("button", { name: "Confirmar cero: hoy revisé y está vacío" }).click();
     await expect(page.getByText("«Cero» confirmado para hoy.")).toBeVisible();
     await expect(page.getByText("Nota: contenedor vacío al cierre")).toBeVisible();
     await expect(page.getByRole("form", { name: `Confirmar cero en ${PET}` })).toHaveCount(0);
@@ -203,7 +203,7 @@ test.describe("calendarios de medición y cero confirmado", () => {
 
     await page.goto(`/dashboard?from=${today}&to=${today}&origin=demo`);
     await expect(tile(page, "Cobertura de medición")).toContainText("100 %");
-    await expect(tile(page, "Cobertura de medición")).toContainText("1 cero confirmado");
+    await expect(tile(page, "Cobertura de medición")).toContainText("1 revisado sin residuos (cero)");
     await expect(tile(page, "Reciclable captado")).toContainText("0,000 kg"); // el cero no suma masa
 
     // El administrador termina el calendario (como máximo ayer: lo esperado hoy deja de existir)
