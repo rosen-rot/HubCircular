@@ -9,13 +9,32 @@ export const MOVEMENT_HEADERS = ["movimiento", "fecha_local", "tipo", "efectivo"
 
 export const TIME_ZONE_NOTE = "America/Santiago";
 
-export function detailCsv(headers: readonly string[], rows: Record<string, CsvValue>[], truncatedAt?: number): string {
-  const body: CsvValue[][] = rows.map((r) => headers.map((h) => r[h] ?? null));
-  if (truncatedAt) body.push([`# Exportación truncada a ${truncatedAt} filas: acote el período o los filtros`, ...headers.slice(1).map(() => null)]);
-  return toCsv([...headers], body);
+/** Una tabla lista para escribir: la misma que se usa para el CSV y para la hoja de Excel (así no pueden divergir). */
+export interface Table {
+  headers: string[];
+  rows: CsvValue[][];
 }
 
-export function kpiCsv(opts: { kpis: Kpis; occurrences: Occurrence[]; filters: IndicatorFilters; zoneName: string | null; materialName: string | null }): string {
+export function detailTable(headers: readonly string[], rows: Record<string, CsvValue>[], truncatedAt?: number): Table {
+  const body: CsvValue[][] = rows.map((r) => headers.map((h) => r[h] ?? null));
+  if (truncatedAt) body.push([`# Exportación truncada a ${truncatedAt} filas: acote el período o los filtros`, ...headers.slice(1).map(() => null)]);
+  return { headers: [...headers], rows: body };
+}
+
+export function detailCsv(headers: readonly string[], rows: Record<string, CsvValue>[], truncatedAt?: number): string {
+  const t = detailTable(headers, rows, truncatedAt);
+  return toCsv(t.headers, t.rows);
+}
+
+export interface KpiOptions {
+  kpis: Kpis;
+  occurrences: Occurrence[];
+  filters: IndicatorFilters;
+  zoneName: string | null;
+  materialName: string | null;
+}
+
+export function kpiTable(opts: KpiOptions): Table {
   const { kpis: k, filters: f } = opts;
   const cov = summarizeCoverage(opts.occurrences);
   const pct = cov.percent === null ? "sin datos" : `${String(cov.percent).replace(".", ",")} %`;
@@ -44,18 +63,28 @@ export function kpiCsv(opts: { kpis: Kpis; occurrences: Occurrence[]; filters: I
     ["cobertura_pendientes_hoy", cov.pending, "n"],
     ["cobertura_porcentaje", pct, "%"],
   ];
-  return toCsv(
-    ["indicador", "valor", "unidad", "desde", "hasta", "zona_horaria", "origen", "zona", "material"],
-    rows.map(([name, value, unit]) => [name, value, unit, f.from, f.to, TIME_ZONE_NOTE, f.origin, opts.zoneName ?? "todas", opts.materialName ?? "todos"]),
-  );
+  return {
+    headers: ["indicador", "valor", "unidad", "desde", "hasta", "zona_horaria", "origen", "zona", "material"],
+    rows: rows.map(([name, value, unit]) => [name, value, unit, f.from, f.to, TIME_ZONE_NOTE, f.origin, opts.zoneName ?? "todas", opts.materialName ?? "todos"]),
+  };
 }
 
-export function coverageCsv(occurrences: Occurrence[], containers: Record<string, ContainerInfo>): string {
-  return toCsv(
-    ["contenedor", "material", "zona", "fecha", "estado", "pesajes", "nota_cero", "origen"],
-    occurrences.map((o) => {
+export function kpiCsv(opts: KpiOptions): string {
+  const t = kpiTable(opts);
+  return toCsv(t.headers, t.rows);
+}
+
+export function coverageTable(occurrences: Occurrence[], containers: Record<string, ContainerInfo>): Table {
+  return {
+    headers: ["contenedor", "material", "zona", "fecha", "estado", "pesajes", "nota_cero", "origen"],
+    rows: occurrences.map((o) => {
       const c = containers[o.containerId];
       return [c?.code ?? o.containerId, c?.materialName ?? null, c?.zoneName ?? null, o.day, COVERAGE_LABEL[o.status], o.weighings, o.zeroNote, c?.dataOrigin ?? null];
     }),
-  );
+  };
+}
+
+export function coverageCsv(occurrences: Occurrence[], containers: Record<string, ContainerInfo>): string {
+  const t = coverageTable(occurrences, containers);
+  return toCsv(t.headers, t.rows);
 }

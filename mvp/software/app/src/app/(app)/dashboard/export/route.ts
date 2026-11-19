@@ -4,7 +4,9 @@ import { santiagoToday } from "@/lib/time";
 import { assertCan } from "@/modules/identity/permissions";
 import { getCurrentActor } from "@/modules/identity/service";
 import { CSV_KINDS, type CsvKind } from "@/modules/indicators/csv";
-import { coverageCsv, detailCsv, kpiCsv, MOVEMENT_HEADERS, WEIGHING_HEADERS } from "@/modules/indicators/exports";
+import { toCsv } from "@/modules/indicators/csv";
+import { coverageTable, detailTable, kpiTable, MOVEMENT_HEADERS, WEIGHING_HEADERS, type Table } from "@/modules/indicators/exports";
+import { buildWorkbook, XLSX_MIME } from "@/modules/indicators/workbook";
 import { parseIndicatorFilters } from "@/modules/indicators/filters";
 import { EXPORT_ROW_LIMIT, exportCoverage, exportMovements, exportWeighings, getIndicators, loadIndicatorOptions } from "@/modules/indicators/queries";
 
@@ -22,49 +24,52 @@ export async function GET(req: NextRequest) {
     assertCan(actor, "indicators:read");
 
     const kind = req.nextUrl.searchParams.get("kind") ?? "";
-    if (!(CSV_KINDS as readonly string[]).includes(kind)) {
+    if (kind !== "todo" && !(CSV_KINDS as readonly string[]).includes(kind)) {
       return NextResponse.json({ error: { code: "validation", message: "Tipo de exportación no válido." } }, { status: 422 });
     }
     const raw = Object.fromEntries(req.nextUrl.searchParams.entries());
     const { filters } = parseIndicatorFilters(raw, santiagoToday());
+    const name = `hubcircular-${kind}-${filters.origin}-${filters.from}_${filters.to}`;
 
-    let csv: string;
-    switch (kind as CsvKind) {
-      case "kpis": {
-        const [data, options] = await Promise.all([getIndicators(actor, filters), loadIndicatorOptions(actor, filters.origin)]);
-        csv = kpiCsv({
-          kpis: data.kpis,
-          occurrences: data.occurrences,
-          filters,
-          zoneName: options.zones.find((z) => z.id === filters.zoneId)?.name ?? null,
-          materialName: options.materials.find((m) => m.id === filters.materialId)?.name ?? null,
-        });
-        break;
-      }
-      case "pesajes": {
-        const r = await exportWeighings(actor, filters);
-        csv = detailCsv(WEIGHING_HEADERS, r.rows, r.truncated ? EXPORT_ROW_LIMIT : undefined);
-        break;
-      }
-      case "movimientos": {
-        const r = await exportMovements(actor, filters);
-        csv = detailCsv(MOVEMENT_HEADERS, r.rows, r.truncated ? EXPORT_ROW_LIMIT : undefined);
-        break;
-      }
-      default: {
-        const r = await exportCoverage(actor, filters);
-        csv = coverageCsv(r.occurrences, r.containers);
-      }
+    const kpis = async (): Promise<Table> => {
+      const [data, options] = await Promise.all([getIndicators(actor, filters), loadIndicatorOptions(actor, filters.origin)]);
+      return kpiTable({
+        kpis: data.kpis,
+        occurrences: data.occurrences,
+        filters,
+        zoneName: options.zones.find((z) => z.id === filters.zoneId)?.name ?? null,
+        materialName: options.materials.find((m) => m.id === filters.materialId)?.name ?? null,
+      });
+    };
+    const pesajes = async (): Promise<Table> => {
+      const r = await exportWeighings(actor, filters);
+      return detailTable(WEIGHING_HEADERS, r.rows, r.truncated ? EXPORT_ROW_LIMIT : undefined);
+    };
+    const movimientos = async (): Promise<Table> => {
+      const r = await exportMovements(actor, filters);
+      return detailTable(MOVEMENT_HEADERS, r.rows, r.truncated ? EXPORT_ROW_LIMIT : undefined);
+    };
+    const cobertura = async (): Promise<Table> => {
+      const r = await exportCoverage(actor, filters);
+      return coverageTable(r.occurrences, r.containers);
+    };
+
+    const noCache = { "Cache-Control": "no-store", "X-Content-Type-Options": "nosniff" };
+
+    if (kind === "todo") {
+      // Las cuatro consultas se hacen una a una: cada una abre su propia transacción con el actor.
+      const tables = { Indicadores: await kpis(), Pesajes: await pesajes(), Movimientos: await movimientos(), Cobertura: await cobertura() };
+      const book = await buildWorkbook(tables);
+      return new NextResponse(new Uint8Array(book), {
+        status: 200,
+        headers: { "Content-Type": XLSX_MIME, "Content-Disposition": `attachment; filename="${name}.xlsx"`, ...noCache },
+      });
     }
 
-    return new NextResponse(csv, {
+    const table = await { kpis, pesajes, movimientos, cobertura }[kind as CsvKind]();
+    return new NextResponse(toCsv(table.headers, table.rows), {
       status: 200,
-      headers: {
-        "Content-Type": "text/csv; charset=utf-8",
-        "Content-Disposition": `attachment; filename="hubcircular-${kind}-${filters.origin}-${filters.from}_${filters.to}.csv"`,
-        "Cache-Control": "no-store",
-        "X-Content-Type-Options": "nosniff",
-      },
+      headers: { "Content-Type": "text/csv; charset=utf-8", "Content-Disposition": `attachment; filename="${name}.csv"`, ...noCache },
     });
   } catch (err) {
     if (err instanceof DomainError) return fail(err);

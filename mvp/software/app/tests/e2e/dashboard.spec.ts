@@ -2,6 +2,7 @@ import AxeBuilder from "@axe-core/playwright";
 import { expect, test, type Page } from "@playwright/test";
 import { Client, types } from "pg";
 import { PASSWORDS } from "../helpers/db";
+import { readWorkbook } from "../helpers/xlsx";
 
 types.setTypeParser(20, (v) => Number(v));
 const adminUrl = process.env.TEST_DATABASE_URL ?? "postgres://postgres@127.0.0.1:54329/postgres";
@@ -158,6 +159,99 @@ test.describe("tablero de indicadores", () => {
     // el origen real no mezcla DEMO
     const real = await (await page.request.get("/dashboard/export?kind=pesajes&from=2026-03-09&to=2026-03-13")).text();
     expect(real.trim().split("\r\n")).toHaveLength(1);
+  });
+
+  test("«Todo junto»: un solo Excel con las 4 hojas, mismas cifras que los CSV, con permisos y ámbito del servidor", async ({ page, request }) => {
+    const anon = await request.get(`/dashboard/export?kind=todo&${PERIOD}`, { maxRedirects: 0 });
+    expect(anon.status()).toBe(307);
+    const forged = await request.get(`/dashboard/export?kind=todo&${PERIOD}`, { headers: { cookie: "hc_session=invalida" }, maxRedirects: 0 });
+    expect(forged.status()).toBe(401);
+
+    await login(page, "admin");
+    const res = await page.request.get(`/dashboard/export?kind=todo&${PERIOD}`);
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-type"]).toBe("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+    expect(res.headers()["content-disposition"]).toContain("hubcircular-todo-demo-2026-03-09_2026-03-13.xlsx");
+    expect(res.headers()["cache-control"]).toBe("no-store");
+    const wb = readWorkbook(await res.body());
+    expect(Object.keys(wb.sheets)).toEqual(["Indicadores", "Pesajes", "Movimientos", "Cobertura"]);
+    expect(wb.withFormulas).toEqual([]);
+
+    // mismas cifras que el CSV de indicadores
+    const ind = Object.fromEntries(wb.sheets.Indicadores!.slice(1).map((r) => [r[0], r[1]]));
+    expect(ind["captado"]).toBe(10000);
+    expect(ind["inventario_cierre"]).toBe(8000);
+    expect(ind["cobertura_porcentaje"]).toBe("sin datos");
+    const csvKpis = await (await page.request.get(`/dashboard/export?kind=kpis&${PERIOD}`)).text();
+    expect(csvKpis).toContain("captado;10000;g;");
+
+    // mismas filas que el CSV de pesajes (encabezado + 3) y masas numéricas
+    const csvLines = (await (await page.request.get(`/dashboard/export?kind=pesajes&${PERIOD}`)).text()).trim().split("\r\n");
+    expect(wb.sheets.Pesajes).toHaveLength(csvLines.length);
+    expect(wb.sheets.Pesajes![0]!.join(";")).toBe(csvLines[0]);
+    const h = wb.sheets.Pesajes![0]!;
+    expect(wb.sheets.Pesajes!.slice(1).map((r) => r[h.indexOf("neto_g")]).sort()).toEqual([2000, 3000, 5000]);
+    expect(wb.sheets.Movimientos!.some((r) => r.includes("despacho"))).toBe(true);
+
+    // el origen real no mezcla DEMO: solo encabezados
+    const real = readWorkbook(await (await page.request.get("/dashboard/export?kind=todo&from=2026-03-09&to=2026-03-13")).body());
+    expect(real.sheets.Pesajes).toHaveLength(1);
+    expect(real.sheets.Movimientos).toHaveLength(1);
+  });
+
+  test("el operador y el lector descargan el Excel solo con lo de su zona / de solo lectura", async ({ page }) => {
+    await login(page, "operator");
+    const wb = readWorkbook(await (await page.request.get(`/dashboard/export?kind=todo&${PERIOD}`)).body());
+    const cont = wb.sheets.Pesajes!.slice(1).map((r) => r[2]);
+    expect(cont).toContain("DEMO-Z01-EST01-CARTON");
+    expect(cont).not.toContain("DEMO-Z02-EST01-ALUMINIO");
+    const mov = wb.sheets.Movimientos!.flat().join(" ");
+    expect(mov).not.toContain("ALUMINIO");
+  });
+
+  test("selector «¿Qué quieres descargar?»: por defecto todo junto en Excel, o una sola tabla en CSV", async ({ page }) => {
+    await login(page, "admin");
+    await page.goto(`/dashboard?${PERIOD}`);
+    await expect(page.getByRole("link", { name: /^CSV / })).toHaveCount(0); // ya no hay 4 botones sueltos
+    await page.getByText("Descargar datos", { exact: true }).click();
+    const form = page.getByRole("form", { name: "Descargar datos del tablero" });
+    await expect(form.getByRole("radio", { name: /Todo junto/ })).toBeChecked();
+    for (const t of ["Solo indicadores", "Solo pesajes", "Solo movimientos", "Solo cobertura"]) await expect(form.getByRole("radio", { name: new RegExp(t) })).toBeVisible();
+
+    const box = (await form.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0); // el panel queda dentro de la ventana (antes quedaba fuera a la izquierda)
+    await expect(form.getByRole("button", { name: "Descargar" })).toBeInViewport();
+
+    const [xlsx] = await Promise.all([page.waitForEvent("download"), form.getByRole("button", { name: "Descargar" }).click()]);
+    expect(xlsx.suggestedFilename()).toBe("hubcircular-todo-demo-2026-03-09_2026-03-13.xlsx");
+
+    await page.goto(`/dashboard?${PERIOD}`);
+    await page.getByText("Descargar datos", { exact: true }).click();
+    await form.getByRole("radio", { name: /Solo pesajes/ }).check();
+    const [csv] = await Promise.all([page.waitForEvent("download"), form.getByRole("button", { name: "Descargar" }).click()]);
+    expect(csv.suggestedFilename()).toBe("hubcircular-pesajes-demo-2026-03-09_2026-03-13.csv");
+  });
+
+  test("en un teléfono el selector de descarga también cabe en la pantalla", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 800 });
+    await login(page, "admin");
+    await page.goto(`/dashboard?${PERIOD}`);
+    await page.getByText("Descargar datos", { exact: true }).click();
+    const form = page.getByRole("form", { name: "Descargar datos del tablero" });
+    const box = (await form.boundingBox())!;
+    expect(box.x).toBeGreaterThanOrEqual(0);
+    expect(box.x + box.width).toBeLessThanOrEqual(390);
+  });
+
+  test("el selector de descarga no tiene violaciones de accesibilidad y respeta los filtros activos", async ({ page }) => {
+    await login(page, "admin");
+    await page.goto(`/dashboard?${PERIOD}`);
+    await page.getByText("Descargar datos", { exact: true }).click();
+    const form = page.getByRole("form", { name: "Descargar datos del tablero" });
+    await expect(form.locator('input[name="from"]')).toHaveValue("2026-03-09");
+    await expect(form.locator('input[name="origin"]')).toHaveValue("demo");
+    const res = await new AxeBuilder({ page }).withTags(["wcag2a", "wcag2aa", "wcag21a", "wcag21aa"]).analyze();
+    expect(res.violations).toEqual([]);
   });
 
   test("el operador exporta solo lo de su zona", async ({ page }) => {

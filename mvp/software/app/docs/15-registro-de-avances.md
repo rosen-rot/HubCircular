@@ -182,6 +182,16 @@
 - Confirmado por el usuario (2026-11-19, sin captura): tras la corrección, `npm run dev` en Windows «se ve todo sin ningún error».
 - Próxima acción: resumen de H-01/H-05/H-07 para el Hub o unir los CSV, según prioridad del usuario.
 
+### 2026-11-19 — Descarga unificada: «Descargar datos» (Excel con 4 hojas o una tabla en CSV)
+- Agente / rama / commit: Claude (Cowork) · `main` (commit al entregar).
+- Objetivo (pedido del usuario): juntar los CSV. Elección del usuario: **Excel con una hoja por tabla** y **un botón que pregunta qué descargar** (todo o algo enfocado).
+- Cambios y archivos: `src/modules/indicators/workbook.ts` (libro); `exports.ts` con `kpiTable`/`detailTable`/`coverageTable` (los CSV usan las mismas tablas); `/dashboard/export` con `kind=todo`; `src/components/indicators/export-picker.tsx` y el tablero (reemplaza los 4 botones); dependencia `write-excel-file` (+ `fflate` como devDependency para pruebas); `tests/unit/workbook.test.ts`, `tests/helpers/xlsx.ts`, 5 pruebas E2E nuevas; `docs/25` §9, ADR-028, `docs/14`, README. Sin cambios de base de datos.
+- Comandos y pruebas (resultados reales, Linux + PostgreSQL 16 local): `tsc`, `eslint` y `next build` sin errores; `npm audit`: 0 vulnerabilidades; **Vitest 349/349** (30 archivos); **Playwright 66/66** (con axe-core); el `.xlsx` se abrió en LibreOffice (4 hojas; `=1+1` queda como texto); `next dev` sin avisos de hidratación. Detalle en `docs/25` §9.
+- Incidencias: en el primer intento el panel de descarga quedaba fuera de la pantalla (a la izquierda) y luego el botón «Descargar» bajo el pliegue; lo detectaron las pruebas E2E y la revisión visual, y se corrigieron con pruebas de posición (escritorio y 390 px).
+- Decisiones tomadas: ADR-028; los CSV sueltos se conservan como opciones del selector (no se quitó ninguna descarga).
+- Riesgos y límites: no probado en Microsoft Excel real ni con 20.000 filas por hoja; no probado en Windows nativo ni contra Supabase.
+- Próxima acción: el usuario prueba «Descargar datos» (Todo junto y una tabla) y abre el Excel; luego resumen H-01/H-05/H-07 para el Hub o Iteración 4.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

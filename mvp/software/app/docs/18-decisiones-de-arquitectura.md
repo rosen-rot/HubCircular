@@ -157,3 +157,9 @@ Formato: contexto → decisión → consecuencias / cómo revertir. Las decision
 ## ADR-027 · Gráficos en SVG propio, sin Recharts (modifica la previsión de ADR-001)
 - **Decisión.** El gráfico semanal es un componente servidor en SVG con leyenda, `<title>` por segmento, tabla de datos equivalente y paleta categórica validada con el validador del skill de visualización (separación CVD adyacente y piso de visión normal aprobados; el contraste bajo de tres tonos se compensa con leyenda y tabla). Sin dependencia nueva.
 - **Consecuencia aceptada.** Sin tooltip interactivo propio ni animaciones; cada gráfico nuevo requiere código nuevo.
+
+## ADR-028 · Descarga unificada en Excel con `write-excel-file` (2026-11-19)
+- **Decisión.** «Descargar datos» ofrece un Excel con una hoja por tabla (Indicadores, Pesajes, Movimientos, Cobertura) o una sola tabla en CSV. Las hojas y los CSV salen de las mismas tablas (`exports.ts`), de modo que no pueden divergir. Librería: `write-excel-file` (dependencia propia `fflate`, 0 vulnerabilidades en `npm audit`); los textos se escriben como texto, nunca como fórmula.
+- **Consecuencia aceptada.** Una dependencia nueva en producción; el libro no se ha abierto en Microsoft Excel real (sí en LibreOffice); los CSV sueltos se conservan.
+- **Alternativas descartadas.** Un único CSV «largo» con columna de tipo (incómodo de leer); ZIP de CSV (no junta realmente); `xlsx` de SheetJS en npm (sin mantenimiento) y `exceljs` (mucho más pesada).
+

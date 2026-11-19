@@ -3,10 +3,15 @@
 **Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-19 (descarga unificada — ver `docs/25` §9, ADR-028):**
+- **Hecho y verificado en Linux + PostgreSQL 16 local:** botón «Descargar datos» en el tablero («¿Qué quieres descargar?»): **Todo junto** en un Excel de 4 hojas, o una sola tabla en CSV; los CSV conservan su URL y contenido. Nueva dependencia `write-excel-file` (0 vulnerabilidades). **Vitest 349/349 (30 archivos), Playwright 66/66** (con axe-core), tsc/eslint/build limpios; `next dev` sin avisos de hidratación.
+- **Pendiente / no verificado:** apertura en Microsoft Excel real (sí en LibreOffice); rendimiento con 20.000 filas por hoja; Windows nativo; Supabase (no se tocó la base de datos).
+- La mejora «unir los CSV» ya **no está pendiente**. Siguen abiertas H-01/H-05/H-07; extras aplazados sin cambios; sin IoT.
+
 **Corte 2026-11-19 (prueba manual de la Iteración 3 y mejora de ayuda — ver `docs/25` §8–§9):**
 - **Hecho y verificado en Linux + PostgreSQL 16 local:** glosario único (`src/lib/glossary.ts`), icono (i) accesible junto a los términos de toda la aplicación, nombres más claros («Tara: recipiente vacío», «Cero confirmado (revisado, sin residuos)», «Tara de referencia»…) y página `/ayuda` en el menú. Sin migración ni cambios de reglas. **Vitest 343/343 (29 archivos), Playwright 61/61** (con axe-core), tsc/eslint/build limpios.
 - **Informado por el usuario:** probó a mano tablero, calendarios y CSV contra Supabase y «todo está como se describe» (sin capturas ni detalle por paso).
-- **Pendiente / no verificado:** lector de pantalla real; Windows nativo; despliegue/HTTPS; revisión de los textos por el equipo/Hub. **Mejora anotada sin implementar: unir los CSV** (`docs/25` §9).
+- **Pendiente / no verificado:** lector de pantalla real; Windows nativo; despliegue/HTTPS; revisión de los textos por el equipo/Hub. La mejora «unir los CSV» se implementó después (corte superior).
 - **Siguen abiertas:** H-01, H-05 y H-07; extras aplazados sin cambios; sin IoT; el PDF oficial es interno.
 - **Estado por iteración de `docs/07`:** Iter. 0–3 ✅ (la 3 también probada a mano en Supabase) · Iter. 4–6 ⏳.
 

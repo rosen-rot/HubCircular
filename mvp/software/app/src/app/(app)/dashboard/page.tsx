@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Forbidden } from "@/components/forbidden";
+import { ExportPicker } from "@/components/indicators/export-picker";
 import { WeeklyChart } from "@/components/indicators/weekly-chart";
 import { Button } from "@/components/ui/button";
 import { Alert, Badge, Card, DemoBadge } from "@/components/ui/card";
@@ -61,7 +62,6 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
   const incomplete = includesToday(filters, today);
   const demo = filters.origin === "demo";
   const noDataAtAll = !demo && !data.hasRealData;
-  const params = (extra: Record<string, string> = {}) => filtersToParams(filters, extra).toString();
   const closingCalc = k.openingG + k.capturedG + k.adjustInG - k.adjustOutG - k.dispatchedG - k.reusedG - k.rejectedG + k.transferInG - k.transferOutG;
   const closingMatches = closingCalc === k.closingG;
 
@@ -88,13 +88,9 @@ export default async function DashboardPage({ searchParams }: { searchParams: Pr
           <p className="text-slate-700">
             Del {dmy(filters.from)} al {dmy(filters.to)} · días en hora de Chile (America/Santiago) · masas en kilogramos. Solo se muestra lo que su rol y zona permiten ver.
           </p>
-        </div>
-        <div className="flex flex-wrap gap-2" aria-label="Exportar datos">
-          {(["kpis", "pesajes", "movimientos", "cobertura"] as const).map((kind) => (
-            <Button key={kind} asChild variant="outline">
-              <a href={`/dashboard/export?${params({ kind })}`} download>CSV {kind}</a>
-            </Button>
-          ))}
+          <div className="mt-3">
+            <ExportPicker filters={Object.fromEntries(filtersToParams(filters))} />
+          </div>
         </div>
       </div>
 
