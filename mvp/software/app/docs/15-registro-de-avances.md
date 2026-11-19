@@ -77,7 +77,7 @@
 ### 2026-11-18 — Contenedor global mixto (DEMO)
 - Cambios: `db/seed/demo.ts` (material `DEMO-MIXTO`, estación `DEMO-Z01-GLOBAL`, contenedor `DEMO-Z01-GLOBAL-MIXTO` sin tara nominal); `tests/integration/mixed-container.test.ts` (4 pruebas nuevas); ajustados los recuentos esperados en `queries.test.ts` y `rls.test.ts`; ADR-018.
 - Pruebas (Linux, PostgreSQL 16): typecheck y lint limpios; Vitest **16 archivos, 171/171**; E2E **20/20**. Sin cambios de migraciones ni de código de aplicación.
-- Pendiente: en Supabase aún no se vuelve a ejecutar `db:seed`; hacerlo restablece las claves de los 3 usuarios DEMO (usar `SEED_*_PASSWORD` si se quieren fijar).
+- Supabase: el usuario volvió a ejecutar `db:seed` y informó que el contenedor global mixto funciona (salida no compartida). El seed restablece las claves de los 3 usuarios DEMO.
 
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]

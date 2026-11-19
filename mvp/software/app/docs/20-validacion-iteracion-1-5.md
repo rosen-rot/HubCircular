@@ -120,3 +120,5 @@ El usuario comprobó en la app conectada a Supabase que **no es posible hacer do
 ## 12. Actualización posterior: contenedor global mixto (DEMO)
 
 Tras agregar el material `DEMO-MIXTO` y el contenedor `DEMO-Z01-GLOBAL-MIXTO` al seed (ADR-018), el resultado en Linux es: typecheck y lint limpios; Vitest **16 archivos, 171 pruebas: 171 pasan, 0 fallan, 0 omitidas** (4 nuevas en `mixed-container.test.ts`; 3 expectativas de recuento actualizadas porque el seed ahora tiene un contenedor y un material más); E2E **20/20**. Las cifras de la sección 2 corresponden al estado anterior. En Supabase el seed aún no se ha vuelto a ejecutar.
+
+Resultado en Supabase (informado por el usuario, 2026-11-18): tras volver a ejecutar `db:seed`, el contenedor global mixto aparece y funciona. No se compartió la salida de los comandos; el registro se basa en el informe del usuario.
