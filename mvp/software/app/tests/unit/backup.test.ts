@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
-import { assertDumpClientCompatible, assertOutsideRepo, backupFileName, isInside, parsePgMajor, pgEnvFromUrl } from "@/lib/backup";
+import { assertDumpClientCompatible, assertOutsideRepo, backupFileName, isInside, localRestoreEnv, parsePgMajor, pgEnvFromUrl } from "@/lib/backup";
+import { buildClientConfig } from "@/lib/db-config";
 
 describe("respaldo: ubicación segura", () => {
   it("detecta rutas dentro del repositorio (POSIX)", () => {
@@ -33,6 +34,21 @@ describe("respaldo: nombre y entorno", () => {
     const v = pgEnvFromUrl("postgresql://u:p@db.x.supabase.co/postgres", { DB_SSL: "verify", DB_SSL_CA_FILE: "C:\\ca.crt" });
     expect(v).toMatchObject({ PGSSLMODE: "verify-full", PGSSLROOTCERT: "C:\\ca.crt" });
     expect(() => pgEnvFromUrl("postgresql://u:p@h/db", { DB_SSL: "xx" })).toThrow(/DB_SSL/);
+  });
+});
+
+describe("prueba de restauración: TLS del destino local", () => {
+  it("ignora DB_SSL=require/verify del .env.local (pensado para Supabase) y conecta sin TLS", () => {
+    const url = "postgres://postgres@127.0.0.1:54329/hc_restore_test";
+    for (const DB_SSL of ["require", "verify"]) {
+      const env = localRestoreEnv({ DB_SSL, DB_SSL_CA_FILE: "C:\\ca.crt", OTRA: "x" });
+      expect(env.OTRA).toBe("x");
+      expect(pgEnvFromUrl(url, env).PGSSLMODE).toBe("disable");
+      expect(pgEnvFromUrl(url, env).PGSSLROOTCERT).toBeUndefined();
+      expect(buildClientConfig(url, env).ssl).toBeUndefined();
+    }
+    // sin el ajuste, DB_SSL=require habría exigido TLS al servidor local (el fallo observado)
+    expect(buildClientConfig(url, { DB_SSL: "require" }).ssl).toBeTruthy();
   });
 });
 

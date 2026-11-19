@@ -3,7 +3,7 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { spawnSync } from "node:child_process";
 import { Client } from "pg";
-import { pgEnvFromUrl } from "../src/lib/backup";
+import { localRestoreEnv, pgEnvFromUrl } from "../src/lib/backup";
 import { assertLocalOnly, buildClientConfig, describeTarget } from "../src/lib/db-config";
 import { loadEnv } from "./env";
 import { collectInventory, type Manifest } from "./backup-inventory";
@@ -47,7 +47,8 @@ async function main() {
   else line("ERROR", "El checksum del archivo NO coincide con el manifiesto (archivo alterado o dañado).");
   if (errors) process.exit(1);
 
-  const client = new Client(buildClientConfig(url));
+  const restoreEnv = localRestoreEnv();
+  const client = new Client(buildClientConfig(url, restoreEnv));
   await client.connect();
   try {
     const has = await client.query<{ n: number }>("select count(*)::int as n from pg_namespace where nspname = 'hc'");
@@ -59,14 +60,14 @@ async function main() {
     await client.end();
   }
 
-  const restore = spawnSync(process.env.PG_RESTORE_PATH?.trim() || "pg_restore", ["--no-owner", "--exit-on-error", "--dbname", pgEnvFromUrl(url).PGDATABASE, dumpPath], {
-    env: { ...process.env, ...pgEnvFromUrl(url) },
+  const restore = spawnSync(process.env.PG_RESTORE_PATH?.trim() || "pg_restore", ["--no-owner", "--exit-on-error", "--dbname", pgEnvFromUrl(url, restoreEnv).PGDATABASE, dumpPath], {
+    env: { ...process.env, ...pgEnvFromUrl(url, restoreEnv) },
     stdio: ["ignore", "inherit", "inherit"],
   });
   if (restore.status !== 0) throw new Error("pg_restore falló; la base de prueba quedó parcialmente poblada (descártela).");
   line("OK", "pg_restore terminó sin errores.");
 
-  const c2 = new Client(buildClientConfig(url));
+  const c2 = new Client(buildClientConfig(url, restoreEnv));
   await c2.connect();
   try {
     await c2.query("begin read only");

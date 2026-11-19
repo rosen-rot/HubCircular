@@ -60,6 +60,14 @@ export function pgEnvFromUrl(connectionString: string, env: Record<string, strin
   return out;
 }
 
+/**
+ * Entorno de la PRUEBA DE RESTAURACIÓN: el destino es siempre un PostgreSQL local (assertLocalOnly), por lo que se
+ * ignora el DB_SSL del .env.local (pensado para Supabase) y se conecta sin TLS.
+ */
+export function localRestoreEnv(env: Record<string, string | undefined> = process.env): Record<string, string | undefined> {
+  return { ...env, DB_SSL: "disable", DB_SSL_CA_FILE: undefined };
+}
+
 /** pg_dump no puede volcar un servidor de versión mayor que la suya. */
 export function assertDumpClientCompatible(clientMajor: number, serverMajor: number): void {
   if (clientMajor < serverMajor) {
