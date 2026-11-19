@@ -59,7 +59,7 @@ Ver `docs/24-respaldos-y-restauracion.md`: `npm run db:backup` y `npm run db:res
 | # | Acción | Responsable | Estado |
 |---|---|---|---|
 | 1 | Aplicación de 0008 y 0009 en Supabase con `CONFIRM_REMOTE_MIGRATION` | Usuario | **Hecho** el 19-11-2026 (salida real en `docs/15`); no consta respaldo previo |
-| 2 | Primera corrida real de `db:backup` y de `db:restore-check` en Windows | Usuario | `db:backup` **hecho** el 19-11-2026 (pg_dump 18.2, 77 filas, 9 migraciones; `docs/15`); `db:restore-check` pendiente |
+| 2 | Primera corrida real de `db:backup` y de `db:restore-check` en Windows | Usuario | **Hecho** el 19-11-2026 (`docs/15`): `db:backup` con pg_dump 18.2 (77 filas, 9 migraciones) y `db:restore-check` OK en un PostgreSQL 18 local (filas, migraciones, políticas y RLS idénticos). Falta probar la restauración en un servidor 17 |
 | 3 | Confirmar en el panel de Supabase qué copias automáticas/PITR incluye el plan (`docs/24` §6) | Usuario | Pendiente |
 | 4 | Decidir el proveedor de identidad (local o Supabase Auth) y, si es Supabase, completar la sección 3 | Usuario/equipo | Pendiente |
 | 5 | Servir detrás de HTTPS con `SESSION_COOKIE_SECURE=true` y comprobar las cabeceras con `curl -I` | Usuario | Pendiente (sin despliegue) |
@@ -78,4 +78,4 @@ Ver `docs/24-respaldos-y-restauracion.md`: `npm run db:backup` y `npm run db:res
 | Mutaciones (prueba de que las pruebas detectan fallos) | Quitar el control del último administrador (6 fallos); aceptar correo sin confirmar, identidad distinta de Supabase o perfil inactivo (1 fallo cada una) |
 | Respaldo y restauración | Restauración real en base vacía: 18 tablas, 43 filas, 8 migraciones, 17 políticas, 35 funciones y RLS idénticos; 7 salvaguardas negativas verificadas |
 
-**No verificado:** Supabase Auth real (forma exacta de las respuestas, `email_confirmed_at`, límites de tasa, registro deshabilitado, correo de confirmación/SMTP); `/usuarios` y la clave temporal contra Supabase, respaldo y cabeceras en Supabase/producción; ejecución nativa en Windows; PostgreSQL 17 como servidor de la restauración. La validación manual de la Iteración 2 en Supabase (`docs/22`) fue informada por el usuario («está bien todo») sin detalle por paso.
+**No verificado:** Supabase Auth real (forma exacta de las respuestas, `email_confirmed_at`, límites de tasa, registro deshabilitado, correo de confirmación/SMTP); `/usuarios` y la clave temporal contra Supabase, cabeceras en producción, restauración del respaldo de Supabase en un servidor PostgreSQL 17; ejecución nativa en Windows; PostgreSQL 17 como servidor de la restauración. La validación manual de la Iteración 2 en Supabase (`docs/22`) fue informada por el usuario («está bien todo») sin detalle por paso.

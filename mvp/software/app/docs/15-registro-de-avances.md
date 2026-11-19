@@ -131,6 +131,14 @@
 - **Sigue sin verificar:** `db:restore-check` con este archivo (requiere una base **local y vacía**); la restauración no se ha probado con un volcado de Supabase, solo con uno local en Linux. El respaldo es anterior a la prueba manual de `/usuarios` en Supabase, que tampoco consta.
 - Próxima acción: prueba de restauración local y prueba manual de `/usuarios` (`docs/23` §5).
 
+### 2026-11-19 — Primera prueba de restauración real del respaldo de Supabase (ejecutada por el usuario en Windows)
+- Agente / rama / commit: usuario en PowerShell + Claude (Cowork) · `main` · corrección en `61d305d`.
+- Preparación (salida real del usuario): PostgreSQL local descartable con `scripts/windows/postgres-local.ps1` usando los binarios 18 instalados (`-PgBin "C:\Program Files\PostgreSQL\18\bin"`, puerto 54329, solo `127.0.0.1`, sin contraseña) y base vacía `hc_restore_test`. La contraseña del PostgreSQL instalado no se necesitó ni se compartió.
+- Fallo encontrado y corregido: el primer intento de `db:restore-check` terminó con «The server does not support SSL connections» tras el checksum correcto, porque el `DB_SSL=require` del `.env.local` (para Supabase) se aplicaba también al destino local. Reproducido en Linux con la misma variable, corregido (el destino local de la restauración siempre se conecta sin TLS) y cubierto con una prueba unitaria (`tests/unit/backup.test.ts`, ahora 9 pruebas). Sin otros cambios de comportamiento.
+- Resultado (salida real del usuario, tras la corrección): `db:restore-check` sobre `hubcircular-hc-remoto-postgres-20261119-040207Z.dump` ⇒ **«Prueba de restauración OK»**: checksum coincide; `pg_restore` sin errores; 18 tablas; **77 filas idénticas** al origen; 9 migraciones idénticas; 17 políticas RLS; 36 funciones; RLS idéntico al origen (solo `schema_migrations` sin RLS, sin concesiones a roles de la app); concesiones clave restauradas; sin saldos negativos.
+- Límites: restaurado en un PostgreSQL **18** local; la restauración en un servidor 17 (la versión de Supabase) o en un proyecto Supabase nuevo no se ha probado. La base `hc_restore_test` y el servidor local siguen existiendo en el equipo del usuario hasta que los descarte.
+- Pendiente: prueba manual de `/usuarios` contra Supabase; confirmar las copias del plan de Supabase; decidir el proveedor de identidad (`docs/23` §3 y §5).
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:
