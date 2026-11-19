@@ -32,7 +32,7 @@ La línea base de «171» incluye el contenedor MIXTO DEMO añadido tras la Iter
 Otras pruebas de `docs/08`: ajuste solo administrador y con motivo; corrección conserva autor, motivo y referencia, una sola vez, y es idempotente; no se revierte si el saldo no alcanza; verificación con historial; RLS por zona (incluido que el lote queda visible tras un traslado); inmutabilidad (HC423); `hc_app` no escribe directamente; `anon`/`authenticated` sin privilegios; ningún destino DEMO con lote real.
 
 ## 4. Límites y riesgos
-- **Supabase:** la migración 0007 **fue aplicada por el usuario** el 18-11-2026 y `db:check` quedó sin errores (7 migraciones, 0 pendientes, ningún saldo negativo). Los movimientos, la evidencia y la verificación **aún no se han probado en Supabase**, solo en PostgreSQL local.
+- **Supabase:** la migración 0007 **fue aplicada por el usuario** el 18-11-2026 y `db:check` quedó sin errores (7 migraciones, 0 pendientes, ningún saldo negativo). Tras cargar los destinos DEMO con `db:seed`, el usuario probó a mano los movimientos, la evidencia y la verificación en Supabase con los tres roles e informó «está bien todo» (sin salidas por paso; no verificado por Claude).
 - **Windows nativo:** no verificado (igual que en 1.5).
 - **Decisiones abiertas:** H-01 (ubicación = zona, provisional), H-05 (valorización = verificación, provisional), H-07 (sin excepciones de material). Cambiarlas no obliga a rehacer los saldos.
 - **Zonas visibles:** un operador solo ve como destino de traslado zonas de su ámbito (RLS de `zones`); la función de BD sí permite trasladar a cualquier zona activa si se conoce su identificador. Revisar con el Hub si los traslados entre zonas deben ser exclusivos del administrador.
@@ -45,3 +45,11 @@ Otras pruebas de `docs/08`: ajuste solo administrador y con motivo; corrección 
 3. `npm run db:check`: debe mostrar 7 migraciones, 0 pendientes y «Ningún saldo de lote es negativo».
 4. Para tener destinos DEMO: `$env:CONFIRM_REMOTE_SEED="<host>"; npm run db:seed`. **Atención:** el seed restablece las contraseñas de los usuarios DEMO (a `SEED_*_PASSWORD` o a claves aleatorias que imprime una vez).
 5. Revertir: no hay migración «down». Antes de aplicar, confirmar copia de seguridad de Supabase; una reversión sería una migración nueva y revisada.
+
+## 6. Lista de validación manual en Supabase (informada como correcta por el usuario)
+1. Operador: lote de 12,000 kg; despacho de 9 kg ⇒ saldo 3,000 kg y «Pendiente: sin evidencia»; segundo despacho de 4 kg rechazado por saldo insuficiente.
+2. Operador: agrega evidencia de texto ⇒ «Pendiente de verificación»; sin botones de verificación.
+3. Administrador: confirma la valorización ⇒ el saldo no cambia.
+4. Administrador: corrige un movimiento sin verificación confirmada ⇒ aparece «Corrige M-…» y se restituye el saldo.
+5. Administrador: crea y desactiva un destino ⇒ ya no se ofrece al registrar movimientos.
+6. Lector: ve la trazabilidad, sin menú «Movimientos» ni botones de acción.

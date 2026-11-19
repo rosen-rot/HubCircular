@@ -5,7 +5,7 @@
 ## Software web
 **Corte 2026-11-18 (Iteración 2 — Trazabilidad):**
 - **Hecho y verificado en PostgreSQL local (ver `docs/22`):** migración 0007 (movimientos, destinos, evidencia por referencia de texto, verificaciones); los cinco movimientos con un único flujo transaccional, bloqueo del lote, saldo nunca negativo, idempotencia, correcciones sin borrado, auditoría y RLS; pantallas `/retiros`, `/destinos` y trazabilidad en el detalle del lote. **225 pruebas Vitest en 18 archivos y 31 E2E pasan** (incl. concurrencia con prueba de mutación y axe-core). Casos de aceptación 3, 4, 6 y 8 de `docs/01` cubiertos.
-- **Pendiente / no verificado:** la migración 0007 **ya está aplicada en Supabase** (ejecutada por el usuario; `db:check` sin errores), pero movimientos, evidencia y verificación no se han probado allí (faltan los destinos DEMO: `db:seed`); Windows nativo; Supabase Auth; API REST de movimientos (no definida en `docs/04`); carga de archivos de evidencia (descartada por el usuario).
+- **Pendiente / no verificado:** la migración 0007 **ya está aplicada en Supabase** (ejecutada por el usuario; `db:check` sin errores), destinos DEMO cargados y movimientos, evidencia y verificación probados a mano por el usuario en Supabase (informado como correcto, sin detalle por paso); Windows nativo; Supabase Auth; API REST de movimientos (no definida en `docs/04`); carga de archivos de evidencia (descartada por el usuario).
 - **Decisiones abiertas con valor provisional:** H-01 (ubicación = zona), H-05 (valorización = verificación sin movimiento), H-07 (sin excepciones de material). Ver ADR-019/019 y `docs/21`.
 - **Estado por iteración de `docs/07`:** Iter. 0 ✅ · Iter. 1 ✅ · Iter. 2 ✅ (local) · Iter. 3–6 ⏳.
 

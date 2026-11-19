@@ -102,6 +102,12 @@
 - Pesajes existentes en Supabase: 0 reales · 6 DEMO · 6 saldos (los pesajes DEMO de la validación manual).
 - Pendiente: cargar los 3 destinos DEMO (`db:seed` con `CONFIRM_REMOTE_SEED`; restablece contraseñas DEMO) y probar `/retiros` en Supabase con los tres roles. Sin probar aún en Supabase: movimientos, evidencia y verificación (solo en PostgreSQL local).
 
+### 2026-11-18 — Seed de destinos y validación manual de la Iteración 2 en Supabase (ejecutadas por el usuario)
+- Agente / rama / commit: usuario en PowerShell y navegador + Claude (Cowork) · `main`.
+- Comandos y resultados (salida real del usuario): `db:seed` con `CONFIRM_REMOTE_SEED` ⇒ «Datos DEMO cargados», sin claves impresas (se usaron `SEED_*_PASSWORD`); `db:check` ⇒ `Movimientos: 0 reales · 0 DEMO · 3 destinos`, sin errores.
+- Validación manual (`npm run dev` contra Supabase, tres roles, lista de seis pasos de `docs/22` §6): el usuario informó «está bien todo». **No se compartieron capturas, salidas por paso ni un segundo `db:check`**, de modo que el detalle (cifras de saldo, estados mostrados, correcciones) queda como informado por el usuario y no verificado por Claude.
+- Pendiente: Iteración 3; decisiones H-01/H-05/H-07 con el Hub; antes de datos reales: CSP/HSTS, gestión de usuarios por UI, copias de seguridad.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:
