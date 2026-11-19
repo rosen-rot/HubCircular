@@ -112,3 +112,7 @@ Pendiente de esta lista: doble envío en Supabase y revisar en el panel que `hc`
 - Resultado informado por el usuario: `npm run db:check:app` correcto y la aplicación funciona con el rol nuevo. **La salida de `db:check:app` no fue compartida con el asistente**; la afirmación se basa en el informe del usuario.
 - Efecto: la aplicación ya no conecta como `postgres`; no puede volver a un rol privilegiado ante una inyección SQL hipotética. El riesgo residual de la sección 5 queda mitigado.
 - La clave de `hc_login` solo existe en `.env.local` y en el gestor de contraseñas del usuario; no figura en el repositorio ni en el chat.
+
+## 11. Aclaración sobre el doble envío (2026-11-18)
+
+El usuario comprobó en la app conectada a Supabase que **no es posible hacer doble clic**: al primer clic el botón se deshabilita y muestra «Registrando». Es la primera barrera (interfaz). La segunda es la clave de idempotencia en la base de datos, que cubre lo que la interfaz no puede evitar (reintento de red, dos pestañas, recarga durante el envío, cliente de API). Esa segunda barrera está probada en PostgreSQL local (10 envíos simultáneos con la misma clave ⇒ 1 pesaje y 1 lote) y **no se ejercitó directamente contra Supabase**; el esquema y la función son idénticos allí (migraciones 0001–0006 aplicadas y `db:check` sin errores).
