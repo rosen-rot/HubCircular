@@ -19,6 +19,7 @@
     "db:reset": "tsx scripts/reset-dev-db.ts",
     "db:backup": "tsx scripts/backup.ts",
     "db:restore-check": "tsx scripts/restore-check.ts",
+    "iot:simulate": "tsx scripts/iot-simulator.ts",
     "test": "vitest run",
     "test:unit": "vitest run tests/unit",
     "test:integration": "vitest run tests/integration",

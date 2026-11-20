@@ -203,7 +203,7 @@ test.describe("lotes y movimientos (listas con panel de detalle)", () => {
 
   test("todas las pantallas del menú: sin violaciones de axe y sin desplazamiento horizontal a 390 px", async ({ page }) => {
     await login(page, "admin");
-    const urls = ["/inicio?origin=demo", "/registro", "/historial", "/lotes?origin=demo", "/movimientos?origin=demo", "/retiros", "/dashboard?origin=demo", "/calendarios", "/contenedores", "/destinos", "/usuarios", "/ayuda", "/cuenta/clave"];
+    const urls = ["/inicio?origin=demo", "/registro", "/historial", "/lotes?origin=demo", "/movimientos?origin=demo", "/retiros", "/dashboard?origin=demo", "/calendarios", "/contenedores", "/destinos", "/dispositivos", "/usuarios", "/ayuda", "/cuenta/clave"];
     for (const vp of [{ width: 1280, height: 900 }, { width: 390, height: 844 }]) {
       await page.setViewportSize(vp);
       for (const u of urls) {

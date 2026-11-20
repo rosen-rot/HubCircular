@@ -21,6 +21,8 @@ export type Permission =
   | "indicators:read"
   | "schedule:manage"
   | "measurement:zero"
+  | "device:read"
+  | "device:manage"
   | "user:manage"
   | "account:password";
 
@@ -40,6 +42,8 @@ const MATRIX: Record<Permission, AppRole[]> = {
   "indicators:read": ["administrador", "operador", "lector"],
   "schedule:manage": ["administrador"],
   "measurement:zero": ["administrador", "operador"],
+  "device:read": ["administrador", "operador", "lector"],
+  "device:manage": ["administrador"],
   "user:manage": ["administrador"],
   "account:password": ["administrador", "operador", "lector"],
 };

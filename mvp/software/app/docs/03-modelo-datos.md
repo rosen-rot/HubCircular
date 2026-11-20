@@ -49,3 +49,8 @@ Opciones: libro mayor append-only de movimientos con consultas y bloqueo transac
 - `hc.measurement_schedules`: calendario de medición por contenedor (`weekdays` ISO 1–7, `start_on`, `end_on` inclusive o nulo, autor, `data_origin`). Solo se puede terminar una vez (`end_on`, `ended_by`); no se edita ni se borra.
 - `hc.measurement_zero_confirmations`: «cero confirmado» (contenedor revisado, sin residuos) único por contenedor y día; inmutable. **No es un pesaje**: no crea lote ni masa.
 - No existe una tabla de ocurrencias: las mediciones esperadas y su estado se **derivan** (`hc.coverage_occurrences`). Reemplaza la `measurement_occurrences` prevista antes. Ver `docs/25`, ADR-026.
+
+## Dispositivos y lecturas (Iteración 4, migración 0011)
+- `hc.devices`: `device_code` único (no es credencial), `container_id` (obligatorio al crear), `token_hash` (SHA-256; **no legible** por `hc_app`), `token_prefix`, `stale_after_minutes`, `data_origin` (heredado del contenedor), `last_seen_at`, `last_reading_id`, `revoked_at/by`, `token_rotated_at`. No se borra (solo se revoca); se administra solo con funciones del administrador.
+- `hc.sensor_readings`: solo anexado; `UNIQUE (device_id, message_id)`; `container_id` copiado al recibir; `measured_at` (dispositivo), `received_at` (servidor), `clock_ok`, `effective_at`; `weight_g`, `distance_mm`, `fill_percent` pueden ser NULL; `quality`; `data_origin`. No incluye `raw_payload` (no se guarda el cuerpo crudo).
+- Previsión original ajustada: `credential_hash` → `token_hash`; `container_id` es obligatorio (no hay dispositivos sin contenedor) y no se guarda historial de reasignaciones (no hay reasignación aún). Ver `docs/27`.

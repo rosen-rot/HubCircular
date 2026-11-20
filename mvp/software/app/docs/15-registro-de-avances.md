@@ -213,6 +213,16 @@
 - Riesgos y límites: sin revisión del Hub/usuario; Windows nativo y Supabase sin probar (no hubo cambios de base de datos).
 - Próxima acción: que el usuario revise el diseño (`npm run dev`); luego Iteración 4 (IoT simulado) y ajustes tras las respuestas del Hub.
 
+### 2026-11-20 — Iteración 4 (núcleo): ingesta IoT simulada, dispositivos, panel y simulador
+- Agente / rama / commit: Claude (Cowork) · `main` (commit al entregar).
+- Objetivo: según lo elegido por el usuario («Núcleo: ingesta + dispositivos + panel + simulador» y contrato de `docs/04` v0.1 «tal cual como v1»). Detalle en `docs/27`; decisión en ADR-029.
+- Cambios y archivos: migración `db/migrations/0011_iot_ingest.sql`; `src/modules/devices/{token,schema,ingest,service,queries}.ts`; `src/app/api/iot/v1/readings/route.ts`; `src/proxy.ts` (`/api/iot/` sin cookie, con cabeceras); `src/lib/errors.ts` (10 códigos nuevos, 429); permisos `device:read`/`device:manage`; `src/app/(app)/dispositivos/{page,actions,device-forms}`; menú «Dispositivos»; glosario (grupo «Sensores y dispositivos»); `scripts/iot-simulator.ts`, `scripts/iot-scenarios.ts`, `npm run iot:simulate`; pruebas `tests/unit/iot.test.ts`, `tests/integration/iot.test.ts`, `tests/e2e/dispositivos.spec.ts`; docs 03, 04 (v1), 07, 09, 14, 15, 18, 27 y README.
+- Comandos y pruebas (resultados reales, Linux + PostgreSQL 16 local): `tsc`, `eslint` y `next build` sin errores; **Vitest 415/415** (34 archivos; +50); **Playwright 90/90** (+7; `/dispositivos` incluido en la prueba de axe y sin desborde a 390 px de las 14 pantallas); simulador por HTTP real contra `next start`: `--scenario=todos` → 53 envíos, 53 como se esperaba, 49 lecturas guardadas y 0 pesajes/lotes/movimientos; `next dev` en 1280 y 390 px: 0 avisos. No se ejecutó `npm audit` (sin dependencias nuevas).
+- Incidencias: axe detectó `label-content-name-mismatch` en «Rotar credencial» (el nombre accesible no comenzaba con el texto visible); corregido. `TRUNCATE` suelto de `sensor_readings` lo frena PostgreSQL por la clave foránea (0A000) y en conjunto/cascada el trigger de solo anexado (HC423); la prueba lo refleja.
+- Decisiones: ver ADR-029 y `docs/27` §4 (token 256 bits con hash SHA-256; `deviceId` debe coincidir con el dueño del token; `Idempotency-Key` opcional e igual a `messageId`; 60 lecturas/min; reloj imposible → hora del servidor; simulador `sim-…` solo en dispositivos DEMO; `sensor_error` solo con nulos).
+- Riesgos y límites: **0011 no aplicada en Supabase** (aprobación pendiente); sin prueba con ESP32/HX711/celda/Wi-Fi ni HTTPS; sin límite por IP ni retención de lecturas; telemetría aún no visible en Inicio/Contenedores; Windows nativo sin probar. El usuario debe ejecutar `npm ci` tras traer los commits del rediseño (agregan `lucide-react`).
+- Próxima acción: que el usuario pruebe `/dispositivos` y el simulador en local (`docs/27` §7); luego revisar el diseño con datos simulados y, con su aprobación, aplicar 0011 en Supabase (respaldo previo); después Iteraciones 5–6.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

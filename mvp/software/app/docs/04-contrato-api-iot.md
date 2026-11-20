@@ -1,6 +1,21 @@
 # 04 · Contrato provisional de integración IoT (ESP32 ↔ HubCircular)
 
-**ESTADO: BORRADOR v0.1, para acordar entre chats de hardware y software; no es una API implementada.** Se acordará la versión antes de escribir firmware que dependa de ella.
+**ESTADO (2026-11-20): v1 implementada y probada con mensajes SIMULADOS en PostgreSQL local** (`docs/27`). No se ha probado con el ESP32 real ni contra Supabase/HTTPS. El contenido original (v0.1) se conserva debajo; la tabla siguiente indica lo que se **implementó exactamente** y las precisiones añadidas. Si el firmware necesita cambios, se publica una v2 en otra ruta (`/api/iot/v2/…`) sin romper la v1.
+
+### Implementación v1 (lo que hace el servidor hoy)
+| Tema | Comportamiento |
+|---|---|
+| Autenticación | `Authorization: Bearer hcd_<43 caracteres>` por dispositivo. En BD solo existe el SHA-256. Se crea, rota y revoca en `/dispositivos` (administrador). Sin cookie de sesión. |
+| `deviceId` | Debe ser el código del dispositivo dueño del token (si no, `403 device_mismatch`). Sin distinguir mayúsculas. |
+| `Idempotency-Key` | **Opcional**; si se envía debe ser igual a `messageId` (si no, 400). La idempotencia real es por `(dispositivo, messageId)`. |
+| Cuerpo | JSON estricto, máximo 2 048 bytes; campos desconocidos → 400. `firmwareVersion` opcional (1–32 caracteres). |
+| Rangos | `weightGrams` entero 0–1 000 000 (puede ser `null`); `distanceMm` entero 0–10 000 (`null` si falla); `fillPercent` 0–100 con hasta 2 decimales (`null` permitido); valores negativos o fuera de rango → 400. |
+| Calidad | `sensor_error` exige peso, distancia y llenado `null`; `uncalibrated` exige peso `null`. Los nulos se guardan como NULL (nunca como cero). |
+| Reloj | `measuredAt` con más de 5 min en el futuro o más de 7 días atrás: se guarda lo informado, `clock_ok=false` y se usa la hora del servidor como momento efectivo. `received_at` siempre es del servidor. |
+| Respuestas | `202 {accepted, readingId, duplicate}` · `400 reading_invalid` · `401 device_token_invalid` (con `WWW-Authenticate: Bearer`) · `403 device_revoked / device_mismatch / simulation_not_allowed` · `409 message_conflict` · `413` · `415` · `429 rate_limited` (más de 60 lecturas nuevas/min por dispositivo; `Retry-After: 60`) · `503` (BD no disponible; `Retry-After: 30`). Cuerpo de error: `{error:{code,message}}`; nunca incluye el token. |
+| Simulador | Firmware `sim-…`: solo aceptado en dispositivos DEMO (`403 simulation_not_allowed` en reales). |
+| Efectos | Solo `hc.sensor_readings` y el último contacto del dispositivo. **Nunca** pesajes, lotes, movimientos ni KPIs. |
+| No implementado | `GET /api/devices/:id/latest` (la última lectura se ve en `/dispositivos`); `POST /api/weighings` y `/api/movements` siguen siendo los únicos que cambian inventario (movimientos solo por la interfaz). |
 
 ## Flujo
 ESP32 / simulador → HTTPS → endpoint autenticado Next.js → validación → `sensor_readings` → estado actual en dashboard. **No** escribe directamente `weighings` ni `movements`.
@@ -64,4 +79,4 @@ El dashboard muestra peso actual y estado de llenado como datos de sensor. **Cap
 ## Simulación
 Ver `docs/09-simulador-iot.md`. Mantener ejemplos de lecturas simuladas etiquetados y aislados de los reportes del piloto real.
 
-> **Estado operativo (18-11-2026):** el ESP32 ejecuta un sketch de prueba por USB; HX711, celda de tres cables y Wi-Fi no tienen integración validada. La API IoT es un contrato de diseño, no un despliegue verificado. Consulta `docs/14-estado-actual-y-handoff.md`.
+> **Estado operativo (20-11-2026):** el ESP32 ejecuta un sketch de prueba por USB; HX711, celda de tres cables y Wi-Fi no tienen integración validada. La API IoT v1 existe y está probada **solo con el simulador** (`docs/27`); no hay despliegue ni HTTPS verificados. Consulta `docs/14-estado-actual-y-handoff.md`.

@@ -1,8 +1,13 @@
 # 14 · Estado real y traspaso entre agentes
 
-**Corte de información:** 18 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
+**Corte de información:** 20 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-20 (Iteración 4, núcleo — ingesta IoT simulada, solo PostgreSQL local — ver `docs/27`, ADR-029):**
+- **Hecho y verificado en Linux + PostgreSQL 16 local:** migración **0011** (`hc.devices`, `hc.sensor_readings` de solo anexado, funciones del administrador para crear/rotar/revocar y `iot_ingest_reading`), endpoint **`POST /api/iot/v1/readings`** (docs/04 implementado como v1: token por dispositivo, idempotencia, 409 si el mensaje fue alterado, 401/403, 400 por rango, 413/415, 429 con `Retry-After`, 503), **`/dispositivos`** (estado En línea / Dato desactualizado / Sin datos aún / Revocado, último contacto, última lectura, alta, rotación y revocación) y el simulador **`npm run iot:simulate`** con los 10 escenarios de `docs/09`. La telemetría **nunca** crea pesajes, lotes ni movimientos ni entra en KPIs (probado). **Vitest 415/415 (34 archivos), Playwright 90/90** (con axe-core; `/dispositivos` a 1280 y 390 px), tsc/eslint/build limpios; simulador por HTTP real: 53/53 envíos como se esperaba; `next dev` sin avisos.
+- **Pendiente / no verificado:** la migración **0011 NO está aplicada en Supabase** (requiere aprobación; procedimiento en `docs/27` §7); **no** se probó con el ESP32, HX711, celda ni Wi-Fi (firmware sin tocar); HTTPS/TLS; límite por IP en el despliegue; política de retención de lecturas; rangos provisionales a validar con la calibración; la telemetría aún no se muestra en Inicio/Contenedores (siguiente paso de diseño); Windows nativo.
+- Siguen abiertas H-01/H-05/H-07; extras aplazados sin cambios. **Estado por iteración de `docs/07`:** Iter. 0–3 ✅ · Iter. 4 ✅ núcleo (local, simulada) · Iter. 5–6 ⏳.
+
 **Corte 2026-11-19 (rediseño completo, fases 1–3 — ver `docs/26` y `docs/15`):**
 - **Hecho y verificado en Linux + PostgreSQL 16 local:** nuevo marco (menú lateral que se pliega en teléfono, barra superior con búsqueda), **`/inicio`** como aterrizaje de todos los roles, **`/lotes`** y **`/movimientos`** con panel de detalle y línea de tiempo, `/registro` con resumen de hoy y últimos registros, y encabezados nuevos en el resto. Solo datos ya registrados (sin cifras estimadas). **Vitest 365/365 (32 archivos), Playwright 83/83** (con axe-core, incluido axe y ausencia de desplazamiento horizontal a 390 px en las 13 pantallas del menú), tsc/eslint/build limpios; `next dev` sin avisos en escritorio y 390 px. Sin cambios de base de datos.
 - **Pendiente:** revisión del usuario/Hub; elementos de las imágenes que dependen de datos que no existen (CO₂, CLP, llenado, mapa, alertas, flujo de retiro con transportista, estados de pesaje), listados con su motivo en `docs/26` §4; Windows nativo.
@@ -57,7 +62,7 @@
 4. Antes de la Iteración 2: conectar y validar Supabase (`docs/19` y lista de `docs/20`, sección 8).
 5. Antes de seguir: aplicar 0007 en Supabase con aprobación del usuario (`docs/22`, sección 5) y repasar con el Hub H-01, H-05 y H-07 (`docs/11`, `docs/21`).
 6. Si se van a usar datos reales: seguir primero `docs/23` §5 (respaldo, aplicar 0008/0009 con aprobación, decidir proveedor de identidad, HTTPS).
-7. (Hecho por el usuario el 2026-11-19: tablero, calendarios y CSV probados en Supabase.) Revisar los textos de `/ayuda` y los iconos (i). Próxima tarea recomendada: Iteración 4 (IoT **simulado**; la telemetría nunca crea captaciones) o, antes, las decisiones H-01/H-05/H-07 con el Hub, de las que dependen las definiciones del tablero.
+7. (Hecho por el usuario el 2026-11-19: tablero, calendarios y CSV probados en Supabase.) Revisar los textos de `/ayuda` y los iconos (i). Iteración 4 (núcleo) hecha en local (`docs/27`). Próximas tareas: revisar el diseño con datos simulados (llenado/estado del sensor en Inicio y Contenedores), aplicar 0011 en Supabase solo con aprobación, Iteraciones 5–6 y las decisiones H-01/H-05/H-07 con el Hub, de las que dependen las definiciones del tablero. Tras actualizar el código ejecutar `npm ci` (el rediseño agregó `lucide-react`).
 
 ## Hardware
 | Componente | Estado conocido | Precaución |
