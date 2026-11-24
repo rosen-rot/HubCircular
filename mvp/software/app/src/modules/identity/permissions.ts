@@ -17,6 +17,7 @@ export type Permission =
   | "weighing:read"
   | "batch:read"
   | "catalog:read"
+  | "catalog:manage"
   | "audit:read"
   | "indicators:read"
   | "schedule:manage"
@@ -38,6 +39,7 @@ const MATRIX: Record<Permission, AppRole[]> = {
   "weighing:read": ["administrador", "operador", "lector"],
   "batch:read": ["administrador", "operador", "lector"],
   "catalog:read": ["administrador", "operador", "lector"],
+  "catalog:manage": ["administrador"],
   "audit:read": ["administrador"],
   "indicators:read": ["administrador", "operador", "lector"],
   "schedule:manage": ["administrador"],

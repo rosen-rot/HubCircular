@@ -38,7 +38,7 @@
 ## 6. Límites y pendientes (no verificado)
 - **No** se probó con el ESP32, el HX711, la celda ni Wi-Fi reales; el firmware no se tocó. Los valores/rangos (`distanceMm` ≤ 10 000, peso ≤ 1 000 kg, `fillPercent` 0–100) son provisionales y deben ajustarse con la calibración.
 - **HTTPS/TLS** no se probó (solo http local); el ESP32 deberá verificar el certificado (`docs/04`, `docs/23`). Limitar por IP/ráfaga en el borde y definir el tamaño máximo definitivo queda para el despliegue.
-- La telemetría **no** aparece aún en «Inicio»/Contenedores (llenado, estado del sensor): se verá en la revisión de diseño con datos simulados y requiere definir capacidad por contenedor.
+- Estado del sensor y llenado en «Inicio»/Contenedores: **hecho el 2026-11-24** con capacidad opcional por contenedor (migración 0012, aún no aplicada en Supabase): ver `docs/28`.
 - Sin retención/archivo de lecturas: a una lectura por minuto serían ~525 000 filas por dispositivo y año; definir política antes del piloto.
 - Windows nativo: el simulador y los scripts de BD se ejecutaron en Windows (§8), pero `npm run verify` y las pruebas siguen sin correrse allí. La revisión visual de `/dispositivos` en Supabase fue informada como correcta por el usuario (§8).
 

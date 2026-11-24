@@ -66,6 +66,7 @@ export type DomainErrorCode =
   | "message_conflict"
   | "reading_invalid"
   | "rate_limited"
+  | "capacity_invalid"
   | "validation"
   | "unexpected";
 
@@ -138,6 +139,7 @@ const MESSAGES: Record<DomainErrorCode, string> = {
   message_conflict: "Ya se recibió ese mensaje con datos distintos.",
   reading_invalid: "La lectura no cumple el contrato (formato, unidades o rango).",
   rate_limited: "Se superó la frecuencia máxima de envío del dispositivo.",
+  capacity_invalid: "La capacidad debe ser un número entero de litros entre 1 y 10000 (o quedar vacía para no mostrar llenado).",
   validation: "Revise los campos marcados.",
   unexpected: "Ocurrió un error inesperado. Intente nuevamente; si persiste, avise a un administrador.",
 };

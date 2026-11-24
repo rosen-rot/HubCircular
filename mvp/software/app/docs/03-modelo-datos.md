@@ -11,7 +11,7 @@ Este es un **modelo conceptual para implementar y migrar**, no SQL aplicado. Cre
 | `zones` | id, building_id, parent_id, name, active | Espacios configurables |
 | `stations` | id, zone_id, code, active | Punto de reciclaje |
 | `materials` | id, name, code, unit='g', active | Categorías validadas |
-| `containers` | id, station_id, material_id, code, tare_g?, active | QR = código, no credencial |
+| `containers` | id, station_id, material_id, code, tare_g?, capacity_l?, active | QR = código, no credencial; `capacity_l` (litros, 0012) solo para interpretar el llenado del sensor |
 | `weighings` | id, container_id, material_id, gross_g, tare_g, net_g, source, occurred_at, created_by, notes, idempotency_key | `source` manual/confirmación-IoT; bruto ≥ tara y neto >0 |
 | `batches` | id, weighing_id, origin_zone_id, material_id, initial_g, created_at | Lote homogéneo por material |
 | `movements` | id, batch_id, type, quantity_g, from_location_id, to_location_id, destination_id?, occurred_at, actor_id, reason?, reference_id? | Eventos/ajustes auditables |

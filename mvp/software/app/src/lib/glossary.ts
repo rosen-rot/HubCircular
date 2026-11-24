@@ -133,6 +133,18 @@ export const GLOSSARY = {
     short: "Una clave larga y única que el equipo envía para identificarse. Se muestra una sola vez al crearla o rotarla.",
     detail: "HubCircular solo guarda una huella de la clave, no la clave. Si se pierde, se rota: se genera una nueva y la anterior deja de funcionar al instante.",
   },
+  capacidad: {
+    group: "sensores",
+    name: "Capacidad del contenedor",
+    short: "Cuántos litros caben en el contenedor. La define un administrador; sin ella no se muestra el llenado.",
+    detail: "Ejemplo: un contenedor de 120 L con el sensor marcando 50 % tiene unos 60 L ocupados. La capacidad no cambia pesajes ni inventario: solo ayuda a leer el dato del sensor.",
+  },
+  llenado: {
+    group: "sensores",
+    name: "Llenado (estimado por el sensor)",
+    short: "Qué tan lleno está el contenedor según el sensor de distancia, en porcentaje. Es una estimación, no kilos.",
+    detail: "Se muestra solo si el contenedor tiene capacidad definida y el sensor envió un dato. Si el sensor está desactualizado se ve el último dato en gris. Si no hay dato se escribe «Sin dato», nunca «0 %».",
+  },
 
   // --- Lotes y movimientos ---
   lote: {

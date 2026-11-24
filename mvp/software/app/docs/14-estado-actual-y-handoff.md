@@ -3,6 +3,10 @@
 **Corte de información:** 24 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-24, tarde (estado del sensor y llenado en Inicio y Contenedores — ver `docs/28`, ADR-030):**
+- **Hecho y verificado en Windows + PostgreSQL 18 local temporal:** migración **0012** (capacidad opcional `capacity_l` por contenedor + `admin_set_container_capacity`, solo administrador, auditada); `/contenedores` con columnas Capacidad, Sensor y Llenado y formulario de capacidad para el administrador; tarjeta «Sensores de contenedores» en `/inicio` que respeta el origen real/DEMO. El llenado solo aparece con capacidad y dato (nunca «0 %» inventado); desactualizado se marca en gris. **Vitest 437/437 (36 archivos)**, **Playwright 97/97** (con axe-core; requiere `DB_SSL=disable` en la terminal en este Windows porque el `.env` trae el TLS de Supabase), tsc/eslint/build limpios, revisión en navegador a escritorio y 375 px sin errores de consola. La telemetría sigue sin crear captación (probado).
+- **Pendiente / no verificado:** **0012 NO aplicada en Supabase** (aprobación del usuario; sin ella la app funciona allí sin llenado y con aviso); `next dev` sin revisar; sin hardware (firmware sin tocar).
+
 **Corte 2026-11-24 (0011 aplicada en Supabase y simulador probado allí — ver `docs/27` §8):**
 - **Hecho por el usuario en Windows, informado con las salidas de los comandos:** respaldo previo (20 tablas, 99 filas, 10 migraciones), ensayo y aplicación de **0011** en Supabase (11 migraciones, 22 tablas con RLS, `db:check` y `db:check:app` sin errores, datos sin cambios) y `npm run iot:simulate -- --scenario=todos` contra la aplicación local conectada a Supabase: **53/53 correctos**; `token_revocado` 1/1 (acepta 401 o 403).
 - **Revisión en pantalla informada por el usuario:** `/dispositivos` mostró «En línea» con unas 49 lecturas en 24 h y «—» en la fila de error de sensor; Inicio y Tablero (DEMO) no cambiaron (6 pesajes); el usuario pulsó «Revocar» antes de `token_revocado`.
@@ -68,7 +72,7 @@
 4. Antes de la Iteración 2: conectar y validar Supabase (`docs/19` y lista de `docs/20`, sección 8).
 5. Antes de seguir: aplicar 0007 en Supabase con aprobación del usuario (`docs/22`, sección 5) y repasar con el Hub H-01, H-05 y H-07 (`docs/11`, `docs/21`).
 6. Si se van a usar datos reales: seguir primero `docs/23` §5 (respaldo, aplicar 0008/0009 con aprobación, decidir proveedor de identidad, HTTPS).
-7. (Hecho por el usuario el 2026-11-19: tablero, calendarios y CSV probados en Supabase.) Revisar los textos de `/ayuda` y los iconos (i). Iteración 4 (núcleo) hecha en local (`docs/27`). Próximas tareas: revisar el diseño con datos simulados (llenado/estado del sensor en Inicio y Contenedores), aplicar 0011 en Supabase solo con aprobación, Iteraciones 5–6 y las decisiones H-01/H-05/H-07 con el Hub, de las que dependen las definiciones del tablero. Tras actualizar el código ejecutar `npm ci` (el rediseño agregó `lucide-react`).
+7. (Hecho por el usuario el 2026-11-19: tablero, calendarios y CSV probados en Supabase.) Revisar los textos de `/ayuda` y los iconos (i). Iteración 4 (núcleo) hecha en local (`docs/27`). Estado del sensor y llenado hechos en local (`docs/28`). Próximas tareas: aplicar 0012 en Supabase solo con aprobación (0011 ya aplicada),  Iteraciones 5–6 y las decisiones H-01/H-05/H-07 con el Hub, de las que dependen las definiciones del tablero. Tras actualizar el código ejecutar `npm ci` (el rediseño agregó `lucide-react`).
 
 ## Hardware
 | Componente | Estado conocido | Precaución |

@@ -2,6 +2,7 @@ import "server-only";
 import { withActor } from "@/lib/db";
 import type { Actor } from "@/modules/identity/types";
 import type { DataOrigin } from "@/modules/indicators/filters";
+import { fillView, type FillView } from "./fill";
 import { deviceState, type DeviceState, type ReadingQuality } from "./schema";
 
 export interface DeviceReading {
@@ -170,6 +171,139 @@ export async function listRecentReadings(actor: Actor, limit = 15): Promise<Rece
         quality: r.quality,
         firmwareVersion: r.firmware_version,
       }));
+    },
+    { readOnly: true },
+  );
+}
+
+// ---------------------------------------------------------------------------------------------------
+// Estado del sensor y llenado por contenedor (Inicio y Contenedores). Datos de SENSOR: no son captación ni KPIs.
+// ---------------------------------------------------------------------------------------------------
+export interface ContainerSensor {
+  containerId: string;
+  code: string;
+  materialName: string;
+  stationName: string;
+  zoneName: string;
+  dataOrigin: DataOrigin;
+  fullyActive: boolean;
+  capacityL: number | null;
+  sensor: {
+    deviceCode: string;
+    state: DeviceState;
+    lastSeenAt: Date | null;
+    staleAfterMinutes: number;
+    last: { effectiveAt: Date; fillPercent: number | null; weightG: number | null; quality: ReadingQuality } | null;
+  } | null;
+  fill: FillView;
+}
+
+export interface ContainerSensorList {
+  /** false si la base aún no tiene la migración 0012 (capacidad): entonces nunca se muestra llenado. */
+  capacitySupported: boolean;
+  items: ContainerSensor[];
+}
+
+interface ContainerSensorRow {
+  id: string;
+  code: string;
+  material_name: string;
+  station_name: string;
+  zone_name: string;
+  data_origin: DataOrigin;
+  fully_active: boolean;
+  capacity_l: number | null;
+  device_code: string | null;
+  revoked_at: Date | null;
+  last_seen_at: Date | null;
+  stale_after_minutes: number | null;
+  r_effective_at: Date | null;
+  r_fill: string | null;
+  r_weight_g: number | null;
+  r_quality: ReadingQuality | null;
+}
+
+/**
+ * Un renglón por contenedor visible (la RLS aplica el ámbito). Si un contenedor tiene varios dispositivos se usa el
+ * vigente (no revocado) con el contacto más reciente. `origin` filtra por origen del contenedor: en Inicio DEMO y real
+ * nunca se mezclan.
+ */
+export async function listContainerSensors(
+  actor: Actor,
+  opts: { origin?: DataOrigin; onlyActive?: boolean; now?: Date } = {},
+): Promise<ContainerSensorList> {
+  const now = opts.now ?? new Date();
+  return withActor(
+    actor.userId,
+    async (db) => {
+      // Degradación segura: sin la migración 0012 la columna no existe y la vista sigue funcionando, sin llenado.
+      const cap = await db.query<{ ok: boolean }>(
+        `select exists (select 1 from pg_attribute
+                         where attrelid = 'hc.containers'::regclass and attname = 'capacity_l' and not attisdropped) as ok`,
+      );
+      const capacitySupported = cap.rows[0]?.ok === true;
+      const where: string[] = [];
+      const params: unknown[] = [];
+      if (opts.origin) {
+        params.push(opts.origin);
+        where.push(`c.data_origin = $${params.length}`);
+      }
+      if (opts.onlyActive) where.push("c.active and s.active and z.active and m.active");
+      const { rows } = await db.query<ContainerSensorRow>(
+        `select c.id, c.code, m.name as material_name, s.name as station_name, z.name as zone_name, c.data_origin,
+                (c.active and s.active and z.active and m.active) as fully_active,
+                ${capacitySupported ? "c.capacity_l" : "null::int"} as capacity_l,
+                d.device_code, d.revoked_at, d.last_seen_at, d.stale_after_minutes,
+                r.effective_at as r_effective_at, r.fill_percent::text as r_fill, r.weight_g as r_weight_g, r.quality as r_quality
+           from hc.containers c
+           join hc.stations s on s.id = c.station_id
+           join hc.zones z on z.id = s.zone_id
+           join hc.materials m on m.id = c.material_id
+           left join lateral (
+             select x.device_code, x.revoked_at, x.last_seen_at, x.stale_after_minutes, x.last_reading_id
+               from hc.devices x
+              where x.container_id = c.id
+              order by (x.revoked_at is not null), x.last_seen_at desc nulls last, x.created_at desc
+              limit 1
+           ) d on true
+           left join hc.sensor_readings r on r.id = d.last_reading_id
+          ${where.length ? `where ${where.join(" and ")}` : ""}
+          order by z.name, s.name, c.code`,
+        params,
+      );
+      const items = rows.map((r): ContainerSensor => {
+        const stale = r.stale_after_minutes ?? 15;
+        const sensor = r.device_code
+          ? {
+              deviceCode: r.device_code,
+              state: deviceState({ revokedAt: r.revoked_at, lastSeenAt: r.last_seen_at, staleAfterMinutes: stale }, now),
+              lastSeenAt: r.last_seen_at,
+              staleAfterMinutes: stale,
+              last:
+                r.r_effective_at && r.r_quality
+                  ? {
+                      effectiveAt: r.r_effective_at,
+                      fillPercent: r.r_fill === null ? null : Number(r.r_fill),
+                      weightG: r.r_weight_g,
+                      quality: r.r_quality,
+                    }
+                  : null,
+            }
+          : null;
+        return {
+          containerId: r.id,
+          code: r.code,
+          materialName: r.material_name,
+          stationName: r.station_name,
+          zoneName: r.zone_name,
+          dataOrigin: r.data_origin,
+          fullyActive: r.fully_active,
+          capacityL: r.capacity_l,
+          sensor,
+          fill: fillView({ capacityL: r.capacity_l, sensor }),
+        };
+      });
+      return { capacitySupported, items };
     },
     { readOnly: true },
   );
