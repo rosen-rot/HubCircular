@@ -1,11 +1,16 @@
 # 14 · Estado real y traspaso entre agentes
 
-**Corte de información:** 20 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
+**Corte de información:** 24 de noviembre de 2026, Chile. Este documento distingue hechos verificados, pendientes y supuestos. Actualizar fecha cuando cambie el estado.
 
 ## Software web
+**Corte 2026-11-24 (0011 aplicada en Supabase y simulador probado allí — ver `docs/27` §8):**
+- **Hecho por el usuario en Windows, informado con las salidas de los comandos:** respaldo previo (20 tablas, 99 filas, 10 migraciones), ensayo y aplicación de **0011** en Supabase (11 migraciones, 22 tablas con RLS, `db:check` y `db:check:app` sin errores, datos sin cambios) y `npm run iot:simulate -- --scenario=todos` contra la aplicación local conectada a Supabase: **53/53 correctos**; `token_revocado` 1/1 (acepta 401 o 403).
+- **No informado / pendiente:** inspección visual de `/dispositivos` en Supabase y comprobación de que Inicio/Tablero no cambian; «Dato desactualizado» tras la tolerancia; `db:restore-check` con el respaldo del 2026-11-24; ESP32/HX711/celda/Wi-Fi reales; HTTPS; límite por IP; retención de lecturas. El respaldo exigió definir `BACKUP_DIR`, `PG_DUMP_PATH` y `PG_RESTORE_PATH` en `.env.local`. El proyecto gratuito puede pausarse por inactividad (un intento falló con «tenant/user not found»).
+- La base de Supabase ahora contiene el modelo de dispositivos; las lecturas simuladas de la prueba (49 con el dispositivo DEMO) quedaron guardadas como datos DEMO.
+
 **Corte 2026-11-20 (Iteración 4, núcleo — ingesta IoT simulada, solo PostgreSQL local — ver `docs/27`, ADR-029):**
 - **Hecho y verificado en Linux + PostgreSQL 16 local:** migración **0011** (`hc.devices`, `hc.sensor_readings` de solo anexado, funciones del administrador para crear/rotar/revocar y `iot_ingest_reading`), endpoint **`POST /api/iot/v1/readings`** (docs/04 implementado como v1: token por dispositivo, idempotencia, 409 si el mensaje fue alterado, 401/403, 400 por rango, 413/415, 429 con `Retry-After`, 503), **`/dispositivos`** (estado En línea / Dato desactualizado / Sin datos aún / Revocado, último contacto, última lectura, alta, rotación y revocación) y el simulador **`npm run iot:simulate`** con los 10 escenarios de `docs/09`. La telemetría **nunca** crea pesajes, lotes ni movimientos ni entra en KPIs (probado). **Vitest 415/415 (34 archivos), Playwright 90/90** (con axe-core; `/dispositivos` a 1280 y 390 px), tsc/eslint/build limpios; simulador por HTTP real: 53/53 envíos como se esperaba; `next dev` sin avisos.
-- **Pendiente / no verificado:** la migración **0011 NO está aplicada en Supabase** (requiere aprobación; procedimiento en `docs/27` §7); **no** se probó con el ESP32, HX711, celda ni Wi-Fi (firmware sin tocar); HTTPS/TLS; límite por IP en el despliegue; política de retención de lecturas; rangos provisionales a validar con la calibración; la telemetría aún no se muestra en Inicio/Contenedores (siguiente paso de diseño); Windows nativo.
+- **Pendiente / no verificado:** la migración 0011 **ya se aplicó en Supabase el 2026-11-24** (corte superior); **no** se probó con el ESP32, HX711, celda ni Wi-Fi (firmware sin tocar); HTTPS/TLS; límite por IP en el despliegue; política de retención de lecturas; rangos provisionales a validar con la calibración; la telemetría aún no se muestra en Inicio/Contenedores (siguiente paso de diseño); Windows nativo.
 - Siguen abiertas H-01/H-05/H-07; extras aplazados sin cambios. **Estado por iteración de `docs/07`:** Iter. 0–3 ✅ · Iter. 4 ✅ núcleo (local, simulada) · Iter. 5–6 ⏳.
 
 **Corte 2026-11-19 (rediseño completo, fases 1–3 — ver `docs/26` y `docs/15`):**

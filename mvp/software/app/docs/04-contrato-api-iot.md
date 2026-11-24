@@ -1,6 +1,6 @@
 # 04 · Contrato provisional de integración IoT (ESP32 ↔ HubCircular)
 
-**ESTADO (2026-11-20): v1 implementada y probada con mensajes SIMULADOS en PostgreSQL local** (`docs/27`). No se ha probado con el ESP32 real ni contra Supabase/HTTPS. El contenido original (v0.1) se conserva debajo; la tabla siguiente indica lo que se **implementó exactamente** y las precisiones añadidas. Si el firmware necesita cambios, se publica una v2 en otra ruta (`/api/iot/v2/…`) sin romper la v1.
+**ESTADO (2026-11-24): v1 implementada y probada con mensajes SIMULADOS en PostgreSQL local y contra Supabase (simulador 53/53)** (`docs/27`). No se ha probado con el ESP32 real ni con HTTPS. El contenido original (v0.1) se conserva debajo; la tabla siguiente indica lo que se **implementó exactamente** y las precisiones añadidas. Si el firmware necesita cambios, se publica una v2 en otra ruta (`/api/iot/v2/…`) sin romper la v1.
 
 ### Implementación v1 (lo que hace el servidor hoy)
 | Tema | Comportamiento |

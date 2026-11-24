@@ -1,6 +1,6 @@
 # 27 · Iteración 4 — Ingesta de telemetría IoT simulada (núcleo)
 
-**Estado (2026-11-20):** implementado y verificado en Linux + PostgreSQL 16 **local**. La migración **0011 NO está aplicada en Supabase** (requiere aprobación explícita del usuario; ver §7). No se probó con el ESP32, el HX711 ni la celda: esta iteración valida el **software** con mensajes simulados. Contrato: `docs/04` v1.
+**Estado (2026-11-24):** implementado y verificado en Linux + PostgreSQL 16 **local**; la migración **0011 fue aplicada en Supabase por el usuario el 2026-11-24** (con respaldo previo) y el simulador se ejecutó allí (§8). No se probó con el ESP32, el HX711 ni la celda: esta iteración valida el **software** con mensajes simulados. Contrato: `docs/04` v1.
 
 ## 1. Alcance acordado con el usuario
 «Núcleo: ingesta + dispositivos + panel + simulador», con el contrato de `docs/04` v0.1 implementado **tal cual como v1** (si el hardware pide cambios, se versiona después). Quedan fuera (siguen aplazados): reglas de oportunidad/alertas (Iteración 5), uso de la telemetría en el tablero o en «Inicio» (relleno/ocupación), consulta `GET /api/devices/:id/latest`, edición de dispositivos y reasignación de contenedor.
@@ -40,12 +40,12 @@
 - **HTTPS/TLS** no se probó (solo http local); el ESP32 deberá verificar el certificado (`docs/04`, `docs/23`). Limitar por IP/ráfaga en el borde y definir el tamaño máximo definitivo queda para el despliegue.
 - La telemetría **no** aparece aún en «Inicio»/Contenedores (llenado, estado del sensor): se verá en la revisión de diseño con datos simulados y requiere definir capacidad por contenedor.
 - Sin retención/archivo de lecturas: a una lectura por minuto serían ~525 000 filas por dispositivo y año; definir política antes del piloto.
-- No probado en Windows nativo ni contra Supabase (la migración 0011 no se aplicó allí).
+- Windows nativo: el simulador y los scripts de BD se ejecutaron en Windows (§8), pero `npm run verify` y las pruebas siguen sin correrse allí. La revisión visual de `/dispositivos` en Supabase no fue informada (ver §8).
 
 ## 7. Cómo aplicarla y probarla
 **Local** (pruebas): se aplica sola en las pruebas; para la BD de desarrollo local use `npm run db:migrate`.
 
-**Supabase (solo con aprobación del usuario):** respaldo previo (`npm run db:backup`; el plan gratuito no tiene copias), `npm run db:migrate -- --dry-run` (debe listar solo `0011_iot_ingest.sql`) y luego, en PowerShell, `CONFIRM_REMOTE_MIGRATION=<host>` + `npm run db:migrate`. Después `npm run db:check` y `npm run db:check:app`.
+**Supabase (solo con aprobación del usuario; aplicado el 2026-11-24, ver §8):** respaldo previo (`npm run db:backup`; el plan gratuito no tiene copias), `npm run db:migrate -- --dry-run` (debe listar solo `0011_iot_ingest.sql`) y luego, en PowerShell, `CONFIRM_REMOTE_MIGRATION=<host>` + `npm run db:migrate`. Después `npm run db:check` y `npm run db:check:app`.
 
 **Probar el simulador a mano:**
 1. `npm run dev`, ingrese como administrador y abra **Dispositivos**.
@@ -53,3 +53,11 @@
 3. En `.env.local` agregue `IOT_DEVICE_TOKEN=<credencial>` (y opcional `IOT_DEVICE_ID`, `IOT_BASE_URL`; **no** suba ese archivo ni pegue la credencial en el chat).
 4. `npm run iot:simulate -- --list`, luego `npm run iot:simulate -- --scenario=todos` y recargue **Dispositivos**.
 5. Para «sin conexión»: espere los minutos de tolerancia y recargue (aparece «Dato desactualizado»). Para «token revocado»: revoque o rote el dispositivo y ejecute `--scenario=token_revocado`.
+
+## 8. Aplicación y prueba en Supabase (2026-11-24, ejecutadas por el usuario en Windows; salidas informadas por el usuario)
+- **Respaldo previo** (`npm run db:backup`, `pg_dump` 18.2 contra un servidor PostgreSQL 17.11): 177 388 bytes, 310 objetos, 20 tablas, 99 filas, 10 migraciones; guardado fuera del repositorio. Incidencias de entorno resueltas: faltaban `BACKUP_DIR`, `PG_DUMP_PATH` y `PG_RESTORE_PATH` (el script no encontraba `pg_dump` ni `pg_restore`; no es un defecto del código), y un intento falló con «tenant/user not found» del pooler (proyecto gratuito probablemente pausado; luego conectó sin cambios de configuración). **No** se ejecutó `db:restore-check` con este respaldo.
+- **Ensayo** (`db:migrate -- --dry-run`): 10 aplicadas, 1 pendiente (`0011_iot_ingest.sql`), sin conflictos. **Aplicación** (`CONFIRM_REMOTE_MIGRATION` con el host del pooler): «Migraciones aplicadas: 0011_iot_ingest.sql».
+- **`db:check`:** sin errores; 11 migraciones y ninguna pendiente; esquema `hc` con **22 tablas**, todas con RLS; `anon`/`authenticated` sin privilegios; `SET LOCAL ROLE hc_app` funciona; saldos no negativos; datos sin cambios (6 pesajes DEMO, 1 movimiento DEMO, 0 reales). **`db:check:app`** (rol `hc_login`): sin errores ni avisos; solo puede cambiar a `hc_app`, que solo lee tablas de negocio.
+- **Simulador contra la aplicación local conectada a Supabase** (`npm run dev` + `iot:simulate -- --scenario=todos`): **53 envíos, 53 correctos, 0 diferencias** (vacío, depósito, estable repetido, retiro parcial, duplicado con `duplicate:true`, alterado 409, sensor inválido, fuera de rango 400, token desconocido 401, sin conexión). `--scenario=token_revocado`: 1 envío, 1 como se esperaba (el escenario acepta 401 o 403, por lo que **no distingue** si el dispositivo estaba revocado o rotado; el usuario no informó qué hizo).
+- **No informado / no verificado:** la inspección visual de `/dispositivos` (estado «En línea», conteo de lecturas, «—» en el error de sensor), que Inicio y Tablero no cambiaron, y el estado «Dato desactualizado» tras la tolerancia. Aunque sí se verificaron en local (§5), no consta en Supabase. Sigue sin haber pruebas con el ESP32/HX711, HTTPS ni retención de lecturas.
+
