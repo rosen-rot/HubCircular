@@ -228,8 +228,9 @@
 - Objetivo: aplicar 0011 en Supabase con respaldo previo y probar el simulador (`docs/27` §7–§8).
 - Evidencia (salidas informadas por el usuario): `db:backup` → 177 388 bytes, 310 objetos, 20 tablas, 99 filas, 10 migraciones (`pg_dump` 18.2, servidor 17.11); `db:migrate --dry-run` → 1 pendiente (0011), sin conflictos; `db:migrate` con `CONFIRM_REMOTE_MIGRATION` → «Migraciones aplicadas: 0011_iot_ingest.sql»; `db:check` → sin errores, 11 migraciones, `hc` con 22 tablas y RLS en todas, 6 pesajes DEMO / 1 movimiento DEMO / 0 reales; `db:check:app` → sin errores ni avisos; `iot:simulate --scenario=todos` → 53 envíos, 53 correctos; `--scenario=token_revocado` → 1/1.
 - Incidencias (de entorno, no del código): `BACKUP_DIR` sin definir; `pg_dump` y `pg_restore` fuera del PATH (se definieron `PG_DUMP_PATH` y `PG_RESTORE_PATH`); un intento falló con «tenant/user not found» del pooler (proyecto gratuito posiblemente pausado por inactividad).
-- Riesgos y límites: no se informó la revisión visual de `/dispositivos` en Supabase ni que Inicio/Tablero no cambian; `token_revocado` acepta 401 o 403 y no prueba por sí solo la revocación; sin `db:restore-check` con este respaldo; sin ESP32/HX711/HTTPS; las 49 lecturas simuladas quedaron en la BD de Supabase (DEMO).
-- Próxima acción: que el usuario confirme lo visto en `/dispositivos`; revisión de diseño con datos simulados (llenado/estado del sensor); Iteraciones 5–6.
+- Revisión en pantalla (informada por el usuario, sin capturas): `/dispositivos` «En línea» con ~49 lecturas en 24 h; error de sensor con «—»; Inicio y Tablero DEMO sin cambios (6 pesajes); antes de `token_revocado` pulsó «Revocar».
+- Riesgos y límites: «Dato desactualizado» no se probó en Supabase (sí en local); `token_revocado` acepta 401 o 403; sin `db:restore-check` con este respaldo; sin ESP32/HX711/HTTPS; las 49 lecturas simuladas quedaron en la BD de Supabase (DEMO).
+- Próxima acción: revisión de diseño con datos simulados (llenado/estado del sensor); Iteraciones 5–6.
 
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
