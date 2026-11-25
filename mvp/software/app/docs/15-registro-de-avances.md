@@ -251,6 +251,7 @@
 - Incidencias: una prueba unitaria propia estaba mal planteada (esperaba sin caso con cobertura 67 %); se corrigió la prueba, no la regla.
 - Decisiones tomadas: ADR-031.
 - Riesgos, bloqueos y cambios no confirmados: umbrales sin validar con el Hub; la prueba con usuarios reales (CE-03) no se ha hecho; la regla de contaminación depende de que se marque la casilla; los datos DEMO de la semilla no generan casos por sí solos.
+- Revisión en pantalla informada por el usuario (2026-11-24, sin capturas ni detalle): con `npm run dev` en la rama `feat/estado-sensor-llenado` contra Supabase (sin 0012) «aparece todo y está bien» (menú Oportunidades, tarjetas nuevas de Inicio, columna Sensor y aviso de 0012 en Contenedores, guía en Ayuda).
 - Próxima acción: prueba con usuarios según `docs/29` §5; acordar umbrales; aplicar 0012 en Supabase con aprobación; luego Iteración 6 o publicar la web.
 
 ## Plantilla para nuevos avances
