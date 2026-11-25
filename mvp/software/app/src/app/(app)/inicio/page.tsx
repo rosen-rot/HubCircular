@@ -4,6 +4,7 @@ import { CalendarCheck, House, Package, Recycle, Scale, TrendingDown, TrendingUp
 import { Forbidden } from "@/components/forbidden";
 import { InfoTip } from "@/components/help/info-tip";
 import { MaterialsDonut } from "@/components/inicio/materials-donut";
+import { OpportunitiesCard } from "@/components/oportunidades/opportunities-card";
 import { SensorsCard } from "@/components/sensores/sensors-card";
 import { TrendChart, type TrendMetric } from "@/components/inicio/trend-chart";
 import { Alert, Card, DemoBadge } from "@/components/ui/card";
@@ -12,6 +13,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { cn } from "@/lib/utils";
 import { formatSantiago } from "@/lib/time";
 import { listContainerSensors } from "@/modules/devices/queries";
+import { getOpportunities } from "@/modules/opportunities/queries";
 import { requireActorWith } from "@/modules/identity/guards";
 import { can } from "@/modules/identity/permissions";
 import { HOME_PERIODS, parseHomeFilters, pctChange } from "@/modules/inicio/filters";
@@ -50,9 +52,10 @@ export default async function InicioPage({ searchParams }: { searchParams: Promi
   const now = new Date();
   const showSensors = can(actor, "device:read");
   // Mismo origen que el resto de Inicio: DEMO y real nunca se mezclan.
-  const [h, sensors] = await Promise.all([
+  const [h, sensors, opportunities] = await Promise.all([
     getHome(actor, f),
     showSensors ? listContainerSensors(actor, { origin: f.origin, onlyActive: true, now }) : Promise.resolve(null),
+    getOpportunities(actor, f.origin, now),
   ]);
   const demo = f.origin === "demo";
   const noDataAtAll = !demo && !h.hasRealData;
@@ -211,6 +214,8 @@ export default async function InicioPage({ searchParams }: { searchParams: Promi
           )}
         </Card>
       </div>
+
+      <OpportunitiesCard report={opportunities} demo={demo} />
 
       {sensors ? <SensorsCard data={sensors} demo={demo} now={now} demoHref={`/inicio?${q({ origin: "demo" })}`} /> : null}
     </div>

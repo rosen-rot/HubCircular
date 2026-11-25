@@ -243,6 +243,16 @@
 - Confirmado por el usuario (2026-11-24, salida pegada): `npm run test:e2e` en su PowerShell → **97 passed (4.4m)**, contra un clúster PostgreSQL 18 solo para pruebas en `D:\PostgresPruebas\hubcircular` (puerto 54329, sin clave, solo 127.0.0.1) y `DB_SSL=disable`. Intentos previos fallaron por entorno: puerto 54329 sin servidor y luego clave incorrecta del `postgres` del servicio instalado (5432). Procedimiento en `docs/28` §5.
 - Próxima acción: que el usuario apruebe (o no) aplicar 0012 en Supabase con respaldo previo; Iteraciones 5–6.
 
+### 2026-11-24 — Iteración 5: oportunidades de mejora y guía del operador
+- Agente / rama / commit: Claude Code (escritorio, Windows) · rama `feat/estado-sensor-llenado` (commit sobre a9dcfb3).
+- Objetivo: Iteración 5 de `docs/07`, elegida por el usuario. Alcance elegido: las tres reglas de `docs/06` con umbrales fijos en el código (provisionales). Detalle en `docs/29`.
+- Cambios y archivos: `src/modules/opportunities/{rules,queries}.ts`; `src/app/(app)/oportunidades/page.tsx`; `src/components/oportunidades/opportunities-card.tsx` e Inicio; menú «Oportunidades» (`app-shell.tsx`, `side-nav.tsx`); guía rápida en `src/app/(app)/ayuda/page.tsx`; glosario «oportunidad»; pruebas `tests/unit/opportunities.test.ts`, `tests/integration/opportunities.test.ts`, `tests/e2e/oportunidades.spec.ts`; docs 14, 18 (ADR-031), 29 y README. Sin migración.
+- Comandos y pruebas (resultados reales, Windows 11, PostgreSQL 18 de pruebas en el puerto 54329): `tsc` y `eslint` sin errores (1 aviso preexistente); `next build` correcto; **Vitest 452/452 (38 archivos)**; **Playwright 103/103** (97 previas + 6 de `tests/e2e/oportunidades.spec.ts`: caso DEMO con umbral, observación, sugerencia y evidencia que abre el lote; «Reales» sin casos DEMO; resumen en Inicio por origen; lector con acceso; guía del operador en Ayuda; axe-core a 1280 y 390 px sin desborde), con `DB_SSL=disable` contra el PostgreSQL de pruebas del puerto 54329. Una corrida anterior tuvo 1 fallo de la prueba (no de la regla): esperaba una antigüedad de 2 cifras y otras pruebas dejan un lote de 259 días; se ajustó la prueba.
+- Incidencias: una prueba unitaria propia estaba mal planteada (esperaba sin caso con cobertura 67 %); se corrigió la prueba, no la regla.
+- Decisiones tomadas: ADR-031.
+- Riesgos, bloqueos y cambios no confirmados: umbrales sin validar con el Hub; la prueba con usuarios reales (CE-03) no se ha hecho; la regla de contaminación depende de que se marque la casilla; los datos DEMO de la semilla no generan casos por sí solos.
+- Próxima acción: prueba con usuarios según `docs/29` §5; acordar umbrales; aplicar 0012 en Supabase con aprobación; luego Iteración 6 o publicar la web.
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

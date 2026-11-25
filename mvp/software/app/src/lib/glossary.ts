@@ -241,6 +241,12 @@ export const GLOSSARY = {
   },
 
   // --- Tablero ---
+  oportunidad: {
+    group: "tablero",
+    name: "Oportunidad de mejora",
+    short: "Un caso que una regla simple encontró en los datos y que conviene revisar. Muestra el umbral, lo observado y los registros que lo respaldan.",
+    detail: "Ejemplo: 25 kg de cartón llevan 20 días en una zona; la regla sugiere revisar la frecuencia de retiro. Es una sugerencia, no una causa: una fluctuación aislada no prueba nada. Los umbrales son provisionales hasta que el Hub los acuerde.",
+  },
   reciclable_captado: {
     group: "tablero",
     name: "Reciclable captado",

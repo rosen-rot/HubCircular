@@ -45,6 +45,7 @@
 | `docs/26-rediseno-de-la-plataforma.md` | Rediseño de la interfaz (imágenes del Hub): qué se construyó, qué no y por qué, y verificación |
 | `docs/27-iteracion-4-ingesta-iot.md` | Iteración 4 (núcleo): ingesta IoT simulada, dispositivos, simulador, verificación, límites y cómo aplicarla/probarla |
 | `docs/28-estado-del-sensor-y-llenado.md` | Estado del sensor y llenado (solo con capacidad) en Inicio y Contenedores; migración 0012 |
+| `docs/29-iteracion-5-oportunidades-y-usabilidad.md` | Iteración 5: reglas de oportunidad de mejora, guía del operador y pauta de prueba con usuarios |
 | `docs/23-seguridad-previa-a-datos-reales.md` | Cabeceras, usuarios, Supabase Auth y lista de control antes de datos reales |
 | `docs/24-respaldos-y-restauracion.md` | Plan de respaldos, restauración y prueba de restauración |
 | `diseno/HubCircular_Dashboard_MVP.png` | Maqueta conceptual, no web construida |
