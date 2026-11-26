@@ -3,6 +3,7 @@
 import { useActionState, useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { InfoTip, Term } from "@/components/help/info-tip";
+import { SensorWeightButton } from "@/components/iot/sensor-weight-button";
 import { Alert, DemoBadge } from "@/components/ui/card";
 import { Field, Input, Select, Textarea, describedBy } from "@/components/ui/field";
 import { formatGrams, formatKg, parseKgToGrams, previewNetGrams } from "@/modules/weighing/units";
@@ -147,6 +148,16 @@ export function WeighingForm({
           />
         </Field>
       </div>
+
+      {container ? (
+        <SensorWeightButton
+          containerCode={container.code}
+          onWeight={(grams, source) => {
+            setGross(kgInput(grams));
+            setNotes((prev) => (prev.includes("Peso bruto leído de") ? prev : `${prev ? `${prev} ` : ""}Peso bruto leído de ${source}.`.slice(0, 500)));
+          }}
+        />
+      ) : null}
 
       <div className="rounded-lg border border-slate-300 bg-white p-4" aria-live="polite" data-testid="net-preview">
         <div className="text-sm text-slate-700">

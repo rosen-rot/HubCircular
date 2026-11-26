@@ -213,6 +213,15 @@
 - Riesgos y límites: sin revisión del Hub/usuario; Windows nativo y Supabase sin probar (no hubo cambios de base de datos).
 - Próxima acción: que el usuario revise el diseño (`npm run dev`); luego Iteración 4 (IoT simulado) y ajustes tras las respuestas del Hub.
 
+## 2026-11-26 — Iteración 4: integración ESP32 (ingesta IoT, pantalla Sensores, firmware)
+- Agente / rama / commit: Claude Code (a pedido de Débora Cáceres) / `software/app`.
+- Objetivo: que el ESP32 envíe lecturas a la plataforma desplegada en internet. El hardware se está montando y se probará después.
+- Cambios y archivos: migración `0011_iot_devices_readings.sql`; `src/modules/iot/` (schema, service, queries); `POST /api/iot/v1/readings`; `GET /api/iot/v1/containers/[code]/latest`; `proxy.ts` (deja pasar `/api/iot/` sin cookie); pantalla `/sensores` y entrada en el menú; botón «Leer peso de la balanza» en `/registro`; nuevos códigos de error en `errors.ts`; scripts `iot:device` e `iot:simulate`; pruebas `tests/unit/iot-schema.test.ts` y `tests/integration/iot.test.ts`; `docs/04` (contrato v1) y `docs/27` (guía); firmware en `mvp/hardware/firmware/`.
+- Comandos y pruebas (resultados reales, Windows + PostgreSQL 18 local): `tsc --noEmit` sin errores; `eslint src scripts` sin avisos; `vitest run` **389/389 (34 archivos)**, de las cuales 24 son nuevas de IoT. `next build` OK. Prueba HTTP de punta a punta con `next start` sobre una base local migrada (0001–0011) y con datos DEMO: `npm run iot:simulate -- --checks` → **11/11 casos con la respuesta esperada** (202, 200 duplicado, 409, 400, 401, 403). Sin sesión, `/api/iot/v1/containers/…/latest` → 401 y `/sensores` → redirección al login. No se ejecutaron Playwright, la migración en Supabase ni pruebas con el ESP32. El firmware **no se compiló** (no hay Arduino IDE en este equipo).
+- Decisiones tomadas: se adopta el contrato de `docs/04` (Bearer por dispositivo y `messageId`) en lugar del borrador `/api/lecturas`. `weightGrams` es el peso **bruto** (cero de la balanza = plataforma vacía). La telemetría nunca crea pesajes: el operador confirma con el bruto precargado (queda `source='manual'` y una nota en Observaciones). Alta de dispositivos por script, no por interfaz. HTTPS validado con las raíces GTS Root R1 e ISRG Root X1.
+- Riesgos, bloqueos y cambios no confirmados: compilación y prueba real del firmware; aplicar `0011` en Supabase (con respaldo); despliegue HTTPS aún inexistente; E2E de `/sensores` pendientes.
+- Próxima acción: seguir `docs/27` §2 (migrar, registrar dispositivos, `iot:simulate -- --checks`, calibrar, cargar el firmware).
+
 ## Plantilla para nuevos avances
 ### AAAA-MM-DD — [Título]
 - Agente / rama / commit:

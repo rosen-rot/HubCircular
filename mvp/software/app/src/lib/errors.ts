@@ -56,6 +56,11 @@ export type DomainErrorCode =
   | "not_expected_today"
   | "weighing_exists"
   | "immutable_record"
+  | "device_unauthenticated"
+  | "device_inactive"
+  | "device_mismatch"
+  | "reading_conflict"
+  | "rate_limited"
   | "validation"
   | "unexpected";
 
@@ -118,6 +123,11 @@ const MESSAGES: Record<DomainErrorCode, string> = {
   not_expected_today: "Hoy no hay una medición esperada para este contenedor, por lo que no se puede confirmar «cero».",
   weighing_exists: "Ya hay un pesaje de este contenedor hoy; no corresponde confirmar «cero».",
   immutable_record: "Este registro no puede modificarse ni eliminarse.",
+  device_unauthenticated: "Token de dispositivo ausente, inválido o revocado.",
+  device_inactive: "El dispositivo está desactivado y no puede enviar lecturas.",
+  device_mismatch: "El token no corresponde al deviceId indicado en el mensaje.",
+  reading_conflict: "Ya existe una lectura con ese messageId y contenido distinto.",
+  rate_limited: "Demasiadas lecturas en poco tiempo. Reintente más tarde.",
   validation: "Revise los campos marcados.",
   unexpected: "Ocurrió un error inesperado. Intente nuevamente; si persiste, avise a un administrador.",
 };
@@ -141,9 +151,12 @@ export class DomainError extends Error {
 function defaultStatus(code: DomainErrorCode): number {
   switch (code) {
     case "unauthenticated":
+    case "device_unauthenticated":
       return 401;
     case "forbidden":
     case "password_change_required":
+    case "device_inactive":
+    case "device_mismatch":
       return 403;
     case "container_not_found":
     case "batch_not_found":
@@ -162,7 +175,10 @@ function defaultStatus(code: DomainErrorCode): number {
     case "auth_external":
     case "schedule_overlap":
     case "schedule_already_ended":
+    case "reading_conflict":
       return 409;
+    case "rate_limited":
+      return 429;
     case "unexpected":
       return 500;
     default:

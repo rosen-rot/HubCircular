@@ -1,7 +1,8 @@
 # 4. Firmware del ESP32
 
-**Entorno:** Arduino IDE, C/C++.  
-**Bibliotecas:** `HX711` (bogde), `WiFi`, `HTTPClient` y `Preferences` (incluidas en el núcleo ESP32 de Arduino).
+**Código:** [`firmware/`](firmware/) · **Estado (26-11-2026):** escrito y revisado, **todavía no compilado ni probado en el ESP32**.  
+**Entorno:** Arduino IDE, placa «ESP32 Dev Module» (núcleo esp32 de Espressif 3.x), C/C++.  
+**Bibliotecas:** «HX711 Arduino Library» (Bogdan Necula), que se instala desde el Gestor de bibliotecas. `WiFi`, `WiFiClientSecure`, `HTTPClient` y `Preferences` vienen incluidas en el núcleo ESP32.
 
 ## 4.1 Ciclo principal
 
@@ -10,8 +11,7 @@ cada 500 ms:
   1. Leer el peso (promedio de 10 lecturas del HX711)
   2. Guardar en una ventana de las últimas 4 lecturas (2 s)
   3. ¿Estable? (máx − mín de la ventana < 20 g)
-       └─ no → seguir esperando
-  4. ¿Cambió respecto al último peso enviado (≥ 50 g)
+  4. ¿Cambió ≥ 50 g respecto al último peso enviado (y está estable)
      o pasaron 30 s desde el último envío (latido)?
        └─ sí → leer el ultrasónico (mediana de 5) y enviar
 ```
@@ -19,68 +19,78 @@ cada 500 ms:
 | Parámetro | Valor inicial | Relación con el software |
 | :-- | :-- | :-- |
 | Ventana de estabilidad | 4 lecturas (2 s), variación < 20 g | Evita enviar el movimiento al depositar la bolsa. |
-| Cambio mínimo para enviar | 50 g | Igual a `UMBRAL_RUIDO_G` del [servidor](../software/4_reglas_medicion.md). |
-| Latido | 30 s | El dashboard marca "sin señal" después de 90 s. |
+| Cambio mínimo para enviar | 50 g | Umbral de ruido. |
+| Latido | 30 s | La pantalla Sensores marca «Sin señal» después de 90 s. |
 
-Si la distancia del ultrasónico queda fuera del rango del contenedor (por ejemplo, con la tapa abierta), se envía la lectura **sin `nivel_pct`** en lugar de un valor erróneo.
+Si la distancia del ultrasónico queda fuera del rango del contenedor (por ejemplo, con la tapa abierta), se envía la lectura con `fillPercent: null` en lugar de un valor erróneo. Si el HX711 no responde, se envía `quality: "sensor_error"` sin peso. Si la balanza no está calibrada, se envía `quality: "uncalibrated"`.
 
 Los valores son **provisionales**: se ajustan con la prueba de ruido de la [calibración](6_calibracion.md).
 
 ## 4.2 Mensaje enviado
 
-Sigue el contrato de la [API de lecturas](../software/3_api_datos.md):
+Sigue el contrato de la plataforma ([`docs/04`](../software/app/docs/04-contrato-api-iot.md), v1). Reemplaza al borrador anterior `/api/lecturas`.
 
 ```
-POST http://<IP del notebook>:8000/api/lecturas
-X-API-Key: <clave del dispositivo>
+POST https://<plataforma>/api/iot/v1/readings
+Authorization: Bearer <token del dispositivo>
 
-{"dispositivo_id": "esp32-01", "secuencia": 1532, "peso_g": 7340, "nivel_pct": 55, "rssi_dbm": -61}
+{"schemaVersion":1,"deviceId":"HUB-ESP32-001","messageId":"<UUID>","measuredAt":"2026-11-26T20:30:00Z",
+ "weightGrams":7340,"distanceMm":180,"fillPercent":55.0,"quality":"stable","rssiDbm":-61,"firmwareVersion":"1.0.0"}
 ```
 
-* `peso_g` es el **peso total sobre la plataforma** (contenedor + residuos) en gramos.
-* `rssi_dbm` se obtiene con `WiFi.RSSI()`.
-* Si el envío falla, se **reintenta con la misma `secuencia`**: el servidor descarta los duplicados.
+* `weightGrams` es el **peso total sobre la plataforma** (contenedor + residuos) en gramos.
+* `messageId` es un UUID aleatorio por lectura. Si el envío falla por red, por `429` o por `5xx`, **se reintenta con el mismo mensaje** (espera de 2 s a 60 s) y el servidor descarta el duplicado. Ante otros errores (`401`, `403`, `400`), el mensaje se descarta y el LED parpadea lento.
+* La hora (`measuredAt`) se obtiene por NTP. El servidor también registra su propia hora de recepción.
 
 ## 4.3 Datos que deben sobrevivir a un reinicio
 
-Se guardan en la memoria no volátil del ESP32 con `Preferences`:
+| Dato | Dónde | Por qué |
+| :-- | :-- | :-- |
+| Cero de la plataforma y factor de calibración | `Preferences` (espacio `balanza`), lo escribe el sketch `calibracion` | Si el ESP32 hiciera tara al encender con residuos dentro, el peso quedaría mal. Por eso el cero se mide una sola vez, con la plataforma vacía. |
 
-| Dato | Por qué |
-| :-- | :-- |
-| Factor de calibración y cero de la plataforma | Si el ESP32 hiciera tara al encender con residuos dentro, el peso quedaría mal. Por eso el cero se mide una sola vez, en la calibración. |
-| Último valor de `secuencia` | Si vuelve a 0 después de un reinicio, el servidor descartaría las lecturas como duplicadas. |
+Ya no hace falta guardar un contador de secuencia: cada lectura usa un UUID aleatorio generado por el hardware del ESP32.
 
 ## 4.4 Configuración
 
-Los datos de la red y la clave van en un archivo `config.h` que **no se sube a GitHub** (se agrega a `.gitignore`); en el repositorio queda solo un `config.example.h`.
+Copiar `config.example.h` como `config.h` (que **no se sube a GitHub**) y completar:
 
 ```cpp
-#define WIFI_SSID     "HubCircular-Demo"
-#define WIFI_PASS     "********"
-#define SERVER_URL    "http://192.168.43.10:8000/api/lecturas"
-#define DEVICE_ID     "esp32-01"
-#define DEVICE_KEY    "********"
+#define WIFI_SSID       "HubCircular-Demo"
+#define WIFI_PASS       "********"
+#define SERVER_BASE_URL "https://hubcircular.vercel.app"   // pruebas locales: http://<IP-del-notebook>:3000
+#define DEVICE_ID       "HUB-ESP32-001"
+#define DEVICE_TOKEN    "hcd_…"                          // npm run iot:device -- create … sensor
 ```
 
-* La clave identifica **solo a este dispositivo**. El ESP32 no tiene credenciales de la base de datos.
+* El token identifica **solo a este dispositivo** y solo sirve para enviar lecturas. El ESP32 no tiene credenciales de la base de datos. El token no se imprime por Serial.
+* Con `https://` el certificado del servidor **se valida** (raíces en `certificados.h`).
 * El ESP32 solo se conecta a redes de **2,4 GHz**: el hotspot debe configurarse en esa banda.
 * Si se pierde el Wi-Fi, el ESP32 intenta reconectarse cada 5 s sin detener la lectura de los sensores.
+* `USAR_BALANZA` y `USAR_ULTRASONICO` permiten probar con un solo sensor conectado.
+
+**LED integrado:** parpadeo rápido = sin Wi-Fi · fijo = conectado · apagado breve = lectura enviada · parpadeo lento = el servidor rechazó la lectura (revisar el Monitor serie).
 
 ## 4.5 Organización del código
 
 ```
 firmware/
   hubcircular_esp32/
-    hubcircular_esp32.ino   ← setup() y loop()
-    peso.h / peso.cpp       ← HX711, promedio y estabilidad
-    nivel.h / nivel.cpp     ← ultrasónico y porcentaje de llenado
-    red.h / red.cpp         ← Wi-Fi y envío HTTP
+    hubcircular_esp32.ino   ← setup() y loop(): estabilidad, latido, reintentos, LED
+    peso.h / peso.cpp       ← HX711, promedio, estabilidad y calibración guardada
+    nivel.h / nivel.cpp     ← ultrasónico (mediana de 5) y % de llenado
+    red.h / red.cpp         ← Wi-Fi, NTP, UUID y envío HTTPS
+    certificados.h          ← raíces TLS (Vercel: GTS Root R1 y Let's Encrypt ISRG Root X1)
     config.example.h        ← plantilla de configuración
   calibracion/
-    calibracion.ino         ← programa aparte para obtener el factor de calibración
+    calibracion.ino         ← comandos por Monitor serie: r, z, c <gramos>, g, p, b
 ```
 
-Cada sensor se puede probar por separado antes de integrarlos.
+## 4.6 Primera prueba (orden sugerido)
+
+1. Cargar `calibracion` → `r` (las lecturas crudas deben cambiar al presionar la celda) → `z` → `c <gramos>` → `p` para verificar → `g` para guardar.
+2. Pedir a software el token (`npm run iot:device -- create HUB-ESP32-001 <CONTENEDOR> sensor`).
+3. Completar `config.h` y cargar `hubcircular_esp32`. En el Monitor serie (115200) debe aparecer `[red] conectada` y luego `[envio] OK 202`.
+4. Abrir **Sensores** en la plataforma: el dispositivo debe estar «En línea» y el peso debe cambiar al cargar la plataforma.
 
 ---
 

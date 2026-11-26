@@ -2,6 +2,8 @@
 
 Este documento es el **contrato entre el hardware y el software**. Si cambia, deben acordarlo ambas partes.
 
+> **Actualización 26-11-2026:** el contrato implementado es [`POST /api/iot/v1/readings`](app/docs/04-contrato-api-iot.md), con token Bearer por dispositivo y `messageId`. Reemplaza al borrador `/api/lecturas` de la sección 3.1. Las lecturas del sensor **no** generan eventos de ingreso automáticos: el operador confirma el pesaje con el peso precargado desde la balanza. Puesta en marcha: [`docs/27`](app/docs/27-integracion-esp32.md). Las secciones siguientes se conservan como registro del diseño inicial.
+
 ## 3.1 Envío de lecturas: `POST /api/lecturas`
 
 **Cabecera:** `X-API-Key: <clave del dispositivo>`
