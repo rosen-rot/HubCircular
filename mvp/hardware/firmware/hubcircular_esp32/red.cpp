@@ -12,9 +12,25 @@ unsigned long ultimoIntento = 0;
 const char* RUTA = "/api/iot/v1/readings";
 }  // namespace
 
+// Diagnóstico al encender: ¿el ESP32 ve la red? (solo detecta redes de 2,4 GHz; si no aparece, suele estar en 5 GHz)
+static void diagnosticarRed() {
+  int n = WiFi.scanNetworks();
+  bool vista = false;
+  Serial.printf("[red] redes visibles (2,4 GHz): %d\n", n);
+  for (int i = 0; i < n; i++) {
+    bool esta = WiFi.SSID(i) == WIFI_SSID;
+    vista |= esta;
+    Serial.printf("[red]   %s\"%s\" canal %d, %d dBm, seguridad %d\n", esta ? "-> " : "   ", WiFi.SSID(i).c_str(),
+                  WiFi.channel(i), WiFi.RSSI(i), (int)WiFi.encryptionType(i));
+  }
+  if (!vista) Serial.println("[red] AVISO: no veo la red configurada. ¿Está encendida y en 2,4 GHz? ¿El nombre es exacto?");
+  WiFi.scanDelete();
+}
+
 void redIniciar() {
   WiFi.mode(WIFI_STA);
   WiFi.setAutoReconnect(true);
+  diagnosticarRed();
   WiFi.begin(WIFI_SSID, WIFI_PASS);
   ultimoIntento = millis();
   // Hora UTC por NTP: sirve para measuredAt. El servidor de todos modos registra su propia hora de recepción.
@@ -31,8 +47,11 @@ void redMantener() {
     Serial.println("[red] se perdió la conexión Wi-Fi");
   }
   estabaConectada = ahora;
-  if (!ahora && millis() - ultimoIntento >= 5000) {
+  // 15 s entre intentos: una conexión puede tardar varios segundos y reintentar antes la interrumpe.
+  if (!ahora && millis() - ultimoIntento >= 15000) {
     ultimoIntento = millis();
+    // Estado: 1 = red no encontrada · 4 = falló (clave incorrecta) · 6 = desconectado/aún intentando
+    Serial.printf("[red] sin conexión (estado %d). Reintentando…\n", (int)WiFi.status());
     WiFi.disconnect();
     WiFi.begin(WIFI_SSID, WIFI_PASS);
   }
