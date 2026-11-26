@@ -33,11 +33,29 @@
 5. **Cargar el firmware** `hubcircular_esp32` con `config.h` completo (Wi-Fi de 2,4 GHz, `SERVER_BASE_URL`, `DEVICE_ID`, `DEVICE_TOKEN`). En el Monitor serie debe aparecer `[envio] OK 202`.
 6. En `/sensores` el dispositivo debe pasar a **En línea**. En `/registro`, «Leer peso de la balanza» debe traer el peso.
 
-## 3. Despliegue en internet (pendiente)
+## 3. Despliegue en internet (Vercel)
+
+**Pasos en vercel.com** (panel web conectado a GitHub; cada push a la rama de producción se despliega solo):
+1. *Add New → Project* → importar `rosen-rot/HubCircular`.
+2. **Root Directory:** `mvp/software/app`. Framework: Next.js (se detecta solo). Build y Output: por defecto.
+3. **Environment Variables** (solo *Production*):
+
+   | Variable | Valor |
+   |---|---|
+   | `DATABASE_URL` | Pooler de Supabase en **modo transacción (puerto 6543)**, con el usuario de la aplicación (`hc_login`), **no** el dueño del esquema. |
+   | `DB_APP_ROLE` | `hc_app` |
+   | `DB_SSL` | `require` |
+   | `DB_POOL_MAX` | `3` (cada instancia serverless abre su propio pool) |
+   | `SESSION_COOKIE_SECURE` | `true` |
+
+   **No** se cargan en Vercel `MIGRATION_DATABASE_URL`, `SEED_*`, `BACKUP_DIR` ni `TEST_DATABASE_URL`: migraciones, respaldos y alta de dispositivos se hacen desde un notebook.
+4. *Deploy*. Después, en *Settings → Git*, poner **Production Branch = `software/app`** (la app no está en `main`).
+5. La región de las funciones queda en São Paulo (`gru1`, en `vercel.json`), junto a Supabase (`sa-east-1`).
+6. El ESP32 debe apuntar al **dominio de producción** (`https://<proyecto>.vercel.app`). Las URL de *preview* tienen *Deployment Protection* y responden 401 a un cliente sin sesión de Vercel.
 
 El ESP32 envía por **HTTPS validando el certificado**. El firmware trae las raíces de `*.vercel.app` (GTS Root R1) y de dominios con Let's Encrypt (ISRG Root X1), verificadas el 26-11-2026. Si se usa otro proveedor, hay que agregar su raíz en `certificados.h`.
 
-Para Vercel (u otro hosting de Next.js): definir `DATABASE_URL` (pooler de Supabase), `DB_APP_ROLE`, `DB_SSL`, `SESSION_COOKIE_SECURE=true` y un `DB_POOL_MAX` bajo (por ejemplo, 3), porque cada instancia serverless abre su propio pool. Para probar en red local antes del despliegue, `SERVER_BASE_URL` acepta `http://<IP-del-notebook>:3000` (sin cifrado: solo pruebas).
+Para probar en red local antes del despliegue, `SERVER_BASE_URL` acepta `http://<IP-del-notebook>:3000` (sin cifrado: solo pruebas).
 
 ## 4. Seguridad
 
