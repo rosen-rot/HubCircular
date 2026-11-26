@@ -18,10 +18,11 @@ export function AppShell({ actor, children }: { actor: Actor; children: React.Re
   if (can(actor, "batch:read")) items.push({ href: "/lotes", label: "Lotes", icon: "lotes" });
   if (can(actor, "movement:read")) items.push({ href: "/movimientos", label: "Movimientos", icon: "movimientos" });
   if (can(actor, "indicators:read")) items.push({ href: "/dashboard", label: "Tablero", icon: "tablero" });
+  if (can(actor, "indicators:read")) items.push({ href: "/oportunidades", label: "Oportunidades", icon: "oportunidades" });
   if (can(actor, "weighing:read")) items.push({ href: "/historial", label: "Historial", icon: "historial" });
   if (can(actor, "measurement:zero")) items.push({ href: "/calendarios", label: "Calendarios", icon: "calendarios" });
   if (can(actor, "catalog:read")) items.push({ href: "/contenedores", label: "Contenedores", icon: "contenedores" });
-  if (can(actor, "catalog:read")) items.push({ href: "/sensores", label: "Sensores", icon: "sensores" });
+  if (can(actor, "device:read")) items.push({ href: "/dispositivos", label: "Dispositivos", icon: "dispositivos" });
   if (can(actor, "destination:manage")) items.push({ href: "/destinos", label: "Destinos", icon: "destinos" });
   if (can(actor, "user:manage")) items.push({ href: "/usuarios", label: "Usuarios", icon: "usuarios" });
   items.push({ href: "/ayuda", label: "Ayuda", icon: "ayuda" });

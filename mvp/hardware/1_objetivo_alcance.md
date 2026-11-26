@@ -31,8 +31,9 @@ Construir un **contenedor inteligente** que mida el peso de los residuos, estime
 
 | Tema | Decisión |
 | :-- | :-- |
-| **Plataforma web** | Python + FastAPI + SQLite en un servidor local (reemplaza la propuesta anterior con Next.js y Supabase). |
-| **Ingresos y retiros** | El ESP32 envía el **peso total estable**; el **servidor** decide si hubo un ingreso o un retiro (ver [Reglas de Medición](../software/4_reglas_medicion.md)). El retiro se detecta automáticamente cuando el contenedor queda vacío. |
+| **Plataforma web** | **Next.js + PostgreSQL (Supabase)**, corriendo en un notebook en la feria (ver [Arquitectura](../software/2_arquitectura.md)). La propuesta del 10 de noviembre con FastAPI + SQLite se reemplazó por la plataforma que desarrolló Carlos. |
+| **Envío de lecturas** | `POST /api/iot/v1/readings` en el puerto 3000, con una clave propia del dispositivo (ver [API](../software/3_api_datos.md)). |
+| **Ingresos y retiros** | El ESP32 envía el **peso estable**; el **servidor** decide si hubo un ingreso o un retiro (ver [Reglas de Medición](../software/4_reglas_medicion.md)). El retiro se detecta cuando el contenedor queda vacío. |
 | **Fecha y hora** | Las asigna el servidor, por lo que el RTC no es necesario. |
 | **Tara del contenedor** | La guarda el servidor. El ESP32 **no hace tara al encender** (ver [Firmware](4_firmware.md)). |
 

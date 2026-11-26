@@ -56,11 +56,17 @@ export type DomainErrorCode =
   | "not_expected_today"
   | "weighing_exists"
   | "immutable_record"
-  | "device_unauthenticated"
-  | "device_inactive"
+  | "device_token_invalid"
+  | "device_revoked"
   | "device_mismatch"
-  | "reading_conflict"
+  | "simulation_not_allowed"
+  | "device_exists"
+  | "device_invalid"
+  | "device_not_found"
+  | "message_conflict"
+  | "reading_invalid"
   | "rate_limited"
+  | "capacity_invalid"
   | "validation"
   | "unexpected";
 
@@ -123,11 +129,17 @@ const MESSAGES: Record<DomainErrorCode, string> = {
   not_expected_today: "Hoy no hay una medición esperada para este contenedor, por lo que no se puede confirmar «cero».",
   weighing_exists: "Ya hay un pesaje de este contenedor hoy; no corresponde confirmar «cero».",
   immutable_record: "Este registro no puede modificarse ni eliminarse.",
-  device_unauthenticated: "Token de dispositivo ausente, inválido o revocado.",
-  device_inactive: "El dispositivo está desactivado y no puede enviar lecturas.",
-  device_mismatch: "El token no corresponde al deviceId indicado en el mensaje.",
-  reading_conflict: "Ya existe una lectura con ese messageId y contenido distinto.",
-  rate_limited: "Demasiadas lecturas en poco tiempo. Reintente más tarde.",
+  device_token_invalid: "La credencial del dispositivo no es válida.",
+  device_revoked: "El dispositivo está revocado: su credencial ya no permite enviar datos.",
+  device_mismatch: "El identificador enviado no corresponde al dispositivo dueño de la credencial.",
+  simulation_not_allowed: "Los datos de un simulador solo se aceptan en dispositivos DEMO.",
+  device_exists: "Ya existe un dispositivo con ese código.",
+  device_invalid: "Revise los datos del dispositivo: código (letras, números, guion), nombre y minutos de tolerancia (1 a 1440).",
+  device_not_found: "No existe el dispositivo indicado.",
+  message_conflict: "Ya se recibió ese mensaje con datos distintos.",
+  reading_invalid: "La lectura no cumple el contrato (formato, unidades o rango).",
+  rate_limited: "Se superó la frecuencia máxima de envío del dispositivo.",
+  capacity_invalid: "La capacidad debe ser un número entero de litros entre 1 y 10000 (o quedar vacía para no mostrar llenado).",
   validation: "Revise los campos marcados.",
   unexpected: "Ocurrió un error inesperado. Intente nuevamente; si persiste, avise a un administrador.",
 };
@@ -151,13 +163,16 @@ export class DomainError extends Error {
 function defaultStatus(code: DomainErrorCode): number {
   switch (code) {
     case "unauthenticated":
-    case "device_unauthenticated":
+    case "device_token_invalid":
       return 401;
     case "forbidden":
     case "password_change_required":
-    case "device_inactive":
+    case "device_revoked":
     case "device_mismatch":
+    case "simulation_not_allowed":
       return 403;
+    case "rate_limited":
+      return 429;
     case "container_not_found":
     case "batch_not_found":
     case "movement_not_found":
@@ -165,6 +180,7 @@ function defaultStatus(code: DomainErrorCode): number {
     case "user_not_found":
     case "role_not_found":
     case "schedule_not_found":
+    case "device_not_found":
       return 404;
     case "idempotency_conflict":
     case "destination_exists":
@@ -175,10 +191,9 @@ function defaultStatus(code: DomainErrorCode): number {
     case "auth_external":
     case "schedule_overlap":
     case "schedule_already_ended":
-    case "reading_conflict":
+    case "device_exists":
+    case "message_conflict":
       return 409;
-    case "rate_limited":
-      return 429;
     case "unexpected":
       return 500;
     default:

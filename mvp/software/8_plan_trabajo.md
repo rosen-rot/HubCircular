@@ -1,13 +1,16 @@
 # 8. Plan de Trabajo
 
-Alineado con el [calendario de la Unidad 3](../../bitácora/semana_13/4_calendario_unidad3.md).
+Alineado con el [plan del curso para las últimas semanas](../../bitácora/semana_14/3_anuncios_feria.md#34-plan-para-las-próximas-semanas) y con el [plan del hardware](../hardware/8_plan_trabajo.md).
 
-| Fecha | Hito del curso | Entregable del software | Demostración |
+| Fecha | Hito del curso | Entregable del software | Estado |
 | :-- | :-- | :-- | :-- |
-| **12 nov** | Primer avance demostrable | S1 + S2 + S5: API, base de datos y simulador. | El simulador envía lecturas y aparecen en una tabla web. |
-| **19 nov** | Integración, pruebas y evidencias | S3 + S4 + conexión con el ESP32 real. Pruebas P1, P2 y P3. | Una bolsa real aparece en el dashboard. |
-| **26 nov** | Ensayo de pitch y demostración | Pruebas P4 y P5 en la red de la feria. S6–S8 si hay tiempo. Guion de la demo. | Demo completa y ensayo del plan B. |
-| **3 dic** | Feria Capstone | Versión final congelada (sin cambios el día de la feria). | Demo en vivo con el contenedor. |
+| **12 nov** | Primer avance concreto | Definición del MVP del software. | ✅ Solo documentación; el código partió el 18 de noviembre |
+| **19 nov** | Segundo avance | Plataforma web: sesión y roles, registro de pesajes, lotes, trazabilidad, tablero, descarga de datos y ayuda. Probada con datos ficticios. | ✅ Cumplido |
+| **26 nov** | Tercer avance | S7–S10: recepción de lecturas, reglas, panel en vivo y simulador. Conexión con el ESP32 real. Pruebas P1, P2 y P3. | ⏳ |
+| **1 dic** | Antes de la feria | Pruebas P4 y P5 en el hotspot de la feria. Ensayo del plan B (simulador y PostgreSQL local). Grabar el video fechado. | ⏳ |
+| **3 dic** | Ensayo del pitch (mañana) y Feria Capstone (14:00–16:30) | Versión congelada: sin cambios el día de la feria. | ⏳ |
+| **7 dic** | Informe final | Resultados de las pruebas, capturas y datos descargados de la feria. | ⏳ |
+| **10 dic** | Evaluación ante comisión | Demo de la plataforma y del contenedor. | ⏳ |
 
 ## 8.1 Responsables
 
@@ -15,8 +18,8 @@ Alineado con el [calendario de la Unidad 3](../../bitácora/semana_13/4_calendar
 
 | Tarea | Responsable |
 | :-- | :-- |
-| API, reglas y base de datos | Carlos Concha |
-| Dashboard | Carlos Concha |
+| Plataforma web, API y base de datos | Carlos Concha |
+| Reglas de medición y panel en vivo | Carlos Concha |
 | Simulador y pruebas | Carlos Concha |
 | Integración con el ESP32 | Carlos Concha y Vicente Lizama |
 
@@ -24,10 +27,12 @@ Alineado con el [calendario de la Unidad 3](../../bitácora/semana_13/4_calendar
 
 | Riesgo | Mitigación |
 | :-- | :-- |
-| El hardware se atrasa | El simulador permite avanzar y demostrar el software. |
-| La red del lugar no permite la conexión | Red propia (hotspot o router) y prueba en el lugar el 26 de noviembre. |
-| El firewall de Windows bloquea al ESP32 | Abrir el puerto 8000 y probarlo antes del 19 de noviembre. |
-| Umbrales mal calibrados | Se ajustan en el servidor y los eventos se recalculan desde las lecturas. |
+| El hardware se atrasa | El simulador permite probar y demostrar la recepción de lecturas. |
+| No hay internet en la feria para llegar a Supabase | PostgreSQL local en el notebook, probado antes del 1 de diciembre. |
+| La red del lugar no permite la conexión | Hotspot propio en 2,4 GHz, probado en el campus antes de la feria. |
+| El firewall de Windows bloquea al ESP32 | Abrir el puerto 3000 y probarlo antes del 26 de noviembre. |
+| Umbrales mal calibrados | Se ajustan en el servidor y los ingresos se recalculan desde las lecturas guardadas. |
+| La plataforma solo se probó por completo en Linux | Correr las pruebas de integración en el notebook de la feria con PostgreSQL local. |
 
 ---
 

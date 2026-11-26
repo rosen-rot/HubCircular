@@ -20,7 +20,7 @@ cada 500 ms:
 | :-- | :-- | :-- |
 | Ventana de estabilidad | 4 lecturas (2 s), variación < 20 g | Evita enviar el movimiento al depositar la bolsa. |
 | Cambio mínimo para enviar | 50 g | Umbral de ruido. |
-| Latido | 30 s | La pantalla Sensores marca «Sin señal» después de 90 s. |
+| Latido | 30 s | En **Dispositivos** el sensor pasa a «Dato desactualizado» si no hay contacto en los minutos de tolerancia del dispositivo (15 por defecto). |
 
 Si la distancia del ultrasónico queda fuera del rango del contenedor (por ejemplo, con la tapa abierta), se envía la lectura con `fillPercent: null` en lugar de un valor erróneo. Si el HX711 no responde, se envía `quality: "sensor_error"` sin peso. Si la balanza no está calibrada, se envía `quality: "uncalibrated"`.
 
@@ -35,12 +35,14 @@ POST https://<plataforma>/api/iot/v1/readings
 Authorization: Bearer <token del dispositivo>
 
 {"schemaVersion":1,"deviceId":"HUB-ESP32-001","messageId":"<UUID>","measuredAt":"2026-11-26T20:30:00Z",
- "weightGrams":7340,"distanceMm":180,"fillPercent":55.0,"quality":"stable","rssiDbm":-61,"firmwareVersion":"1.0.0"}
+ "weightGrams":7340,"distanceMm":180,"fillPercent":55.0,"quality":"stable","firmwareVersion":"1.0.0"}
 ```
 
 * `weightGrams` es el **peso total sobre la plataforma** (contenedor + residuos) en gramos.
-* `messageId` es un UUID aleatorio por lectura. Si el envío falla por red, por `429` o por `5xx`, **se reintenta con el mismo mensaje** (espera de 2 s a 60 s) y el servidor descarta el duplicado. Ante otros errores (`401`, `403`, `400`), el mensaje se descarta y el LED parpadea lento.
-* La hora (`measuredAt`) se obtiene por NTP. El servidor también registra su propia hora de recepción.
+* `messageId` es un UUID aleatorio por lectura. Si el envío falla por red, por `429` o por `5xx`, **se reintenta con el mismo mensaje** (espera de 2 s a 60 s) y el servidor responde `202` con `duplicate: true` sin guardarlo dos veces. Ante otros errores (`401`, `403`, `400`), el mensaje se descarta y el LED parpadea lento.
+* `measuredAt` es **obligatorio**: la hora se obtiene por NTP y el ESP32 no envía hasta tenerla. El servidor también registra su propia hora de recepción.
+* El contrato es **estricto** (un campo extra se rechaza con `400`): la señal Wi-Fi (`rssiDbm`) no se envía, solo se muestra en el Monitor serie.
+* Con `quality: "sensor_error"` (HX711 sin respuesta) peso, distancia y llenado van en `null`. Con `uncalibrated`, el peso va en `null`.
 
 ## 4.3 Datos que deben sobrevivir a un reinicio
 
@@ -57,9 +59,9 @@ Copiar `config.example.h` como `config.h` (que **no se sube a GitHub**) y comple
 ```cpp
 #define WIFI_SSID       "HubCircular-Demo"
 #define WIFI_PASS       "********"
-#define SERVER_BASE_URL "https://hubcircular.vercel.app"   // pruebas locales: http://<IP-del-notebook>:3000
+#define SERVER_BASE_URL "https://hub-circular.vercel.app"  // pruebas locales: http://<IP-del-notebook>:3000
 #define DEVICE_ID       "HUB-ESP32-001"
-#define DEVICE_TOKEN    "hcd_…"                          // npm run iot:device -- create … sensor
+#define DEVICE_TOKEN    "hcd_…"                          // Plataforma → Dispositivos → Crear (solo administrador)
 ```
 
 * El token identifica **solo a este dispositivo** y solo sirve para enviar lecturas. El ESP32 no tiene credenciales de la base de datos. El token no se imprime por Serial.
@@ -88,9 +90,9 @@ firmware/
 ## 4.6 Primera prueba (orden sugerido)
 
 1. Cargar `calibracion` → `r` (las lecturas crudas deben cambiar al presionar la celda) → `z` → `c <gramos>` → `p` para verificar → `g` para guardar.
-2. Pedir a software el token (`npm run iot:device -- create HUB-ESP32-001 <CONTENEDOR> sensor`).
+2. Crear el dispositivo en la plataforma: **Dispositivos → Crear** (administrador), con código `HUB-ESP32-001` y el contenedor real donde va la balanza. El token se muestra **una sola vez**: cópielo al `config.h`.
 3. Completar `config.h` y cargar `hubcircular_esp32`. En el Monitor serie (115200) debe aparecer `[red] conectada` y luego `[envio] OK 202`.
-4. Abrir **Sensores** en la plataforma: el dispositivo debe estar «En línea» y el peso debe cambiar al cargar la plataforma.
+4. Abrir **Dispositivos** en la plataforma: el dispositivo debe estar «En línea» y la última lectura debe cambiar al cargar la plataforma. El estado y el llenado también aparecen en **Inicio** y **Contenedores**.
 
 ---
 

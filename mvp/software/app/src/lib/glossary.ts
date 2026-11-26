@@ -13,7 +13,7 @@ export interface GlossaryEntry {
   group: GlossaryGroup;
 }
 
-export type GlossaryGroup = "pesaje" | "lugares" | "lotes" | "comprobantes" | "tablero" | "cuentas";
+export type GlossaryGroup = "pesaje" | "lugares" | "lotes" | "comprobantes" | "tablero" | "sensores" | "cuentas";
 
 export const GLOSSARY_GROUPS: { id: GlossaryGroup; title: string; intro: string }[] = [
   { id: "pesaje", title: "Al pesar", intro: "Los datos que se anotan cada vez que se pesa un contenedor." },
@@ -21,6 +21,7 @@ export const GLOSSARY_GROUPS: { id: GlossaryGroup; title: string; intro: string 
   { id: "lotes", title: "Lotes y movimientos", intro: "Qué pasa con el material después de pesarlo." },
   { id: "comprobantes", title: "Comprobantes y confirmaciones", intro: "Cómo se respalda que el material fue retirado y aprovechado." },
   { id: "tablero", title: "Tablero de indicadores", intro: "Qué significa cada cifra y cada estado del tablero." },
+  { id: "sensores", title: "Sensores y dispositivos", intro: "Los equipos que miden por su cuenta y cómo se distinguen de un pesaje confirmado." },
   { id: "cuentas", title: "Cuentas y permisos", intro: "Quién puede hacer qué." },
 ];
 
@@ -105,6 +106,44 @@ export const GLOSSARY = {
     name: "Ámbito (zonas que puede ver)",
     short: "Las zonas a las que su cuenta tiene acceso. Solo ve y registra datos de esas zonas.",
     detail: "Un operador asignado a Cowork no ve los datos del Laboratorio. Un administrador con «todas las zonas» ve todo.",
+  },
+
+  // --- Sensores y dispositivos ---
+  dispositivo: {
+    group: "sensores",
+    name: "Dispositivo (sensor)",
+    short: "Un equipo (por ejemplo, un ESP32 con balanza) instalado en un contenedor que envía lecturas por su cuenta.",
+    detail: "Cada dispositivo tiene su propia credencial. Si se pierde o se sospecha de ella, se revoca o se rota sin afectar a los demás.",
+  },
+  lectura_sensor: {
+    group: "sensores",
+    name: "Lectura de sensor (telemetría)",
+    short: "Un dato que mandó el equipo: peso, distancia y nivel de llenado estimados. Es informativo y NO suma captación.",
+    detail: "La captación solo cambia cuando una persona confirma un pesaje. Un peso que baja puede sugerir un retiro, pero no dice quién retiró, cuánto ni a qué destino: eso se registra como movimiento.",
+  },
+  estado_dispositivo: {
+    group: "sensores",
+    name: "Estado del dispositivo",
+    short: "«En línea» si envió datos dentro del tiempo de tolerancia; «dato desactualizado» si pasó ese tiempo sin recibir nada.",
+    detail: "Un dispositivo desactualizado puede tener la batería agotada, haber perdido el Wi-Fi o estar apagado. «Sin datos aún» significa que todavía no ha enviado ninguna lectura. «Revocado» significa que su credencial ya no sirve.",
+  },
+  token_dispositivo: {
+    group: "sensores",
+    name: "Credencial del dispositivo",
+    short: "Una clave larga y única que el equipo envía para identificarse. Se muestra una sola vez al crearla o rotarla.",
+    detail: "HubCircular solo guarda una huella de la clave, no la clave. Si se pierde, se rota: se genera una nueva y la anterior deja de funcionar al instante.",
+  },
+  capacidad: {
+    group: "sensores",
+    name: "Capacidad del contenedor",
+    short: "Cuántos litros caben en el contenedor. La define un administrador; sin ella no se muestra el llenado.",
+    detail: "Ejemplo: un contenedor de 120 L con el sensor marcando 50 % tiene unos 60 L ocupados. La capacidad no cambia pesajes ni inventario: solo ayuda a leer el dato del sensor.",
+  },
+  llenado: {
+    group: "sensores",
+    name: "Llenado (estimado por el sensor)",
+    short: "Qué tan lleno está el contenedor según el sensor de distancia, en porcentaje. Es una estimación, no kilos.",
+    detail: "Se muestra solo si el contenedor tiene capacidad definida y el sensor envió un dato. Si el sensor está desactualizado se ve el último dato en gris. Si no hay dato se escribe «Sin dato», nunca «0 %».",
   },
 
   // --- Lotes y movimientos ---
@@ -202,6 +241,12 @@ export const GLOSSARY = {
   },
 
   // --- Tablero ---
+  oportunidad: {
+    group: "tablero",
+    name: "Oportunidad de mejora",
+    short: "Un caso que una regla simple encontró en los datos y que conviene revisar. Muestra el umbral, lo observado y los registros que lo respaldan.",
+    detail: "Ejemplo: 25 kg de cartón llevan 20 días en una zona; la regla sugiere revisar la frecuencia de retiro. Es una sugerencia, no una causa: una fluctuación aislada no prueba nada. Los umbrales son provisionales hasta que el Hub los acuerde.",
+  },
   reciclable_captado: {
     group: "tablero",
     name: "Reciclable captado",

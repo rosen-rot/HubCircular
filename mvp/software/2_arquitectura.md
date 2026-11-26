@@ -1,57 +1,67 @@
-# 2. Arquitectura y Red Local
+# 2. Arquitectura y Red
 
 ## 2.1 Componentes
 
 | Componente | Tecnología | Función |
 | :-- | :-- | :-- |
-| API | **FastAPI** + Uvicorn | Recibe lecturas y entrega datos al dashboard. |
-| Validación | Pydantic (incluido en FastAPI) | Rechaza lecturas incompletas o con valores imposibles. |
-| Base de datos | **SQLite** (un solo archivo) | Guarda lecturas y eventos. No requiere instalar un motor de base de datos. |
-| Dashboard | HTML + JavaScript + **Chart.js**, servido por FastAPI | Muestra los datos y consulta la API cada 2 segundos. |
-| Simulador | Script Python con `httpx` | Envía lecturas falsas por la misma API. |
-| Pruebas | `pytest` | Verifica las reglas de medición con secuencias conocidas. |
+| Aplicación web | **Next.js** (App Router) + **TypeScript** | Interfaz y servidor en un solo proyecto: páginas, API y reglas. |
+| Interfaz | Tailwind CSS, componentes accesibles e íconos `lucide-react` | Menú lateral, pantallas adaptadas a celular. |
+| Validación | `zod` | Rechaza datos incompletos o con valores imposibles. |
+| Base de datos | **PostgreSQL** en **Supabase** (o local para pruebas) | Usuarios, contenedores, pesajes, lotes, movimientos y lecturas. Migraciones SQL versionadas en `app/db/migrations/`. |
+| Autenticación | Sesión propia o Supabase Auth | Roles de administrador, operador y lector. |
+| Exportación | `write-excel-file` | Descarga en Excel o CSV. |
+| Simulador | Script Node/TypeScript *(por construir)* | Envía lecturas falsas por la misma API que el ESP32. |
+| Pruebas | **Vitest** (unitarias e integración) y **Playwright** (de punta a punta, con revisión de accesibilidad) | Verifican reglas, permisos y pantallas. |
 
 ```
-┌────────────── Red Wi-Fi propia (hotspot o router) ──────────────┐
-│                                                                  │
-│  ESP32 ──HTTP POST /api/lecturas──▶ Notebook (servidor local)    │
-│                                     ├─ FastAPI + reglas          │
-│  Simulador ──── misma API ────────▶ ├─ SQLite                    │
-│                                     └─ Dashboard (navegador)     │
-└──────────────────────────────────────────────────────────────────┘
+┌────────────── Red Wi-Fi propia (hotspot del celular, 2,4 GHz) ──────────────┐
+│                                                                              │
+│  ESP32 ──HTTP POST /api/iot/v1/readings──▶ Notebook: Next.js (puerto 3000)   │
+│                                            ├─ API + reglas de medición       │
+│  Simulador ──────── misma API ───────────▶ ├─ Dashboard (navegador)          │
+│                                            └──────────┬──────────────────────┘
+│                                                       │ internet del hotspot
+└───────────────────────────────────────────────────────┼──────────────────────┘
+                                                        ▼
+                                          PostgreSQL en Supabase
+                                 (plan B sin internet: PostgreSQL local)
 ```
 
-## 2.2 Red en la feria: mostrar que los datos llegan por Wi-Fi
+**Límite de seguridad:** el ESP32 **nunca** se conecta directamente a la base de datos. Solo conoce su propia clave de dispositivo, que únicamente sirve para enviar lecturas.
 
-El servidor corre en un notebook y el ESP32 le envía las lecturas por la red. Para que funcione en la feria:
+## 2.2 Organización del código
+
+El código está en [`app/`](app/README.md), organizado por módulos de dominio:
+
+```
+app/
+  db/migrations/        ← SQL versionado (0001 a 0010)
+  db/seed/              ← datos DEMO
+  src/app/              ← pantallas y rutas de la API
+  src/modules/
+    identity/ users/    ← sesión, roles, permisos y gestión de usuarios
+    catalog/            ← zonas, materiales y contenedores
+    weighing/           ← pesajes y lotes
+    inventory/          ← saldos
+    movements/          ← trazabilidad: movimientos y destinos
+    indicators/ inicio/ ← tablero, cobertura y descarga de datos
+    telemetry/          ← lecturas del ESP32 (por construir)
+  tests/{unit,integration,e2e}/
+  scripts/              ← migraciones, respaldos y diagnóstico de la base
+```
+
+## 2.3 Red en la feria: mostrar que los datos llegan por Wi-Fi
 
 | Punto | Decisión |
 | :-- | :-- |
-| **Red** | Usar una **red propia en la banda de 2,4 GHz** (hotspot de un celular o un router pequeño), no la del campus. El ESP32 no se conecta a redes de 5 GHz. Las redes institucionales suelen tener portal de inicio de sesión o bloquear la comunicación entre equipos. Hay que verificarlo, pero no depender de ella. |
-| **Dirección del servidor** | El notebook debe tener siempre la **misma IP** en esa red, configurada en el ESP32. Ejemplo: `http://192.168.43.10:8000/api/lecturas`. |
-| **Servidor visible en la red** | Iniciar con `uvicorn app.main:app --host 0.0.0.0 --port 8000`. |
-| **Firewall** | Permitir el puerto 8000 en el firewall de Windows del notebook. Si no se hace, el ESP32 no logra conectarse aunque esté en la misma red. |
-| **Hacer visible el Wi-Fi** | El dashboard muestra un panel de **conexión del sensor**: lecturas en vivo, segundos desde la última lectura y la señal Wi-Fi (RSSI) del ESP32. |
-| **Latido** | El ESP32 envía una lectura cada 30 segundos aunque no cambie el peso, para que se vea que la conexión está activa. |
-
-## 2.3 Estructura sugerida del código
-
-```
-software/
-  app/
-    main.py          ← FastAPI: rutas de la API y del dashboard
-    reglas.py        ← reglas de medición (sin dependencia de FastAPI)
-    db.py            ← conexión y tablas SQLite
-    config.py        ← umbrales y claves de dispositivos
-    static/          ← dashboard: index.html, app.js, estilos
-  simulador/
-    simulador.py     ← escenarios de lecturas simuladas
-  tests/
-    test_reglas.py   ← pruebas de las reglas con secuencias conocidas
-  requirements.txt
-```
-
-Las reglas van en un archivo propio para poder probarlas con `pytest` sin levantar el servidor.
+| **Red** | **Red propia en 2,4 GHz** (hotspot de un celular), no la del campus. El ESP32 no se conecta a redes de 5 GHz y las redes institucionales suelen tener portal de inicio de sesión o bloquear la comunicación entre equipos. |
+| **Servidor** | La plataforma corre en un notebook con `npm run build` y luego `npm run start -- -H 0.0.0.0 -p 3000`, para que sea visible en la red. |
+| **Dirección del servidor** | El notebook debe tener siempre la **misma IP** en el hotspot, configurada en el ESP32. Ejemplo: `http://192.168.43.10:3000/api/iot/v1/readings`. |
+| **Firewall** | Permitir el **puerto 3000** en el firewall de Windows del notebook. Si no, el ESP32 no logra conectarse aunque esté en la misma red. |
+| **Base de datos** | Supabase necesita internet, que entrega el mismo hotspot. **Plan B:** PostgreSQL local en el notebook (`app/scripts/windows/postgres-local.ps1`), para no depender de internet. |
+| **HTTP en la demo** | En la red cerrada de la feria se usa HTTP. Para un uso real en el Hub se requiere HTTPS. |
+| **Hacer visible el Wi-Fi** | El dashboard muestra la **conexión del sensor**: en línea / sin señal, segundos desde la última lectura y señal Wi-Fi (RSSI). |
+| **Latido** | El ESP32 envía una lectura cada 30 s aunque no cambie el peso, para que se vea que la conexión está activa. |
 
 ---
 

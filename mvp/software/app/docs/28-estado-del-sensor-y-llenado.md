@@ -1,0 +1,35 @@
+# 28 · Estado del sensor y llenado en Inicio y Contenedores (datos simulados)
+
+**Estado (2026-11-24):** implementado y verificado en **Windows + PostgreSQL 18 local temporal** (pruebas unitarias, de integración y revisión en navegador). La migración **0012 NO está aplicada en Supabase** (requiere aprobación del usuario). Playwright (E2E) **97/97** en esta máquina (§4). Sin cambios de firmware.
+
+## 1. Pedido
+«Continuar con el diseño con datos simulados: mostrar el estado del sensor (en línea / desactualizado) en Inicio y Contenedores, y el llenado solo si existe la capacidad del contenedor.» Restricciones: no aplicar migraciones en Supabase sin aprobación, no tocar el firmware, no mezclar DEMO con reales.
+
+## 2. Hallazgo y decisión (ADR-030)
+`hc.containers` no tenía capacidad. Sin conocer el tamaño del contenedor, el `fillPercent` del sensor (estimación geométrica, `docs/04`) no se puede interpretar, así que:
+- Migración **`0012_container_capacity.sql`**: columna opcional `capacity_l` (litros enteros, 1–10 000) y función `hc.admin_set_container_capacity` (SECURITY DEFINER, solo administrador con ámbito sobre la zona, auditada con valor anterior y nuevo, `EXECUTE` revocado a PUBLIC/anon/authenticated). No toca pesajes, lotes, movimientos ni lecturas.
+- **Regla de llenado** (`src/modules/devices/fill.ts`, pura y probada): sin capacidad → «Sin capacidad definida» (aunque el sensor envíe %); sin dispositivo → «Sin sensor»; revocado, sin lecturas, error de sensor o lectura sin llenado → «Sin dato de llenado» con el motivo; **nunca** un «0 %» inventado (un 0 % medido sí se muestra). Con dato: «82,5 % · ≈ 99 de 120 L» y barra. Sensor desactualizado → último valor en gris con «Último dato conocido».
+- El llenado es un dato de **sensor**: no suma captación, no entra en KPIs ni en la descarga.
+
+## 3. Qué se construyó
+| Pieza | Detalle |
+|---|---|
+| `listContainerSensors` (`src/modules/devices/queries.ts`) | Un renglón por contenedor visible (RLS por zona); si hay varios dispositivos usa el vigente con contacto más reciente; filtro por origen. **Degradación segura:** si la base no tiene 0012 (Supabase hoy) la vista funciona, muestra el estado y nunca el llenado (`capacitySupported=false`). |
+| `/contenedores` | Columnas «Capacidad», «Sensor» (estado, código del dispositivo, último contacto) y «Llenado (sensor)»; aviso de que son datos de sensor; aviso si falta 0012. El administrador ve «Capacidad de un contenedor» (selector + litros; vacío = quitar). Operador y lector solo consultan. |
+| `/inicio` | Tarjeta «Sensores de contenedores» con resumen (en línea, desactualizados, sin datos, revocados, sin sensor) y lista: primero los desactualizados, luego los más llenos. **Respeta el origen de Inicio:** con «Reales» solo contenedores reales (hoy: «Aún no hay sensores instalados…» y enlace a DEMO); con «DEMO» solo DEMO, con insignia. En teléfono la lista se apila (sin desplazamiento horizontal). |
+| Glosario | «Capacidad del contenedor» y «Llenado (estimado por el sensor)» con iconos (i). |
+| Permiso | `catalog:manage` (solo administrador); la BD vuelve a verificar rol y ámbito. Código de error `capacity_invalid`. |
+
+## 4. Verificación (resultados reales, Windows 11 + Node 24 + PostgreSQL 18 local temporal en el puerto 54329)
+- `tsc --noEmit` y `eslint .` sin errores (1 aviso preexistente en `tests/unit/iot.test.ts`); `next build` correcto.
+- **Vitest 437/437 (36 archivos)**: +9 unitarias (`tests/unit/fill.test.ts`: regla de llenado, validación de capacidad, revocación de `EXECUTE` y que 0012 no toque tablas de negocio) y +13 de integración (`tests/integration/capacity.test.ts`: rango en BD, auditoría, operador y administrador de otra zona rechazados, `hc_app` sin UPDATE directo, privilegios, sin capacidad no hay llenado, desactualizado, error de sensor, DEMO/real separados, ámbito, revocado y prioridad del dispositivo vigente, **base sin 0012**, 0 pesajes/lotes/movimientos creados). Primera ejecución en el clúster nuevo: 5 archivos fallaron al crear a la vez los roles globales (`hc_app`); al repetir, todo pasó (no es un defecto del código).
+- **Revisión en navegador** (`next start` contra una base local con semilla DEMO y 3 dispositivos simulados, lecturas enviadas por HTTP real → 202): Contenedores sin capacidad muestra «Sin capacidad definida» aunque el sensor envíe 82,5 %; tras guardar 120 L desde el formulario aparece «82,5 % · ≈ 99 de 120 L»; el navegador bloquea «12.5» (entero); ALUMINIO desactualizado en gris; Inicio con «Reales» no muestra sensores DEMO; a 375 px sin desplazamiento horizontal en Inicio y Contenedores; consola sin errores. Pesajes/lotes/movimientos: 0 antes y después.
+- **Playwright 97/97** (90 previas + 7 de `tests/e2e/sensores.spec.ts`, con axe-core a 1280 y 390 px), ejecutado en Windows tras `npx playwright install chromium` (autorizado por el usuario) con `DB_SSL=disable` en la terminal: el `.env` local trae el `DB_SSL` de Supabase y sin esa variable la app de pruebas intentaba SSL contra el PostgreSQL local. Casos nuevos: estado, capacidad (incl. bloqueo de decimales en el navegador), Inicio DEMO/real, desactualizado, roles, axe y sin desborde, quitar capacidad sin crear pesajes/lotes/movimientos. Dos intentos previos no llegaron a probar nada (SSL y un servidor GoTrue simulado que quedó ocupando su puerto tras detener el primero).
+- **No ejecutado:** `next dev` (avisos de hidratación en modo desarrollo).
+
+## 5. Pendiente y límites
+- **Aplicar 0012 en Supabase** solo con aprobación: `npm run db:backup` → `npm run db:migrate -- --dry-run` (debe listar solo `0012_container_capacity.sql`) → `CONFIRM_REMOTE_MIGRATION=<host>` + `npm run db:migrate` → `db:check` y `db:check:app`. Mientras no se aplique, Inicio y Contenedores funcionan contra Supabase y muestran el estado del sensor, pero no el llenado (aviso visible).
+- Para repetir los E2E en este Windows (así los ejecutó el usuario el 2026-11-24: **97/97**): un clúster PostgreSQL 18 solo para pruebas en `D:\PostgresPruebas\hubcircular` (creado con `initdb -U postgres -A trust`, fuera del repositorio, independiente del servicio PostgreSQL 18 instalado, cuya clave de `postgres` no se conoce), encendido con `pg_ctl … -o "-p 54329 -c listen_addresses=127.0.0.1" start`; luego, en la misma terminal, sin `TEST_DATABASE_URL` y con `$env:DB_SSL = 'disable'` (el `.env` trae la configuración TLS de Supabase), `npm run test:e2e`. Apagar con `pg_ctl … stop -m fast`. Los avisos finales «terminating connection due to administrator command» son del borrado de `hc_e2e` al terminar, no fallos.
+- La capacidad es nominal y en litros; el porcentaje sigue siendo el que calcula el firmware (sin validar: el sensor ultrasónico no está conectado). Cuando haya calibración puede convenir calcular el llenado en el servidor a partir de `distanceMm` y la altura útil del contenedor (decisión futura, no tomada).
+- El color de «Dato desactualizado» es el mismo ámbar de la insignia DEMO (preexistente en `/dispositivos`); se distingue por texto e icono de reloj.
+- Sin alertas automáticas por llenado alto (Iteración 5).

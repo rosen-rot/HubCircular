@@ -1,6 +1,6 @@
 # 07 · Hoja de ruta de implementación para Codex
 
-> **Estado a 2026-11-19:** Iteraciones 0, 1, 2 y 3 implementadas y probadas en PostgreSQL local (ver `docs/14`, `docs/15`, `docs/22`, `docs/25`); la migración de la 3 (0010) ya está aplicada en Supabase (probadas a mano por el usuario allí); 4–6 pendientes. Los demás párrafos se conservan como plan.
+> **Estado a 2026-11-24:** Iteraciones 0, 1, 2 y 3 implementadas y probadas en PostgreSQL local (ver `docs/14`, `docs/15`, `docs/22`, `docs/25`); la migración de la 3 (0010) ya está aplicada en Supabase (probadas a mano por el usuario allí). **Iteración 4 (núcleo: ingesta, dispositivos, panel y simulador) implementada y probada con mensajes simulados en PostgreSQL local y, tras aplicar su migración 0011 el 2026-11-24, ejecutando el simulador contra Supabase (`docs/27` §8).** Iteraciones 5–6 pendientes. Los demás párrafos se conservan como plan.
 
 ## Iteración 0 — Auditoría y proyecto base
 Leer docs; registrar decisiones; crear repositorio Next.js/TypeScript, convenciones, `.env.example`, configuración de lint/typecheck/tests, guía de inicio. **Entregable:** arranque local reproducible sin secretos en Git.

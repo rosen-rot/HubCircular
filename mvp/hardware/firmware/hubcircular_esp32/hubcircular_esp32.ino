@@ -52,11 +52,20 @@ static void prepararLectura(const LecturaPeso& p) {
   char id[37];
   redNuevoUuid(id);
   char hora[25];
-  bool conHora = redHoraIso(hora, sizeof hora);
+  // measuredAt es OBLIGATORIO en el contrato: sin hora NTP no se genera la lectura (se reintenta en la próxima vuelta).
+  if (!redHoraIso(hora, sizeof hora)) {
+    static unsigned long ultimoAviso = 0;
+    if (millis() - ultimoAviso > 10000) {
+      ultimoAviso = millis();
+      Serial.println("[hora] esperando sincronización NTP para poder enviar…");
+    }
+    return;
+  }
 
   LecturaNivel n = {false, 0, 0};
 #if USAR_ULTRASONICO
-  n = nivelLeer();
+  // Con error de la balanza el contrato exige que TODOS los valores vayan en null.
+  if (p.estado != EstadoPeso::Error) n = nivelLeer();
 #endif
 
   // Solo se envía un peso si es confiable; con error o sin calibrar va null (no se inventa un cero).
@@ -67,7 +76,9 @@ static void prepararLectura(const LecturaPeso& p) {
   j += "{\"schemaVersion\":1,\"deviceId\":\"" DEVICE_ID "\",\"messageId\":\"";
   j += id;
   j += "\",\"measuredAt\":";
-  if (conHora) { j += "\""; j += hora; j += "\""; } else { j += "null"; }
+  j += "\"";
+  j += hora;
+  j += "\"";
   j += ",\"weightGrams\":";
   j += conPeso ? String(p.gramos) : String("null");
   j += ",\"distanceMm\":";
@@ -76,10 +87,8 @@ static void prepararLectura(const LecturaPeso& p) {
   j += n.ok ? String(n.llenadoPct, 1) : String("null");
   j += ",\"quality\":\"";
   j += (p.estado == EstadoPeso::Moviendose && !conPeso) ? "unstable" : calidadTexto(p.estado);
-  j += "\",\"rssiDbm\":";
-  int rssi = redRssi();
-  j += (rssi < 0) ? String(rssi) : String("null");
-  j += ",\"firmwareVersion\":\"" FIRMWARE_VERSION "\"}";
+  // El contrato v1 es estricto (campos extra → 400): la señal Wi-Fi solo se muestra por Serial.
+  j += "\",\"firmwareVersion\":\"" FIRMWARE_VERSION "\"}";
 
   pendiente.hay = true;
   pendiente.json = j;
@@ -94,7 +103,7 @@ static void intentarEnvio() {
   if (!pendiente.hay || millis() < pendiente.proximoIntento || !redConectada()) return;
   int code = redEnviarLectura(pendiente.json, pendiente.id);
   if (code >= 200 && code < 300) {
-    Serial.printf("[envio] OK %d · %s\n", code, pendiente.json.c_str());
+    Serial.printf("[envio] OK %d · Wi-Fi %d dBm · %s\n", code, redRssi(), pendiente.json.c_str());
     ultimoPesoEnviado = pendiente.peso;
     pendiente.hay = false;
     rechazado = false;

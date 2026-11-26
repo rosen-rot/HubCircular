@@ -9,10 +9,10 @@
 // --- Plataforma ----------------------------------------------------------------------------------
 // URL base de la plataforma, SIN barra final. En producción debe ser https:// (se valida el certificado).
 // Para pruebas en red local se acepta http://<IP-del-notebook>:3000
-#define SERVER_BASE_URL "https://hubcircular.vercel.app"
+#define SERVER_BASE_URL "https://hub-circular.vercel.app"
 
 // Código y token del dispositivo. Se obtienen con:
-//   npm run iot:device -- create HUB-ESP32-001 <CODIGO-CONTENEDOR> sensor
+//   Plataforma → Dispositivos → Crear (administrador). Use el contenedor REAL donde va la balanza.
 // El token se muestra una sola vez. No lo imprima por Serial ni lo comparta.
 #define DEVICE_ID    "HUB-ESP32-001"
 #define DEVICE_TOKEN "hcd_pegar_aqui_el_token"

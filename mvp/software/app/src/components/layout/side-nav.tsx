@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowLeftRight, CalendarCheck, ChartColumn, CircleHelp, History, House, KeyRound, Layers, Menu, Radio, Recycle, Scale, Settings, Trash2, Truck, Users, X, type LucideIcon } from "lucide-react";
+import { ArrowLeftRight, CalendarCheck, ChartColumn, CircleHelp, History, House, KeyRound, Layers, Lightbulb, Menu, Radio, Recycle, Scale, Settings, Trash2, Truck, Users, X, type LucideIcon } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
@@ -11,11 +11,12 @@ const ICONS = {
   registro: Scale,
   movimientos: ArrowLeftRight,
   tablero: ChartColumn,
+  oportunidades: Lightbulb,
   historial: History,
   lotes: Layers,
   calendarios: CalendarCheck,
   contenedores: Trash2,
-  sensores: Radio,
+  dispositivos: Radio,
   destinos: Truck,
   usuarios: Users,
   ayuda: CircleHelp,

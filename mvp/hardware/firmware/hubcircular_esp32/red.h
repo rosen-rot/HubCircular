@@ -16,7 +16,7 @@ bool redHoraIso(char* out, size_t len);
 void redNuevoUuid(char out[37]);
 
 // Resultado de un envío:
-//   >= 200 y < 300 → aceptado (202) o duplicado ya guardado (200)
+//   >= 200 y < 300 → aceptado (202; con duplicate:true si ya estaba guardado)
 //   429 / >= 500 / <= 0 (sin red, DNS, TLS, tiempo agotado) → conviene REINTENTAR con el mismo mensaje
 //   otros 4xx → el servidor lo rechazó; reintentar no sirve (revisar token, deviceId o datos)
 int redEnviarLectura(const String& json, const char* messageId);

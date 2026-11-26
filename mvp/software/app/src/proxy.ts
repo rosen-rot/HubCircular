@@ -20,8 +20,8 @@ export function proxy(request: NextRequest) {
   });
 
   const { pathname, search } = request.nextUrl;
-  // /api/iot/: el ESP32 se autentica con su token Bearer (no tiene cookie); cada ruta valida su propia credencial.
-  const isPublic = pathname === "/login" || pathname.startsWith("/api/iot/") || pathname.startsWith("/_next") || pathname === "/favicon.ico";
+  // /api/iot/ autentica con token de dispositivo (Authorization: Bearer) en el propio endpoint, no con cookie de sesión.
+  const isPublic = pathname === "/login" || pathname.startsWith("/_next") || pathname === "/favicon.ico" || pathname.startsWith("/api/iot/");
   if (isPublic || request.cookies.has("hc_session")) {
     // Next lee el nonce de la CSP de la solicitud y lo aplica a sus scripts.
     const forwarded = new Headers(request.headers);

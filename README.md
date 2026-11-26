@@ -9,7 +9,7 @@
 ![Desafío](https://img.shields.io/badge/Desaf%C3%ADo-04-2e7d32?style=for-the-badge)
 ![Área](https://img.shields.io/badge/%C3%81rea-Sostenibilidad-43a047?style=for-the-badge)
 ![Curso](https://img.shields.io/badge/Capstone-Intermedio-1565c0?style=for-the-badge)
-![Bitácora](https://img.shields.io/badge/Bit%C3%A1cora-Semana%2014-f9a825?style=for-the-badge)
+![Bitácora](https://img.shields.io/badge/Bit%C3%A1cora-Semana%2015-f9a825?style=for-the-badge)
 
 <img src="bitácora/semana_7/assets/foto_grupal.jpeg" alt="Equipo HubCircular en la visita al Hub Providencia" width="720">
 
@@ -54,8 +54,8 @@ En la [semana 7](bitácora/semana_7/README.md) el equipo visitó el Hub Providen
 
 | Parte | Tecnología | Responsable | Estado |
 | :-- | :-- | :-- | :-- |
-| [MVP del Software](mvp/software/README.md) | Python + FastAPI + SQLite, servidor local | Carlos Concha | ✅ Definido |
-| [MVP del Hardware](mvp/hardware/README.md) | Celda de carga + HX711 + ESP32 + HC-SR04 | Vicente Lizama | ✅ Definido |
+| [MVP del Software](mvp/software/README.md) | Plataforma web Next.js + PostgreSQL (Supabase) | Carlos Concha | 🟡 Plataforma construida y probada con datos ficticios; falta recibir lecturas del ESP32 |
+| [MVP del Hardware](mvp/hardware/README.md) | Celda de carga + HX711 + ESP32 + HC-SR04 | Vicente Lizama | 🟡 Componentes recibidos; montaje y pruebas pendientes |
 
 ➡️ [Contrato entre hardware y software (API de lecturas)](mvp/software/3_api_datos.md) · [Conexiones](mvp/hardware/3_conexiones.md) · Validación: [software](mvp/software/7_validacion.md) / [hardware](mvp/hardware/7_validacion.md)
 
@@ -85,6 +85,7 @@ En la [semana 7](bitácora/semana_7/README.md) el equipo visitó el Hub Providen
 | 12 | [Sin clases y práctica del pitch](bitácora/semana_12/README.md) | [Resumen](bitácora/semana_12/1_resumen_semana.md) · [Práctica del pitch](bitácora/semana_12/2_practica_pitch.md) |
 | 13 | [Desafío del marshmallow y presentación del pitch](bitácora/semana_13/README.md) | [Resumen](bitácora/semana_13/1_resumen_sesion.md) · [Fotografía](bitácora/semana_13/2_fotografia_equipo.md) · [Retroalimentación de informes](bitácora/semana_13/3_retroalimentacion_informes.md) · [Calendario Unidad 3](bitácora/semana_13/4_calendario_unidad3.md) · [Desafío del marshmallow](bitácora/semana_13/5_desafio_marshmallow.md) · [Reflexión del equipo](bitácora/semana_13/6_reflexion_equipo.md) · [Conexión con el proyecto](bitácora/semana_13/7_conexion_proyecto.md) · [Presentación del pitch](bitácora/semana_13/8_presentacion_pitch.md) · [Actividad en grupo](bitácora/semana_13/9_actividad_grupo.md) |
 | 14 | [Camino a la feria y Egg Drop Challenge](bitácora/semana_14/README.md) | [Resumen](bitácora/semana_14/1_resumen_sesion.md) · [Fotografía](bitácora/semana_14/2_fotografia_equipo.md) · [Anuncios: feria, informe y cierre](bitácora/semana_14/3_anuncios_feria.md) · [Avance del equipo](bitácora/semana_14/4_avance_equipo.md) · [Materiales faltantes](bitácora/semana_14/5_materiales_faltantes.md) · [Egg Drop Challenge](bitácora/semana_14/6_egg_drop_challenge.md) · [Registro de evidencia](bitácora/semana_14/7_registro_evidencia.md) · [Reflexión del equipo](bitácora/semana_14/8_reflexion_equipo.md) · [Conexión con el proyecto](bitácora/semana_14/9_conexion_proyecto.md) · [Pitch de la feria](bitácora/semana_14/10_pitch_feria.md) |
+| 15 | [Segundo avance y tutorías por equipo](bitácora/semana_15/README.md) | [Resumen](bitácora/semana_15/1_resumen_sesion.md) · [Fotografía](bitácora/semana_15/2_fotografia_equipo.md) · [Avance del equipo](bitácora/semana_15/3_avance_equipo.md) · [Protocolo, datos y fallas](bitácora/semana_15/4_protocolo_datos_fallas.md) · [Plan del tercer avance](bitácora/semana_15/5_plan_tercer_avance.md) · [Roles y stand](bitácora/semana_15/6_roles_stand_feria.md) · [Reflexión del equipo](bitácora/semana_15/7_reflexion_equipo.md) |
 
 ## 🗂️ Estructura del Repositorio
 
@@ -92,6 +93,7 @@ En la [semana 7](bitácora/semana_7/README.md) el equipo visitó el Hub Providen
 mvp/
   README.md         ← objetivo del MVP y relación hardware–software
   software/         ← MVP del software (API, reglas, dashboard, pruebas)
+    app/            ← código de la plataforma web (Next.js)
   hardware/         ← MVP del hardware (conexiones, firmware, montaje, calibración)
 bitácora/
   semana_N/
